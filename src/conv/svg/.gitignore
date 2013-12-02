@@ -1,0 +1,9 @@
+.deps
+.libs
+*.lo
+*.la
+Makefile
+Makefile.in
+pmd2svg
+pmd2svg.exe
+*.rc
