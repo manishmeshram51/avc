@@ -13,8 +13,6 @@ configure
 depcomp
 install-sh
 libtool
-libpagemaker.spec
-libpagemaker-zip
 ltmain.sh
 m4
 missing
