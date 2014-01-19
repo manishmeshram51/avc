@@ -6,3 +6,9 @@ libwpd and the rest of Fridrich's libraries. Please run
     astyle --options=astyle.options \*.cpp \*.h
 
 before committing.
+
+
+= Reverse-Engineering notes =
+
+Some notes on the format of the Pagemaker files can be found in the NOTES file. Included are the names of the test files
+that exhibit the behavior.
