@@ -21,7 +21,7 @@ void checkStream(const RVNGInputStreamPtr &input)
     throw EndOfStreamException();
 }
 
-struct SeekFailedException {};
+struct SeekFailedException : public PMDStreamException {};
 
 }
 

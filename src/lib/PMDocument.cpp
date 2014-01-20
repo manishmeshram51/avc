@@ -9,14 +9,16 @@
 
 #include <libpagemaker/libpagemaker.h>
 
+#include "PMDCollector.h"
+#include "PMDParser.h"
+
 namespace libpagemaker
 {
 
-bool PMDocument::isSupported(librevenge::RVNGInputStream *input) try
+bool PMDocument::isSupported(librevenge::RVNGInputStream * /*input*/) try
 {
-  // TODO: implement me
-  (void) input;
-  return false;
+  // TODO: Fix this.
+  return true;
 }
 catch (...)
 {
@@ -25,10 +27,10 @@ catch (...)
 
 bool PMDocument::parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter) try
 {
-  // TODO: implement me
-  (void) input;
-  (void) painter;
-  return false;
+  PMDCollector collector;
+  PMDParser(input, &collector).parse();
+  collector.draw(painter);
+  return true;
 }
 catch (...)
 {

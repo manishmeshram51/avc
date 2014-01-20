@@ -10,9 +10,7 @@
 #ifndef __LIBPAGEMAKER_UTILS_H__
 #define __LIBPAGEMAKER_UTILS_H__
 
-#ifdef DEBUG
 #include <cstdio>
-#endif
 
 #include <string>
 
@@ -72,12 +70,17 @@ typedef __int64 int64_t;
 #define PMD_DEBUG(M)
 #endif
 
+// Log Warnings and Errors, even for a release compile.
+#define PMD_WARN_MSG(M) std::fprintf(stderr, "PageMaker [WARN] %15s:%d: ", __FILE__, __LINE__); std::fprintf(stderr, M)
+#define PMD_ERR_MSG(M) std::fprintf(stderr, "PageMaker [ERROR] %15s:%d: ", __FILE__, __LINE__); std::fprintf(stderr, M)
+
+
 #define PMD_NUM_ELEMENTS(array) sizeof(array)/sizeof(array[0])
 
 namespace libpagemaker
 {
 
-typedef boost::shared_ptr<librevenge::RVNGInputStream> RVNGInputStreamPtr;
+typedef librevenge::RVNGInputStream* RVNGInputStreamPtr;
 
 struct PMDDummyDeleter
 {
@@ -98,7 +101,12 @@ void seekRelative(const RVNGInputStreamPtr &input, long pos);
 
 unsigned long getLength(const RVNGInputStreamPtr &input);
 
-struct EndOfStreamException
+struct PMDStreamException
+{
+  virtual ~PMDStreamException() { }
+};
+
+struct EndOfStreamException : public PMDStreamException
 {
   EndOfStreamException();
 };

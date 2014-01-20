@@ -20,7 +20,15 @@ libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_SOURCES = \
 	PMDInternalStream.cpp \
 	PMDInternalStream.h \
 	libpagemaker_utils.cpp \
-	libpagemaker_utils.h
+	libpagemaker_utils.h \
+	PMDParser.cpp \
+	PMDParser.h \
+	PMDCollector.cpp \
+	PMDCollector.h \
+	PMDExceptions.h \
+	PMDRecord.h \
+	offsets.h \
+	constants.h
 
 if OS_WIN32
 
