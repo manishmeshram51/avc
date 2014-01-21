@@ -2,8 +2,8 @@
 #include <stdint.h>
 
 /* PMD record types */
-const uint16_t PAGE = 0x05;
-const uint16_t GLOBAL_INFO = 0x18;
+const uint16_t PAGE = 0x0500;
+const uint16_t GLOBAL_INFO = 0x1800;
 
 /* Various constants */
 const uint16_t ENDIANNESS_MARKER = 0x99FF;

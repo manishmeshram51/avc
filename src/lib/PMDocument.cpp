@@ -26,11 +26,11 @@ catch (...)
   return false;
 }
 
-bool PMDocument::parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter) try
+bool PMDocument::parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter) 
 {
   PMDCollector collector;
   PMD_DEBUG_MSG(("About to start parsing...\n"));
-  PMDParser(input, &collector).parse();
+  PMDParser(input->getSubStreamByName("PageMaker"), &collector).parse();
   PMD_DEBUG_MSG(("About to start drawing...\n"));
   collector.draw(painter);
   return true;

@@ -126,7 +126,7 @@ unsigned PMDParser::readNextRecordFromTableOfContents(unsigned seqNum, bool seek
   boost::optional<unsigned> maybeRecordSize = getRecordSize(recType);
   if (!maybeRecordSize.is_initialized())
   {
-    PMD_WARN_MSG("Found an unknown record type! Skipping it...");
+    PMD_WARN_MSG("Found an unknown record type! Skipping it...\n");
     return numRecs;
   }
   unsigned recordSize = maybeRecordSize.get();
@@ -154,7 +154,7 @@ void PMDParser::parseTableOfContents(uint32_t offset, uint16_t length) try
 }
 catch ( ... )
 {
-  PMD_ERR_MSG("Error reading the table of contents! Some or all records will be missing.");
+  PMD_ERR_MSG("Error reading the table of contents! Some or all records will be missing.\n");
 }
 
 void PMDParser::parse()
