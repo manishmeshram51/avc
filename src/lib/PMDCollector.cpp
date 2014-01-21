@@ -3,6 +3,8 @@
 #include <string>
 #include <iostream>
 
+#include "libpagemaker_utils.h"
+
 namespace libpagemaker
 {
 PMDCollector::PMDCollector() :
@@ -24,11 +26,33 @@ void PMDCollector::addPage()
 {
   m_pages.push_back( (PMDPage()) );
 }
+ 
+void PMDCollector::writePage(const PMDPage & /*page*/, librevenge::RVNGDrawingInterface *painter) const
+{
+  librevenge::RVNGPropertyList pageProps;
+  if (m_pageWidth.is_initialized())
+  {
+    double widthInInches = pmdUnitsToInches(m_pageWidth.get());
+    pageProps.insert("svg:width", widthInInches);
+  }
+  if (m_pageHeight.is_initialized())
+  {
+    double heightInInches = pmdUnitsToInches(m_pageHeight.get());
+    pageProps.insert("svg:height", heightInInches);
+  }
+  painter->startPage(pageProps);
+  painter->endPage();
+}
 
 /* Output functions */
-void PMDCollector::draw(librevenge::RVNGDrawingInterface* /* painter */) const
+void PMDCollector::draw(librevenge::RVNGDrawingInterface *painter) const
 {
-  std::cout << getJsonRepresentation() << std::endl;
+  painter->startDocument(librevenge::RVNGPropertyList());
+  for (unsigned i = 0; i < m_pages.size(); ++i)
+  {
+    writePage(m_pages[i], painter);
+  }
+  painter->endDocument();
 }
 
 std::string PMDCollector::getJsonRepresentation() const

@@ -31,6 +31,8 @@ class PMDCollector
 
   std::vector<PMDPage> m_pages;
 
+  void writePage(const PMDPage &page, librevenge::RVNGDrawingInterface *painter) const;
+
 public:
   PMDCollector();
 
