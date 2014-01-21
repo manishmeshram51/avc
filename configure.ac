@@ -51,10 +51,23 @@ AC_SUBST([REVENGE_LIBS])
 AC_CHECK_HEADERS(
         boost/shared_ptr.hpp,
     [],
-    [AC_MSG_ERROR([Required boost headers not found.])],
+    [AC_MSG_ERROR([Required header boost/shared_ptr.hpp not found.])],
     []
 )
 
+AC_CHECK_HEADERS(
+        boost/optional.hpp,
+    [],
+    [AC_MSG_ERROR([Required header boost/optional.hpp not found.])],
+    []
+)
+
+AC_CHECK_HEADERS(
+        boost/format.hpp,
+    [],
+    [AC_MSG_ERROR([Required header boost/format.hpp not found.])],
+    []
+)
 # =================================
 # Libtool/Version Makefile settings
 # =================================
