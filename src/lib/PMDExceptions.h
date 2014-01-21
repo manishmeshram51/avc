@@ -8,7 +8,7 @@ struct PMDParseException
 {
   std::string m_message;
   PMDParseException(std::string message)
-   : m_message(message)
+    : m_message(message)
   { }
   virtual ~PMDParseException() { }
 };

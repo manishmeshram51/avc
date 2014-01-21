@@ -80,7 +80,7 @@ typedef __int64 int64_t;
 namespace libpagemaker
 {
 
-typedef librevenge::RVNGInputStream* RVNGInputStreamPtr;
+typedef librevenge::RVNGInputStream *RVNGInputStreamPtr;
 
 struct PMDDummyDeleter
 {

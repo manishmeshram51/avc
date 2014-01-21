@@ -13,7 +13,7 @@ struct PMDRecord
   uint16_t m_recordType;
   uint32_t m_offset;
   unsigned m_seqNum;
-  
+
   PMDRecord(uint16_t recordType, uint32_t offset, unsigned seqNum)
     : m_recordType(recordType), m_offset(offset), m_seqNum(seqNum)
   { }

@@ -24,9 +24,9 @@ void PMDCollector::setPageHeight(int pageHeight)
 
 void PMDCollector::addPage()
 {
-  m_pages.push_back( (PMDPage()) );
+  m_pages.push_back((PMDPage()));
 }
- 
+
 void PMDCollector::writePage(const PMDPage & /*page*/, librevenge::RVNGDrawingInterface *painter) const
 {
   librevenge::RVNGPropertyList pageProps;

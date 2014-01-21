@@ -25,8 +25,8 @@ class PMDParser
   void parseTableOfContents(uint32_t offset, uint16_t length);
 
   /* Prevent copy and assignment */
-  PMDParser &operator=(const PMDParser&);
-  PMDParser(const PMDParser&);
+  PMDParser &operator=(const PMDParser &);
+  PMDParser(const PMDParser &);
 public:
   PMDParser(librevenge::RVNGInputStream *, PMDCollector *);
   void parse();

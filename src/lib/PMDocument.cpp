@@ -26,7 +26,7 @@ catch (...)
   return false;
 }
 
-bool PMDocument::parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter) 
+bool PMDocument::parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter)
 {
   PMDCollector collector;
   PMD_DEBUG_MSG(("About to start parsing...\n"));
