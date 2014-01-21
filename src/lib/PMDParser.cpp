@@ -71,14 +71,17 @@ void PMDParser::parsePages(const std::vector<PMDRecord> &recordVector)
 
 void PMDParser::parseHeader(uint32_t *tocOffset, uint16_t *tocLength)
 {
+  PMD_DEBUG_MSG(("[Header] Parsing header...\n"));
   seek(m_input, ENDIANNESS_MARKER_OFFSET);
   uint16_t endiannessMarker = readU16(m_input, false);
   if (endiannessMarker == ENDIANNESS_MARKER)
   {
+    PMD_DEBUG_MSG(("[Header] File is little-endian.\n"));
     m_bigEndian = false;
   }
   else if (endiannessMarker == WARPED_ENDIANNESS_MARKER)
   {
+    PMD_DEBUG_MSG(("[Header] File is big-endian.\n"));
     m_bigEndian = true;
   }
   else
@@ -89,6 +92,7 @@ void PMDParser::parseHeader(uint32_t *tocOffset, uint16_t *tocLength)
   {
     seek(m_input, TABLE_OF_CONTENTS_LENGTH_OFFSET);
     *tocLength = readU32(m_input, m_bigEndian);
+    PMD_DEBUG_MSG(("[Header] TOC length is %d\n", *tocLength));
   }
   catch (PMDStreamException)
   {
@@ -98,6 +102,7 @@ void PMDParser::parseHeader(uint32_t *tocOffset, uint16_t *tocLength)
   {
     seek(m_input, TABLE_OF_CONTENTS_OFFSET_OFFSET);
     *tocOffset = readU16(m_input, m_bigEndian);
+    PMD_DEBUG_MSG(("[Header] TOC offset is 0x%x\n", *tocOffset));
   }
   catch (PMDStreamException)
   {
@@ -136,10 +141,15 @@ unsigned PMDParser::readNextRecordFromTableOfContents(unsigned seqNum, bool seek
 void PMDParser::parseTableOfContents(uint32_t offset, uint16_t length) try
 {
   unsigned currentSeqNum = 0;
+  PMD_DEBUG_MSG(("[TOC] Seeking to offset 0x%x to read ToC\n", offset));
   seek(m_input, offset);
+  PMD_DEBUG_MSG(("[TOC] entries to read: %d\n", length));
   for (unsigned i = 0; i < length; ++i)
   {
-    currentSeqNum += readNextRecordFromTableOfContents(currentSeqNum, i != length);
+    unsigned numRead = readNextRecordFromTableOfContents(currentSeqNum, i != length);
+    currentSeqNum += numRead;
+    PMD_DEBUG_MSG(("[TOC] Learned about %d TMD records from ToC entry %d; currentSeqNum is now %d.\n",
+      numRead, i, currentSeqNum));
   }
 }
 catch ( ... )

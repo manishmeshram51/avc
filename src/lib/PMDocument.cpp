@@ -11,6 +11,7 @@
 
 #include "PMDCollector.h"
 #include "PMDParser.h"
+#include "libpagemaker_utils.h"
 
 namespace libpagemaker
 {
@@ -28,13 +29,11 @@ catch (...)
 bool PMDocument::parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter) try
 {
   PMDCollector collector;
+  PMD_DEBUG_MSG(("About to start parsing...\n"));
   PMDParser(input, &collector).parse();
+  PMD_DEBUG_MSG(("About to start drawing...\n"));
   collector.draw(painter);
   return true;
-}
-catch (...)
-{
-  return false;
 }
 
 }
