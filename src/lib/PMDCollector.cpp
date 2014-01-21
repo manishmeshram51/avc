@@ -1,4 +1,7 @@
 #include "PMDCollector.h"
+#include <sstream>
+#include <string>
+#include <iostream>
 
 namespace libpagemaker
 {
@@ -25,11 +28,27 @@ void PMDCollector::addPage()
 /* Output functions */
 void PMDCollector::draw(librevenge::RVNGDrawingInterface* /* painter */) const
 {
+  std::cout << getJsonRepresentation() << std::endl;
 }
 
 std::string PMDCollector::getJsonRepresentation() const
 {
-  return "{ }";
+  std::ostringstream output;
+  output << "{\n";
+  output << "\tpages:\n\t[";
+  for (unsigned i = 0; i < m_pages.size(); ++i)
+  {
+    output << "\n\t\t{\n";
+    output << "\t\t\t\theight: " << m_pageHeight.get() << ",\n";
+    output << "\t\t\t\twidth: " << m_pageWidth.get() << "\n\t\t}";
+    if (i + 1 < m_pages.size())
+    {
+      output << ",";
+    }
+  }
+  output << "\n\t]";
+  output << "\n}";
+  return output.str();
 }
 
 }
