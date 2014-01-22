@@ -1,4 +1,7 @@
-==== GLOBAL ATTRIBUTES ====
+=== OLETOY INCONSISTENCIES ===
+* Version 6 sometimes detected erroneously.
+
+=== GLOBAL ATTRIBUTES ===
 
 * Height (in tenths of a point) at 0x3C in the first record of the entire file.
 * Width (same units) at 0x8 in the record of the first page only.
@@ -6,3 +9,9 @@
 * Pagemaker doesn't appear to remember which number was entered first. (5.pmd, 5_input_flpped.pmd)
 * This stuff doesn't care about portrait vs. landscape. (5.pmd, 5_wide.pmd) 
 * Margins don't have an effect either. (2_2_halfinch_margins.pmd)
+
+=== SHAPE ATTRIBUTES ===
+(Only tested on rectangles so far!)
+* Origin is halfway down the page in the y direction, and the left border in the x direction. Positive y is down.
+* Units are 1/20 of a point (1/1440 of an inch)
+* Offset is 0x06 for left position, then goes top, right, bottom. Each are words.
