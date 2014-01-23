@@ -12,6 +12,8 @@
 
 === SHAPE ATTRIBUTES ===
 (Only tested on rectangles so far!)
-* Origin is halfway down the page in the y direction, and the left border in the x direction. Positive y is down.
+* Origin is the center of the page, or double-sided page combo. Positive y is down.
+* Note that the first page is considered a right page, so
+  if the doc is double-sided, the origin is the left edge.
 * Units are 1/20 of a point (1/1440 of an inch)
 * Offset is 0x06 for left position, then goes top, right, bottom. Each are words.
