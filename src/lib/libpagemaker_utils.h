@@ -115,11 +115,6 @@ struct GenericException
 {
 };
 
-inline double pmdUnitsToInches(int valueInPmdUnits)
-{
-  return valueInPmdUnits / 720.;
-}
-
 }
 
 #endif // __LIBPAGEMAKER_UTILS_H__

@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 #include <librevenge/librevenge.h>
 #include <boost/format.hpp>
 namespace libpagemaker
@@ -31,6 +32,10 @@ struct CorruptRecordException : public PMDParseException
     : PMDParseException((boost::format("Corrupt record: %d\nError message: %s\n") % recordType % message).str()),
       m_recordType(recordType)
   { }
+};
+
+struct EmptyLineSetException
+{
 };
 
 }

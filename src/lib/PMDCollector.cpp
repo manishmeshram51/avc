@@ -12,12 +12,12 @@ PMDCollector::PMDCollector() :
 { }
 
 /* State-mutating functions */
-void PMDCollector::setPageWidth(int pageWidth)
+void PMDCollector::setPageWidth(PMDPageUnit pageWidth)
 {
   m_pageWidth = pageWidth;
 }
 
-void PMDCollector::setPageHeight(int pageHeight)
+void PMDCollector::setPageHeight(PMDPageUnit pageHeight)
 {
   m_pageHeight = pageHeight;
 }
@@ -32,12 +32,12 @@ void PMDCollector::writePage(const PMDPage & /*page*/, librevenge::RVNGDrawingIn
   librevenge::RVNGPropertyList pageProps;
   if (m_pageWidth.is_initialized())
   {
-    double widthInInches = pmdUnitsToInches(m_pageWidth.get());
+    double widthInInches = m_pageWidth.get().toInches();
     pageProps.insert("svg:width", widthInInches);
   }
   if (m_pageHeight.is_initialized())
   {
-    double heightInInches = pmdUnitsToInches(m_pageHeight.get());
+    double heightInInches = m_pageHeight.get().toInches();
     pageProps.insert("svg:height", heightInInches);
   }
   painter->startPage(pageProps);
@@ -47,6 +47,7 @@ void PMDCollector::writePage(const PMDPage & /*page*/, librevenge::RVNGDrawingIn
 /* Output functions */
 void PMDCollector::draw(librevenge::RVNGDrawingInterface *painter) const
 {
+  std::cout << "hi" << std::endl;
   painter->startDocument(librevenge::RVNGPropertyList());
   for (unsigned i = 0; i < m_pages.size(); ++i)
   {
@@ -63,8 +64,8 @@ std::string PMDCollector::getJsonRepresentation() const
   for (unsigned i = 0; i < m_pages.size(); ++i)
   {
     output << "\n\t\t{\n";
-    output << "\t\t\t\theight: " << m_pageHeight.get() << ",\n";
-    output << "\t\t\t\twidth: " << m_pageWidth.get() << "\n\t\t}";
+    output << "\t\t\t\theight: " << m_pageHeight.get().m_value << ",\n";
+    output << "\t\t\t\twidth: " << m_pageWidth.get().m_value << "\n\t\t}";
     if (i + 1 < m_pages.size())
     {
       output << ",";

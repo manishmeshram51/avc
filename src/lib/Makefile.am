@@ -28,7 +28,10 @@ libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_SOURCES = \
 	PMDExceptions.h \
 	PMDRecord.h \
 	offsets.h \
-	constants.h
+	constants.h \
+	Units.h \
+	geometry.cpp \
+	geometry.h
 
 if OS_WIN32
 

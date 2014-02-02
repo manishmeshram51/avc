@@ -8,6 +8,7 @@
 
 #include "PMDPage.h"
 #include "PMDExceptions.h"
+#include "Units.h"
 
 namespace libpagemaker
 {
@@ -23,11 +24,11 @@ namespace libpagemaker
 class PMDCollector
 {
   /*
-   * All units are in PMD internal format.
-   * From what I've seen so far, one PMD unit is 1/20 of a point (1/720 inch)
+   * Height and width in PMD page units.
+   * One PMD page unit is 1/20 of a point (1/720 inch)
    */
-  boost::optional<uint16_t> m_pageWidth;
-  boost::optional<uint16_t> m_pageHeight;
+  boost::optional<PMDPageUnit> m_pageWidth;
+  boost::optional<PMDPageUnit> m_pageHeight;
 
   std::vector<PMDPage> m_pages;
 
@@ -37,8 +38,8 @@ public:
   PMDCollector();
 
   /* State-mutating functions */
-  void setPageWidth(int);
-  void setPageHeight(int);
+  void setPageWidth(PMDPageUnit);
+  void setPageHeight(PMDPageUnit);
   void addPage();
 
   /* Output functions */
