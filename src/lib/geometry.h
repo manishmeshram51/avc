@@ -18,23 +18,64 @@ typedef Point<double> InchPoint;
 
 class PMDLineSet
 {
+public:
+  virtual std::vector<PMDShapePoint> getPoints() const = 0;
+  bool virtual getIsClosed() const = 0;
+
+  virtual ~PMDLineSet() = 0;
+};
+
+class PMDGeneralLineSet : public PMDLineSet
+{
   std::vector<PMDShapePoint> m_points;
   bool m_isClosed;
 public:
-  PMDLineSet(std::vector<PMDShapePoint> points, bool isClosed)
+  PMDGeneralLineSet(std::vector<PMDShapePoint> points, bool isClosed)
     : m_points(points), m_isClosed(isClosed)
   { }
 
-  const virtual std::vector<PMDShapePoint> &getPoints() const
-  {
-    return m_points;
-  }
   bool virtual getIsClosed() const
   {
     return m_isClosed;
   }
 
-  virtual ~PMDLineSet()
+  virtual std::vector<PMDShapePoint> getPoints() const
+  {
+    return m_points;
+  }
+
+  virtual ~PMDGeneralLineSet()
+  {
+  }
+}
+
+class PMDRectangle : public PMDLineSet
+{
+  PMDShapePoint m_topLeft;
+  PMDShapePoint m_botRight;
+public:
+  PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight)
+    : m_topLeft(topLeft), m_topRight(topRight)
+  { }
+
+  bool virtual getIsClosed() const
+  {
+    return true;
+  }
+
+  virtual std::vector<PMDShapePoint> getPoints() const
+  {
+    std::vector<PMDShapePoint> points;
+
+    points.push_back(m_topLeft);
+    points.push_back(PMDShapePoint(m_botRight.m_x, m_topLeft.m_y));
+    points.push_back(m_botRight);
+    points.push_back(PMDShapePoint(m_topLeft.m_x, m_botRight.m_y));
+
+    return points;
+  }
+
+  virtual ~PMDRectangle()
   {
   }
 };
