@@ -22,7 +22,6 @@ struct RecordNotFoundException : public PMDParseException
     : PMDParseException((boost::format("Record not found: %d") % recordType).str()),
       m_recordType(recordType)
   { }
-
   RecordNotFoundException(uint16_t recordType, uint16_t seqNum)
     : PMDParseException((boost::format("Record of type %d not found at seqNum %d") % recordType % seqNum).str()),
       m_recordType(recordType)

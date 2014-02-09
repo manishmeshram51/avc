@@ -55,9 +55,6 @@ public:
   /* State-mutating functions */
   void setPageWidth(PMDPageUnit);
   void setPageHeight(PMDPageUnit);
-  void setDoubleSided(bool);
-  void addShapeToPage(unsigned pageID, boost::shared_ptr<PMDLineSet> shape);
-
   unsigned addPage();
 
   /* Output functions */
