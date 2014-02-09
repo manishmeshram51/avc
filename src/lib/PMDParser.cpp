@@ -14,14 +14,27 @@
 namespace libpagemaker
 {
 PMDParser::PMDParser(librevenge::RVNGInputStream *input, PMDCollector *collector)
-  : m_input(input), m_collector(collector), m_records(), m_bigEndian(false)
+  : m_input(input), m_collector(collector), m_records(), m_bigEndian(false),
+    m_recordsInOrder()
 { }
 
 template <typename T> T tryReadRecordAt(librevenge::RVNGInputStream *input,
-                                        bool bigEndian, PMDRecord record, uint32_t offsetWithinRecord, const std::string &errorMsg)
+                                        bool bigEndian, PMDRecordContainer container,
+                                        uint16_t recordIndex,
+                                        uint32_t offsetWithinRecord, const std::string &errorMsg)
 {
   try
   {
+    uint32_t recordOffset = container.m_offset;
+    if (recordIndex > 0)
+    {
+      boost::optional<unsigned> sizePerRecord = getRecordSize(container.m_recordTYpe);
+      if (!sizePerRecord.is_initialized())
+      {
+        throw UnknownRecordSizeException(container.m_recordType);
+      }
+      recordOffset += sizePerRecord.get() * recordIndex;
+    }
     seek(input, record.m_offset + offsetWithinRecord);
     switch (sizeof(T))
     {
@@ -43,28 +56,21 @@ template <typename T> T tryReadRecordAt(librevenge::RVNGInputStream *input,
   throw CorruptRecordException(record.m_recordType, errorMsg);
 }
 
-void PMDParser::parseGlobalInfo(const std::vector<PMDRecord> &recordVector)
+void PMDParser::parseGlobalInfo(PMDRecordContainer container)
 {
-  const PMDRecord &record = recordVector.at(0);
-
-  uint16_t pageHeight = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, record, PAGE_HEIGHT_OFFSET,
-                        "Can't find page height in global attributes record.");
+  uint16_t pageHeight = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, 0
+                        PAGE_HEIGHT_OFFSET, "Can't find page height in global attributes record.");
 
   m_collector->setPageHeight(pageHeight);
 }
 
-void PMDParser::parsePages(const std::vector<PMDRecord> &recordVector)
+void PMDParser::parsePages(PMDRecordContainer container)
 {
-  for (unsigned i = 0; i < recordVector.size(); ++i)
+  uint16_t pageWidth = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, record, 0, PAGE_WIDTH_OFFSET,
+                       "Can't find page width in first page record.");
+  m_collector->setPageWidth(pageWidth);
+  for (unsigned i = 0; i < container.m_numRecords; ++i)
   {
-    const PMDRecord &record = recordVector[i];
-    /* The global height attribute is kept in the first page. */
-    if (i == 0)
-    {
-      uint16_t pageWidth = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, record, PAGE_WIDTH_OFFSET,
-                           "Can't find page width in first page record.");
-      m_collector->setPageWidth(pageWidth);
-    }
     m_collector->addPage();
   }
 }
@@ -110,7 +116,7 @@ void PMDParser::parseHeader(uint32_t *tocOffset, uint16_t *tocLength)
   }
 }
 
-unsigned PMDParser::readNextRecordFromTableOfContents(unsigned seqNum, bool seekToNext)
+void PMDParser::readNextRecordFromTableOfContents(unsigned seqNum, bool seekToNext)
 {
   long currentPosition = m_input->tell();
 
@@ -123,33 +129,21 @@ unsigned PMDParser::readNextRecordFromTableOfContents(unsigned seqNum, bool seek
     seek(m_input, currentPosition + 16);
   }
 
-  boost::optional<unsigned> maybeRecordSize = getRecordSize(recType);
-  if (!maybeRecordSize.is_initialized())
-  {
-    PMD_WARN_MSG("Found an unknown record type! Skipping it...\n");
-    return numRecs;
-  }
-  unsigned recordSize = maybeRecordSize.get();
-
-  for (unsigned i = 0; i < numRecs; ++i)
-  {
-    m_records[recType].push_back(PMDRecord(recType, offset + i * recordSize, seqNum + i));
-  }
+  m_records[recType].push_back(PMDRecordContainer(recType, offset, numRecs, seqNum));
+  m_recordsInOrder.push_back(&(m_records[recType].back()));
   return numRecs;
 }
 
 void PMDParser::parseTableOfContents(uint32_t offset, uint16_t length) try
 {
-  unsigned currentSeqNum = 0;
   PMD_DEBUG_MSG(("[TOC] Seeking to offset 0x%x to read ToC\n", offset));
   seek(m_input, offset);
   PMD_DEBUG_MSG(("[TOC] entries to read: %d\n", length));
   for (unsigned i = 0; i < length; ++i)
   {
     unsigned numRead = readNextRecordFromTableOfContents(currentSeqNum, i != length);
-    currentSeqNum += numRead;
-    PMD_DEBUG_MSG(("[TOC] Learned about %d TMD records from ToC entry %d; currentSeqNum is now %d.\n",
-                   numRead, i, currentSeqNum));
+    PMD_DEBUG_MSG(("[TOC] Learned about %d TMD records from ToC entry %d.\n",
+                   numRead, i));
   }
 }
 catch (...)
@@ -164,13 +158,13 @@ void PMDParser::parse()
   parseHeader(&tocOffset, &tocLength);
   parseTableOfContents(tocOffset, tocLength);
 
-  typedef std::map<uint16_t, std::vector<PMDRecord> >::iterator RecIter;
+  typedef std::map<uint16_t, std::vector<PMDRecordContainer> >::iterator RecIter;
 
   RecIter i = m_records.find(GLOBAL_INFO);
   if (i != m_records.end()
       && !(i->second.empty()))
   {
-    parseGlobalInfo(i->second);
+    parseGlobalInfo(i->second[0]);
   }
   else
   {
@@ -180,7 +174,7 @@ void PMDParser::parse()
   if (i != m_records.end()
       && !(i->second.empty()))
   {
-    parsePages(i->second);
+    parsePages(i->second[0]);
   }
   else
   {

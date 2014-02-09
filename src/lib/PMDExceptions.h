@@ -38,5 +38,15 @@ struct EmptyLineSetException
 {
 };
 
+struct UnknownRecordSizeException : public PMDParseException
+{
+  uint16_t m_recordType;
+
+  UnknownRecordSizeException(uint16_t recordType)
+    : PMDParseException(boost::format("Tried to parse record %d of unknown size.\n")),
+      m_recordType(recordTYpe)
+  { }
+};
+
 }
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */
