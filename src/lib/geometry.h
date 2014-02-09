@@ -56,7 +56,7 @@ public:
   virtual ~PMDGeneralLineSet()
   {
   }
-}
+};
 
 class PMDRectangle : public PMDLineSet
 {
@@ -64,7 +64,7 @@ class PMDRectangle : public PMDLineSet
   PMDShapePoint m_botRight;
 public:
   PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight)
-    : m_topLeft(topLeft), m_topRight(topRight)
+    : m_topLeft(topLeft), m_botRight(botRight)
   { }
 
   bool virtual getIsClosed() const
