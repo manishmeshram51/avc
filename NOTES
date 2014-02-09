@@ -1,5 +1,5 @@
 === OLETOY INCONSISTENCIES ===
-* Version 6 sometimes detected erroneously.
+ Version 6 sometimes detected erroneously.
 
 === GLOBAL ATTRIBUTES ===
 
@@ -11,9 +11,17 @@
 * Margins don't have an effect either. (2_2_halfinch_margins.pmd)
 
 === SHAPE ATTRIBUTES ===
-(Only tested on rectangles so far!)
 * Origin is the center of the page, or double-sided page combo. Positive y is down.
 * Note that the first page is considered a right page, so
   if the doc is double-sided, the origin is the left edge.
 * Units are 1/20 of a point (1/1440 of an inch)
 * Offset is 0x06 for left position, then goes top, right, bottom. Each are words.
+* Offset 0x00 determines type of shape (0x04: rectangle; 0x0c: polygon)
+==== POLYGONS ====
+* Offset 0x2E is the seqNum of a line set (=record type 0x11)
+* Offset 0x38 is 0x3 if the polygon is closed, 0x1 if it is left open. (I think... haven't tested this thoroughly yet)
+
+=== LINE SETS (0x11) ===
+* Points are x, y, x, y, ...
+* Each value in the above is a word (So 4 bytes total per point)
+* Origin and units from "Shape Attributes" above still apply.

@@ -22,7 +22,7 @@ void PMDCollector::setPageHeight(PMDPageUnit pageHeight)
   m_pageHeight = pageHeight;
 }
 
-void PMDCollector::addPage()
+unsigned PMDCollector::addPage()
 {
   m_pages.push_back((PMDPage()));
 }

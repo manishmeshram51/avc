@@ -3,6 +3,7 @@
 #include <vector>
 #include <librevenge/librevenge.h>
 #include <boost/optional.hpp>
+#include <boost/format.hpp>
 #include "PMDRecord.h"
 #include "PMDParser.h"
 #include "PMDCollector.h"
@@ -18,9 +19,22 @@ PMDParser::PMDParser(librevenge::RVNGInputStream *input, PMDCollector *collector
     m_recordsInOrder()
 { }
 
+PMDShapePoint tryReadPointFromRecord(librevenge::RVNGInputStream *input,
+                                     bool bigEndian, PMDRecordContainer container,
+                                     unsigned recordIndex,
+                                     uint32_t offsetWithinRecord, const std::string &errorMsg)
+{
+  PMDShapeUnit x(tryReadRecordAt(input, bigEndian, container, recordIndex, offsetWithinRecord,
+    errorMsg));
+  PMDShapeUnit y(tryReadRecordAt(input, bigEndian, container, recordIndex, offsetWithinRecord + 2,
+    errorMsg));
+  return PMDShapePoint(x, y);
+}
+
+
 template <typename T> T tryReadRecordAt(librevenge::RVNGInputStream *input,
                                         bool bigEndian, PMDRecordContainer container,
-                                        uint16_t recordIndex,
+                                        unsigned recordIndex,
                                         uint32_t offsetWithinRecord, const std::string &errorMsg)
 {
   try
@@ -64,14 +78,100 @@ void PMDParser::parseGlobalInfo(PMDRecordContainer container)
   m_collector->setPageHeight(pageHeight);
 }
 
+void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordIndex,
+                               unsigned pageID)
+{
+  PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
+    recordIndex, RECT_TOP_LEFT_OFFSET, "Can't read rectangle top-left point.");
+  PMDShapePoint botRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
+    recordIndex, RECT_BOT_RIGHT_OFFSET, "Can't read rectangle bottom-right point.");
+  
+  std::shared_ptr<PMDLineSet> newShape(new PMDRectangle(topLeft, botRight));
+  m_collector->addShapeToPage(pageID, newShape);
+}
+
+void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
+                             unsigned pageID)
+{
+  uint16_t lineSetSeqNum = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, recordIndex,
+    POLYGON_LINE_SEQNUM_OFFSET, "Can't find seqNum of line set record in polygon record.");
+  uint8_t closedMarker = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex,
+    POLYGON_CLOSED_MARKER_OFFSET, "Can't find the byte telling whether the polygon is open or closed.");
+  bool closed;
+  switch (closedMarker)
+  {
+  default:
+    PMD_ERR_MSG(
+      boost::format("Unknown value %d for polygon closed/open marker. Defaulting to closed.\n",
+        closedMarker));
+    // Intentional fall-through.
+  case POLYGON_CLOSED:
+    closed = true;
+    break;
+  case POLYGON_OPEN:
+    closed = false;
+    break;
+  }
+  
+  const PMDRecordContainer *ptrToLineSetContainer =
+    (lineSetSeqNum < m_recordsInOrder.size()) ? m_recordsInOrder[lineSetSeqNum] : NULL;
+  if (!ptrToLineSetContainer)
+  {
+    PMD_ERR_MSG(boost::format("No line set with sequence number %d\n", lineSetSeqNum));
+    return;
+  }
+  const PMDRecordContainer &lineSetContainer = *(ptrToLineSetContainer);
+  std::vector<PMDShapePoint> points(lineSetContainer.m_numRecords);
+  for (unsigned i = 0; i < lineSetContainer.m_numRecords; ++i)
+  {
+    points.push_back(m_input, m_bigEndian, container, i, 0,
+      boost::format("Couldn't read point %d from line set container at seqnum %d.\n",
+        i, lineSetSeqNum));
+  }
+  std::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed));
+  m_collector->addShapeToPage(pageID, newShape);
+}
+
+void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
+{
+  const PMDRecordContainer *ptrToContainer =
+    (seqNum < m_recordsInOrder.size()) ? m_recordsInOrder[seqNum] : NULL;
+  if (!container)
+  {
+    throw RecordNotFoundException(SHAPE, seqNum);
+  }
+  const PMDRecordContainer &container = *(m_recordsInOrder[seqNum]);
+  for (unsigned i = 0; i < container.m_numRecords; ++i)
+  {
+    uint8_t shapeType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, i,
+      SHAPE_TYPE_OFFSET, "Can't find shape type in shape.");
+    switch (shapeType)
+    {
+    case RECTANGLE_RECORD:
+      parseRectangle(container, i, pageID);
+      break;
+    case POLYGON_RECORD:
+      parsePolygon(container, i, pageID);
+      break;
+    default:
+      PMD_ERR_MSG(boost::format("Encountered shape of unknown type %d.\n", shapeType));
+      continue;
+    }
+  }
+}
+
 void PMDParser::parsePages(PMDRecordContainer container)
 {
-  uint16_t pageWidth = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, record, 0, PAGE_WIDTH_OFFSET,
+  uint16_t pageWidth = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, 0, PAGE_WIDTH_OFFSET,
                        "Can't find page width in first page record.");
   m_collector->setPageWidth(pageWidth);
   for (unsigned i = 0; i < container.m_numRecords; ++i)
   {
-    m_collector->addPage();
+    uint16_t shapesSeqNum = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, i,
+      PAGE_SHAPE_SEQNUM_OFFSET,
+      boost::format("Can't find shape record sequence number in page record at index %d", i));
+    unsigned pageID = m_collector->addPage();
+    parseShapes(shapesSeqNum, pageID);
   }
 }
 

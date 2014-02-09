@@ -30,6 +30,8 @@ inline boost::optional<unsigned> getRecordSize(uint16_t recType)
     return 2496;
   case PAGE:
     return 472;
+  case LINE_SET:
+    return 4;
   default:
     return boost::none;
   }

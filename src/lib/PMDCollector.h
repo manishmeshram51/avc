@@ -40,7 +40,7 @@ public:
   /* State-mutating functions */
   void setPageWidth(PMDPageUnit);
   void setPageHeight(PMDPageUnit);
-  void addPage();
+  unsigned addPage();
 
   /* Output functions */
   void draw(librevenge::RVNGDrawingInterface *) const;
