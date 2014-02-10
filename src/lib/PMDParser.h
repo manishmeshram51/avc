@@ -15,8 +15,8 @@ class PMDParser
   librevenge::RVNGInputStream *m_input;
   PMDCollector *m_collector;
   std::map<uint16_t, std::vector<PMDRecordContainer> > m_records;
-  std::vector<const PMDRecordContainer*> m_recordContainers;
   bool m_bigEndian;
+  std::vector<const PMDRecordContainer*> m_recordsInOrder;
 
   /* Private functions. */
   void parseGlobalInfo(PMDRecordContainer);

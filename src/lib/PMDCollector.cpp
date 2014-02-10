@@ -25,9 +25,22 @@ void PMDCollector::setPageHeight(PMDPageUnit pageHeight)
 unsigned PMDCollector::addPage()
 {
   m_pages.push_back((PMDPage()));
+  return m_pages.size() - 1;
 }
 
-void PMDCollector::writePage(const PMDPage & /*page*/, librevenge::RVNGDrawingInterface *painter) const
+void PMDCollector::addShapeToPage(unsigned pageID, boost::shared_ptr<PMDLineSet> shape)
+{
+  m_pages.at(pageID).addShape(shape);
+}
+
+void PMDCollector::paintShape(const OutputShape &shape)
+{
+
+}
+
+void PMDCollector::writePage(const PMDPage & /*page*/,
+  librevenge::RVNGDrawingInterface *painter,
+  const std::vector<boost::shared_ptr<OutputShape> > &outputShapes) const
 {
   librevenge::RVNGPropertyList pageProps;
   if (m_pageWidth.is_initialized())
@@ -41,6 +54,10 @@ void PMDCollector::writePage(const PMDPage & /*page*/, librevenge::RVNGDrawingIn
     pageProps.insert("svg:height", heightInInches);
   }
   painter->startPage(pageProps);
+  for (unsigned i = 0; i < outputShapes.size(); ++i)
+  {
+    paintShape(*(outputShapes[i]));
+  }
   painter->endPage();
 }
 
@@ -49,9 +66,13 @@ void PMDCollector::draw(librevenge::RVNGDrawingInterface *painter) const
 {
   std::cout << "hi" << std::endl;
   painter->startDocument(librevenge::RVNGPropertyList());
+
+  std::map<unsigned, std::vector<boost::shared_ptr<PMDLineSet> > > shapesByPage
+    = getRealShapesByPage();
   for (unsigned i = 0; i < m_pages.size(); ++i)
   {
-    writePage(m_pages[i], painter);
+    std::vector<boost::shared_ptr<PMDLineSet> > shapes = shapesByPage[i];
+    writePage(m_pages[i], painter, shapes);
   }
   painter->endDocument();
 }
