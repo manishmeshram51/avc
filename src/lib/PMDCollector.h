@@ -8,8 +8,6 @@
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
 
-
-#include "yaml_utils.h"
 #include "geometry.h"
 #include "PMDPage.h"
 #include "PMDExceptions.h"
@@ -55,6 +53,7 @@ public:
   /* State-mutating functions */
   void setPageWidth(PMDPageUnit);
   void setPageHeight(PMDPageUnit);
+  void addShapeToPage(unsigned pageID, boost::shared_ptr<PMDLineSet> shape);
   unsigned addPage();
 
   /* Output functions */

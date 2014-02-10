@@ -1,6 +1,9 @@
 #pragma once
 #include "geometry.h"
+<<<<<<< HEAD
 #include "yaml_utils.h"
+=======
+>>>>>>> add some stuff
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -19,23 +22,6 @@ public:
   void addShape(boost::shared_ptr<PMDLineSet> shape)
   {
     m_shapes.push_back(shape);
-  }
-
-  unsigned numShapes() const
-  {
-    return m_shapes.size();
-  }
-
-  boost::shared_ptr<const PMDLineSet> getShape(unsigned i) const
-  {
-    return m_shapes.at(i);
-  }
-
-  void emitYaml(yaml_emitter_t *emitter) const
-  {
-    yamlBeginMap(emitter);
-    yamlIndirectForeach(emitter, "shapes", m_shapes);
-    yamlEndMap(emitter);
   }
 };
 

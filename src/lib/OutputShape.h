@@ -1,6 +1,5 @@
 #pragma once
 #include "geometry.h"
-#include "PMDExceptions.h"
 #include <boost/shared_ptr.hpp>
 #include <vector>
 namespace libpagemaker
@@ -44,7 +43,7 @@ public:
   void addPoint(InchPoint point)
   {
     double x = point.m_x,
-           y = point.m_y;
+      y = point.m_y;
     if (m_points.empty())
     {
       m_left = m_right = x;
@@ -63,7 +62,7 @@ public:
 
 
 boost::shared_ptr<OutputShape> newOutputShape(
-  boost::shared_ptr<const PMDLineSet> lineSet, InchPoint translate);
+  boost::shared_ptr<PMDLineSet> lineSet);
 
 }
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

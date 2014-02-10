@@ -31,15 +31,17 @@ public:
   virtual std::vector<PMDShapePoint> getPoints() const = 0;
   bool virtual getIsClosed() const = 0;
 
-  virtual ~PMDLineSet() = 0;
+  virtual ~PMDLineSet()
+  {
+  }
 };
 
-class PMDGeneralLineSet : public PMDLineSet
+class PMDPolygon : public PMDLineSet
 {
   std::vector<PMDShapePoint> m_points;
   bool m_isClosed;
 public:
-  PMDGeneralLineSet(std::vector<PMDShapePoint> points, bool isClosed)
+  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed)
     : m_points(points), m_isClosed(isClosed)
   { }
 
@@ -53,7 +55,7 @@ public:
     return m_points;
   }
 
-  virtual ~PMDGeneralLineSet()
+  virtual ~PMDPolygon()
   {
   }
 };
