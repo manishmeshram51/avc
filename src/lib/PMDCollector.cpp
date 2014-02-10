@@ -40,34 +40,14 @@ void PMDCollector::addShapeToPage(unsigned pageID, boost::shared_ptr<PMDLineSet>
   m_pages.at(pageID).addShape(shape);
 }
 
-void PMDCollector::paintShape(const OutputShape &shape,
-                              librevenge::RVNGDrawingInterface *painter) const
+void PMDCollector::paintShape(const OutputShape &shape)
 {
-  librevenge::RVNGPropertyListVector vertices;
-  for (unsigned i = 0; i < shape.numPoints(); ++i)
-  {
-    librevenge::RVNGPropertyList vertex;
-    vertex.insert("svg:x", shape.getPoint(i).m_x);
-    vertex.insert("svg:y", shape.getPoint(i).m_y);
-    vertices.append(vertex);
-  }
-  librevenge::RVNGPropertyList points;
-  points.insert("svg:points", vertices);
-  if (shape.getIsClosed())
-  {
-    painter->drawPolygon(points);
-  }
-  else
-  {
-    painter->drawPolyline(points);
-  }
+
 }
 
-
-
 void PMDCollector::writePage(const PMDPage & /*page*/,
-                             librevenge::RVNGDrawingInterface *painter,
-                             const std::vector<boost::shared_ptr<const OutputShape> > &outputShapes) const
+  librevenge::RVNGDrawingInterface *painter,
+  const std::vector<boost::shared_ptr<OutputShape> > &outputShapes) const
 {
   librevenge::RVNGPropertyList pageProps;
   if (m_pageWidth.is_initialized())
@@ -83,7 +63,7 @@ void PMDCollector::writePage(const PMDPage & /*page*/,
   painter->startPage(pageProps);
   for (unsigned i = 0; i < outputShapes.size(); ++i)
   {
-    paintShape(*(outputShapes[i]), painter);
+    paintShape(*(outputShapes[i]));
   }
   painter->endPage();
 }
@@ -151,11 +131,11 @@ void PMDCollector::draw(librevenge::RVNGDrawingInterface *painter) const
   std::cout << "hi" << std::endl;
   painter->startDocument(librevenge::RVNGPropertyList());
 
-  std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > shapesByPage
-    = getOutputShapesByPage();
+  std::map<unsigned, std::vector<boost::shared_ptr<PMDLineSet> > > shapesByPage
+    = getRealShapesByPage();
   for (unsigned i = 0; i < m_pages.size(); ++i)
   {
-    std::vector<boost::shared_ptr<const OutputShape> > shapes = shapesByPage[i];
+    std::vector<boost::shared_ptr<PMDLineSet> > shapes = shapesByPage[i];
     writePage(m_pages[i], painter, shapes);
   }
   painter->endDocument();

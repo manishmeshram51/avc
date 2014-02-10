@@ -16,7 +16,7 @@ struct PMDRecordContainer
   unsigned m_seqNum;
   uint16_t m_numRecords;
 
-  PMDRecord(uint16_t recordType, uint32_t offset, unsigned seqNum, uint16_t numRecords)
+  PMDRecordContainer(uint16_t recordType, uint32_t offset, unsigned seqNum, uint16_t numRecords)
     : m_recordType(recordType), m_offset(offset), m_seqNum(seqNum),
       m_numRecords(numRecords)
   { }

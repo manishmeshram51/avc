@@ -11,6 +11,10 @@ const uint16_t LINE_SET = 0x1100;
 const uint8_t POLYGON_RECORD = 0x0C;
 const uint8_t RECTANGLE_RECORD = 0x04;
 
+/* Polygon flags */
+const uint8_t POLYGON_CLOSED = 0x03;
+const uint8_t POLYGON_OPEN = 0x01;
+
 /* Various constants */
 const uint16_t ENDIANNESS_MARKER = 0x99FF;
 const uint16_t WARPED_ENDIANNESS_MARKER = 0xFF99;
