@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 
+#include <map>
 #include <vector>
 #include <string>
 
@@ -11,6 +12,7 @@
 #include "PMDPage.h"
 #include "PMDExceptions.h"
 #include "Units.h"
+#include "OutputShape.h"
 
 namespace libpagemaker
 {
@@ -33,16 +35,27 @@ class PMDCollector
   boost::optional<PMDPageUnit> m_pageHeight;
 
   std::vector<PMDPage> m_pages;
+  bool m_doubleSided;
 
-  void writePage(const PMDPage &page, librevenge::RVNGDrawingInterface *painter) const;
+  void writePage(const PMDPage &,
+    librevenge::RVNGDrawingInterface *,
+    const std::vector<boost::shared_ptr<const OutputShape> > &) const;
 
+  void paintShape(const OutputShape &shape,
+    librevenge::RVNGDrawingInterface *) const;
+
+  std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > getOutputShapesByPage_OneSided() const;
+  std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > getOutputShapesByPage_TwoSided() const;
+  std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > getOutputShapesByPage() const;
 public:
   PMDCollector();
 
   /* State-mutating functions */
   void setPageWidth(PMDPageUnit);
   void setPageHeight(PMDPageUnit);
+  void setDoubleSided(bool);
   void addShapeToPage(unsigned pageID, boost::shared_ptr<PMDLineSet> shape);
+
   unsigned addPage();
 
   /* Output functions */

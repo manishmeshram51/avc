@@ -15,4 +15,5 @@ const unsigned POLYGON_LINE_SEQNUM_OFFSET = 0x2E;
 const unsigned POLYGON_CLOSED_MARKER_OFFSET = 0x38;
 
 const unsigned SHAPE_TYPE_OFFSET = 0;
+const unsigned LEFT_PAGE_RIGHT_BOUND_OFFSET = 0x3A;
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

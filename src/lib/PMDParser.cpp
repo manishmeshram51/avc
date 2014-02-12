@@ -77,6 +77,12 @@ void PMDParser::parseGlobalInfo(PMDRecordContainer container)
   uint16_t pageHeight = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, 0,
                         PAGE_HEIGHT_OFFSET, "Can't find page height in global attributes record.");
 
+  uint16_t leftPageRightBound = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, 0,
+                        LEFT_PAGE_RIGHT_BOUND_OFFSET, "Can't find the right boundary of the left page.");
+
+  bool doubleSided = (leftPageRightBound == 0);
+  m_collector->setDoubleSided(doubleSided);
+
   m_collector->setPageHeight(pageHeight);
 }
 

@@ -31,7 +31,8 @@ libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_SOURCES = \
 	constants.h \
 	Units.h \
 	geometry.cpp \
-	geometry.h
+	geometry.h \
+	OutputShape.cpp
 
 if OS_WIN32
 
