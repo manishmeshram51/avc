@@ -40,14 +40,34 @@ void PMDCollector::addShapeToPage(unsigned pageID, boost::shared_ptr<PMDLineSet>
   m_pages.at(pageID).addShape(shape);
 }
 
-void PMDCollector::paintShape(const OutputShape &shape)
+void PMDCollector::paintShape(const OutputShape &shape,
+  librevenge::RVNGDrawingInterface *painter) const
 {
-
+  librevenge::RVNGPropertyListVector vertices;
+  for (unsigned i = 0; i < shape.numPoints(); ++i)
+  {
+    librevenge::RVNGPropertyList vertex;
+    vertex.insert("svg:x", shape.getPoint(i).m_x);
+    vertex.insert("svg:y", shape.getPoint(i).m_y);
+    vertices.append(vertex);
+  }
+  librevenge::RVNGPropertyList points;
+  points.insert("svg:points", vertices);
+  if (shape.getIsClosed())
+  {
+    painter->drawPolygon(points);
+  }
+  else
+  {
+    painter->drawPolyline(points);
+  }
 }
+
+
 
 void PMDCollector::writePage(const PMDPage & /*page*/,
   librevenge::RVNGDrawingInterface *painter,
-  const std::vector<boost::shared_ptr<OutputShape> > &outputShapes) const
+  const std::vector<boost::shared_ptr<const OutputShape> > &outputShapes) const
 {
   librevenge::RVNGPropertyList pageProps;
   if (m_pageWidth.is_initialized())
@@ -63,19 +83,18 @@ void PMDCollector::writePage(const PMDPage & /*page*/,
   painter->startPage(pageProps);
   for (unsigned i = 0; i < outputShapes.size(); ++i)
   {
-    paintShape(*(outputShapes[i]));
+    paintShape(*(outputShapes[i]), painter);
   }
   painter->endPage();
 }
 
 std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > PMDCollector::getOutputShapesByPage_TwoSided()
-const
+  const
 {
   std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > toReturn;
-  double centerToEdge_x = m_pageWidth.get().toInches() / 2;
-  double centerToEdge_y = m_pageHeight.get().toInches() / 2;
-  InchPoint translateForLeftPage(centerToEdge_x * 2, centerToEdge_y);
-  InchPoint translateForRightPage(0, centerToEdge_y);
+  double centerToEdge = m_pageWidth.get().toInches() / 2;
+  InchPoint translateForLeftPage(-centerToEdge, 0);
+  InchPoint translateForRightPage(centerToEdge, 0);
   /* Iterate over the right-sided pages. */
   for (unsigned i = 0; i < m_pages.size(); i += 2)
   {
@@ -92,7 +111,7 @@ const
       if (leftPageExists)
       {
         boost::shared_ptr<const OutputShape> left = newOutputShape(page.getShape(j), translateForLeftPage);
-        if (left->getBoundingBox().first.m_x <= centerToEdge_x * 2)
+        if (left->getBoundingBox().first.m_x <= centerToEdge)
         {
           toReturn[i - 1].push_back(left);
         }
@@ -103,7 +122,7 @@ const
 }
 
 std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > PMDCollector::getOutputShapesByPage_OneSided()
-const
+  const
 {
   std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > toReturn;
   for (unsigned i = 0; i < m_pages.size(); ++i)
@@ -118,11 +137,11 @@ const
 }
 
 std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > PMDCollector::getOutputShapesByPage()
-const
+  const
 {
   return m_doubleSided ?
-         getOutputShapesByPage_TwoSided()
-         : getOutputShapesByPage_OneSided();
+      getOutputShapesByPage_TwoSided()
+    : getOutputShapesByPage_OneSided();
 }
 
 /* Output functions */
@@ -131,11 +150,11 @@ void PMDCollector::draw(librevenge::RVNGDrawingInterface *painter) const
   std::cout << "hi" << std::endl;
   painter->startDocument(librevenge::RVNGPropertyList());
 
-  std::map<unsigned, std::vector<boost::shared_ptr<PMDLineSet> > > shapesByPage
-    = getRealShapesByPage();
+  std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > shapesByPage
+    = getOutputShapesByPage();
   for (unsigned i = 0; i < m_pages.size(); ++i)
   {
-    std::vector<boost::shared_ptr<PMDLineSet> > shapes = shapesByPage[i];
+    std::vector<boost::shared_ptr<const OutputShape> > shapes = shapesByPage[i];
     writePage(m_pages[i], painter, shapes);
   }
   painter->endDocument();

@@ -1,5 +1,6 @@
 #pragma once
 #include "geometry.h"
+#include "PMDExceptions.h"
 #include <boost/shared_ptr.hpp>
 #include <vector>
 namespace libpagemaker
@@ -62,7 +63,7 @@ public:
 
 
 boost::shared_ptr<OutputShape> newOutputShape(
-  boost::shared_ptr<PMDLineSet> lineSet);
+  boost::shared_ptr<const PMDLineSet> lineSet, InchPoint translate);
 
 }
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

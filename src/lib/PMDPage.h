@@ -19,6 +19,16 @@ public:
   {
     m_shapes.push_back(shape);
   }
+
+  unsigned numShapes() const
+  {
+    return m_shapes.size();
+  }
+
+  boost::shared_ptr<const PMDLineSet> getShape(unsigned i) const
+  {
+    return m_shapes.at(i);
+  }
 };
 
 }
