@@ -38,11 +38,11 @@ class PMDCollector
   bool m_doubleSided;
 
   void writePage(const PMDPage &,
-                 librevenge::RVNGDrawingInterface *,
-                 const std::vector<boost::shared_ptr<const OutputShape> > &) const;
+    librevenge::RVNGDrawingInterface *,
+    const std::vector<boost::shared_ptr<const OutputShape> > &) const;
 
   void paintShape(const OutputShape &shape,
-                  librevenge::RVNGDrawingInterface *) const;
+    librevenge::RVNGDrawingInterface *) const;
 
   std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > getOutputShapesByPage_OneSided() const;
   std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > getOutputShapesByPage_TwoSided() const;
@@ -53,7 +53,9 @@ public:
   /* State-mutating functions */
   void setPageWidth(PMDPageUnit);
   void setPageHeight(PMDPageUnit);
+  void setDoubleSided(bool);
   void addShapeToPage(unsigned pageID, boost::shared_ptr<PMDLineSet> shape);
+
   unsigned addPage();
 
   /* Output functions */
