@@ -92,9 +92,10 @@ std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > PMDColle
   const
 {
   std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > toReturn;
-  double centerToEdge = m_pageWidth.get().toInches() / 2;
-  InchPoint translateForLeftPage(-centerToEdge, 0);
-  InchPoint translateForRightPage(centerToEdge, 0);
+  double centerToEdge_x = m_pageWidth.get().toInches() / 2;
+  double centerToEdge_y = m_pageHeight.get().toInches() / 2;
+  InchPoint translateForLeftPage(centerToEdge_x * 2, centerToEdge_y);
+  InchPoint translateForRightPage(0, centerToEdge_y);
   /* Iterate over the right-sided pages. */
   for (unsigned i = 0; i < m_pages.size(); i += 2)
   {
@@ -111,7 +112,7 @@ std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > PMDColle
       if (leftPageExists)
       {
         boost::shared_ptr<const OutputShape> left = newOutputShape(page.getShape(j), translateForLeftPage);
-        if (left->getBoundingBox().first.m_x <= centerToEdge)
+        if (left->getBoundingBox().first.m_x <= centerToEdge_x * 2)
         {
           toReturn[i - 1].push_back(left);
         }

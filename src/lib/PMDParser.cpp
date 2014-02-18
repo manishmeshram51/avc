@@ -39,7 +39,7 @@ template <typename T> T tryReadRecordAt(librevenge::RVNGInputStream *input,
       }
       recordOffset += sizePerRecord.get() * recordIndex;
     }
-    seek(input, container.m_offset + offsetWithinRecord);
+    seek(input, recordOffset + offsetWithinRecord);
     switch (sizeof(T))
     {
     case 1:
@@ -65,9 +65,9 @@ PMDShapePoint tryReadPointFromRecord(librevenge::RVNGInputStream *input,
                                      unsigned recordIndex,
                                      uint32_t offsetWithinRecord, const std::string &errorMsg)
 {
-  PMDShapeUnit x(tryReadRecordAt<uint16_t>(input, bigEndian, container, recordIndex, offsetWithinRecord,
+  PMDShapeUnit x(tryReadRecordAt<int16_t>(input, bigEndian, container, recordIndex, offsetWithinRecord,
     errorMsg));
-  PMDShapeUnit y(tryReadRecordAt<uint16_t>(input, bigEndian, container, recordIndex, offsetWithinRecord + 2,
+  PMDShapeUnit y(tryReadRecordAt<int16_t>(input, bigEndian, container, recordIndex, offsetWithinRecord + 2,
     errorMsg));
   return PMDShapePoint(x, y);
 }
@@ -120,7 +120,7 @@ void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
   }
   
   const PMDRecordContainer *ptrToLineSetContainer =
-    (lineSetSeqNum < m_recordsInOrder.size()) ? m_recordsInOrder[lineSetSeqNum] : NULL;
+    (lineSetSeqNum < m_recordsInOrder.size()) ? &(m_recordsInOrder[lineSetSeqNum]) : NULL;
   if (!ptrToLineSetContainer)
   {
     PMD_ERR_MSG("No line set with the given sequence number.\n");
@@ -130,7 +130,7 @@ void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
   std::vector<PMDShapePoint> points;
   for (unsigned i = 0; i < lineSetContainer.m_numRecords; ++i)
   {
-    points.push_back(tryReadPointFromRecord(m_input, m_bigEndian, container, i, 0,
+    points.push_back(tryReadPointFromRecord(m_input, m_bigEndian, lineSetContainer, i, 0,
       (boost::format("Couldn't read point %d from line set container at seqnum %d.\n") % i % lineSetSeqNum).str()));
   }
   boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed));
@@ -140,12 +140,12 @@ void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
 void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
 {
   const PMDRecordContainer *ptrToContainer =
-    (seqNum < m_recordsInOrder.size()) ? m_recordsInOrder[seqNum] : NULL;
+    (seqNum < m_recordsInOrder.size()) ? &(m_recordsInOrder[seqNum]) : NULL;
   if (!ptrToContainer)
   {
     throw RecordNotFoundException(SHAPE, seqNum);
   }
-  const PMDRecordContainer &container = *(m_recordsInOrder[seqNum]);
+  const PMDRecordContainer &container = *ptrToContainer;
   for (unsigned i = 0; i < container.m_numRecords; ++i)
   {
     uint8_t shapeType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, i,
@@ -234,8 +234,8 @@ unsigned PMDParser::readNextRecordFromTableOfContents(unsigned seqNum, bool seek
     seek(m_input, currentPosition + 16);
   }
 
-  m_records[recType].push_back(PMDRecordContainer(recType, offset, numRecs, seqNum));
-  m_recordsInOrder.push_back(&(m_records[recType].back()));
+  m_recordsInOrder.push_back(PMDRecordContainer(recType, offset, seqNum, numRecs));
+  m_records[recType].push_back((unsigned)(m_recordsInOrder.size() - 1));
   return numRecs;
 }
 
@@ -263,13 +263,13 @@ void PMDParser::parse()
   parseHeader(&tocOffset, &tocLength);
   parseTableOfContents(tocOffset, tocLength);
 
-  typedef std::map<uint16_t, std::vector<PMDRecordContainer> >::iterator RecIter;
+  typedef std::map<uint16_t, std::vector<unsigned> >::iterator RecIter;
 
   RecIter i = m_records.find(GLOBAL_INFO);
   if (i != m_records.end()
       && !(i->second.empty()))
   {
-    parseGlobalInfo(i->second[0]);
+    parseGlobalInfo(m_recordsInOrder[i->second[0]]);
   }
   else
   {
@@ -279,7 +279,7 @@ void PMDParser::parse()
   if (i != m_records.end()
       && !(i->second.empty()))
   {
-    parsePages(i->second[0]);
+    parsePages(m_recordsInOrder[i->second[0]]);
   }
   else
   {

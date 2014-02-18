@@ -26,6 +26,8 @@ inline boost::optional<unsigned> getRecordSize(uint16_t recType)
 {
   switch (recType)
   {
+  case SHAPE:
+    return 258;    
   case GLOBAL_INFO:
     return 2496;
   case PAGE:
