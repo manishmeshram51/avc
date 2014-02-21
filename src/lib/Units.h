@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "yaml_utils.h"
 
 namespace libpagemaker
 {
@@ -18,6 +19,11 @@ public:
   double toInches() const
   {
     return m_value / ((double)PER_INCH);
+  }
+
+  void emitYaml(yaml_emitter_t *emitter) const
+  {
+    yamlTryPutScalar(emitter, m_value);
   }
 };
 

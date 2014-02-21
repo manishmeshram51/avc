@@ -41,6 +41,8 @@ public:
     \return A value that indicates whether the parsing was successful
   */
   static bool parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter);
+
+  static bool parseToYaml(librevenge::RVNGInputStream *input);
 };
 
 } // namespace libpagemaker

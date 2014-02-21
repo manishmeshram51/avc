@@ -10,9 +10,9 @@ libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_include_HEADERS = \
 	$(top_srcdir)/inc/libpagemaker/libpagemaker.h \
 	$(top_srcdir)/inc/libpagemaker/PMDocument.h
 
-AM_CXXFLAGS = -I$(top_srcdir)/inc $(REVENGE_CFLAGS) $(REVENGE_STREAM_CFLAGS) $(DEBUG_CXXFLAGS)
+AM_CXXFLAGS = -I$(top_srcdir)/inc $(YAML_CFLAGS) $(REVENGE_CFLAGS) $(REVENGE_STREAM_CFLAGS) $(DEBUG_CXXFLAGS)
 
-libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_LIBADD  = $(REVENGE_LIBS) @LIBPMD_WIN32_RESOURCE@
+libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_LIBADD  = $(YAML_LIBS) $(REVENGE_LIBS) @LIBPMD_WIN32_RESOURCE@
 libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_DEPENDENCIES = @LIBPMD_WIN32_RESOURCE@
 libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_LDFLAGS = $(version_info) -export-dynamic -no-undefines
 libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_SOURCES = \
@@ -32,7 +32,8 @@ libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_SOURCES = \
 	Units.h \
 	geometry.cpp \
 	geometry.h \
-	OutputShape.cpp
+	OutputShape.cpp \
+	yaml_utils.cpp
 
 if OS_WIN32
 

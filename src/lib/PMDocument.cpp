@@ -7,8 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <iostream>
-#include <yaml-cpp/yaml.h>
+#include <cstdio>
 
 #include <libpagemaker/libpagemaker.h>
 
@@ -16,6 +15,7 @@
 
 #include "PMDCollector.h"
 #include "PMDParser.h"
+#include "yaml_utils.h"
 #include "libpagemaker_utils.h"
 
 namespace libpagemaker
@@ -37,7 +37,7 @@ bool PMDocument::parseToYaml(librevenge::RVNGInputStream *input)
   PMD_DEBUG_MSG(("About to start parsing...\n"));
   PMDParser(input->getSubStreamByName("PageMaker"), &collector).parse();
   PMD_DEBUG_MSG(("About to start printing...\n"));
-  std::cout << collector.getYamlRepresentation();
+  dumpAsYaml(stdout, collector);
   return true;
 }
 

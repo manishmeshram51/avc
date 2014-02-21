@@ -1,7 +1,7 @@
 #pragma once
-#include <yaml-cpp/yaml.h>
 #include <vector>
 #include "Units.h"
+#include "yaml_utils.h"
 namespace libpagemaker
 {
 template <typename Unit> class Point
@@ -13,13 +13,12 @@ public:
   Point(Unit x, Unit y) : m_x(x), m_y(y)
   { }
 
-  Yaml::Node getYamlRepresentation() const
+  void emitYaml(yaml_emitter_t *emitter) const
   {
-    Yaml::Node pointNode;
-    pointNode["x"] = m_x.m_value;
-    pointNode["y"] = m_y.m_value;
-    pointNode["units"] = Unit.UNIT_NAME;
-    return pointNode;
+    yamlBeginMap(emitter);
+    yamlMapObject(emitter, "x", m_x);
+    yamlMapObject(emitter, "y", m_y);
+    yamlEndMap(emitter);
   }
 };
 
@@ -32,16 +31,12 @@ public:
   virtual std::vector<PMDShapePoint> getPoints() const = 0;
   bool virtual getIsClosed() const = 0;
 
-  Yaml::Node getYamlRepresentation() const
+  void emitYaml(yaml_emitter_t *emitter) const
   {
-    Yaml::Node shapeNode;
-    std::vector<PMDShapePoint> points = getPoints();
-    shapeNode["closed"] = getIsClosed();
-    for (unsigned i = 0; i < points.size(); ++i)
-    {
-      shapeNode["points"].push_back(points[i].getYamlRepresentation());
-    }
-    return shapeNode;
+    yamlBeginMap(emitter);
+    yamlMapEntry(emitter, "closed", getIsClosed());
+    yamlForeach(emitter, "points", getPoints());
+    yamlEndMap(emitter);
   }
 
   virtual ~PMDLineSet()
