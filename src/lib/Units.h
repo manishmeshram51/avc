@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include "yaml_utils.h"
 
 namespace libpagemaker
 {
@@ -20,33 +19,28 @@ public:
   {
     return m_value / ((double)PER_INCH);
   }
-
-  void emitYaml(yaml_emitter_t *emitter) const
-  {
-    yamlTryPutScalar(emitter, m_value);
-  }
 };
 
-template<unsigned PER_INCH, const char *UNIT_NAME> const LengthUnit<PER_INCH, UNIT_NAME>
-operator+(LengthUnit<PER_INCH> left, LengthUnit<PER_INCH> right)
+template<unsigned PER_INCH, const char *UNIT_NAME> const LengthUnit<PER_INCH, UNIT_NAME> 
+  operator+(LengthUnit<PER_INCH> left, LengthUnit<PER_INCH> right)
 {
   return LengthUnit<PER_INCH, UNIT_NAME>(left.m_value + right.m_value);
 }
 
 template<unsigned PER_INCH, const char *UNIT_NAME> const LengthUnit<PER_INCH, UNIT_NAME>
-operator*(LengthUnit<PER_INCH, UNIT_NAME> left, int right)
+  operator*(LengthUnit<PER_INCH, UNIT_NAME> left, int right)
 {
   return LengthUnit<PER_INCH, UNIT_NAME>(left.m_value * right);
 }
 
 template<unsigned PER_INCH, const char *UNIT_NAME> const LengthUnit<PER_INCH, UNIT_NAME>
-operator*(int left, LengthUnit<PER_INCH, UNIT_NAME> right)
+  operator*(int left, LengthUnit<PER_INCH, UNIT_NAME> right)
 {
   return right * left;
 }
 
 template<unsigned PER_INCH, const char *UNIT_NAME> const LengthUnit<PER_INCH, UNIT_NAME>
-operator-(LengthUnit<PER_INCH, UNIT_NAME> left, LengthUnit<PER_INCH, UNIT_NAME> right)
+  operator-(LengthUnit<PER_INCH, UNIT_NAME> left, LengthUnit<PER_INCH, UNIT_NAME> right)
 {
   return LengthUnit<PER_INCH, UNIT_NAME>(left.m_value - right.m_value);
 }

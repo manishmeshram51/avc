@@ -6,6 +6,7 @@
 >>>>>>> add some stuff
 
 #include <vector>
+#include <yaml-cpp/yaml.h>
 #include <boost/shared_ptr.hpp>
 #include <librevenge/librevenge.h>
 
@@ -32,6 +33,17 @@ public:
   boost::shared_ptr<const PMDLineSet> getShape(unsigned i) const
   {
     return m_shapes.at(i);
+  }
+
+  Yaml::Node getYamlRepresentation() const
+  {
+    Yaml::Node pageNode;
+    for (unsigned i = 0; i < m_shapes.size(); ++i)
+    {
+      const PMDLineSet &shape = *(m_shapes[i]);
+      pageNode["shapes"].push_back(shape.getYamlRepresentation());
+    }
+    return pageNode;
   }
 };
 

@@ -161,20 +161,25 @@ void PMDCollector::draw(librevenge::RVNGDrawingInterface *painter) const
   painter->endDocument();
 }
 
-void PMDCollector::emitYaml(yaml_emitter_t *emitter) const
+Yaml::Node PMDCollector::getYamlRepresentation() const
 {
-  yamlBeginMap(emitter);
+  Yaml::Node docRoot;
   if (m_pageWidth.is_initialized())
   {
-    yamlMapObject(emitter, "pageWidth", m_pageWidth.get());
+    docRoot["pageWidth"] = m_pageWidth.get();
   }
   if (m_pageHeight.is_initialized())
   {
-    yamlMapObject(emitter, "pageHeight", m_pageHeight.get());
+    docRoot["pageHeight"] = m_pageHeight.get();
   }
-  yamlMapEntry(emitter, "doubleSided", m_doubleSided);
-  yamlForeach(emitter, "pages", m_pages);
-  yamlEndMap(emitter);
+
+  docRoot["doubleSided"] = m_doubleSided;
+  for (unsigned i = 0; i < m_pages.size(); ++i)
+  {
+    docRoot["pages"].push_back(m_pages[i].getYamlRepresentation());
+  }
+
+  return docRoot;
 }
 
 }
