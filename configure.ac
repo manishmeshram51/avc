@@ -259,6 +259,12 @@ AC_SUBST([REVENGE_GENERATORS_LIBS])
 AC_SUBST([REVENGE_STREAM_CFLAGS])
 AC_SUBST([REVENGE_STREAM_LIBS])
 
+PKG_CHECK_MODULES([YAML_CPP],[
+    yaml-cpp
+])
+AC_SUBST([YAML_CPP_CFLAGS])
+AC_SUBST([YAML_CPP_LIBS])
+
 # =====================
 # Prepare all .in files
 # =====================

@@ -161,24 +161,25 @@ void PMDCollector::draw(librevenge::RVNGDrawingInterface *painter) const
   painter->endDocument();
 }
 
-std::string PMDCollector::getJsonRepresentation() const
+Yaml::Node PMDCollector::getYamlRepresentation() const
 {
-  std::ostringstream output;
-  output << "{\n";
-  output << "\tpages:\n\t[";
+  Yaml::Node docRoot;
+  if (m_pageWidth.is_initialized())
+  {
+    docRoot["pageWidth"] = m_pageWidth.get();
+  }
+  if (m_pageHeight.is_initialized())
+  {
+    docRoot["pageHeight"] = m_pageHeight.get();
+  }
+
+  docRoot["doubleSided"] = m_doubleSided;
   for (unsigned i = 0; i < m_pages.size(); ++i)
   {
-    output << "\n\t\t{\n";
-    output << "\t\t\t\theight: " << m_pageHeight.get().m_value << ",\n";
-    output << "\t\t\t\twidth: " << m_pageWidth.get().m_value << "\n\t\t}";
-    if (i + 1 < m_pages.size())
-    {
-      output << ",";
-    }
+    docRoot["pages"].push_back(m_pages[i].getYamlRepresentation());
   }
-  output << "\n\t]";
-  output << "\n}";
-  return output.str();
+
+  return docRoot;
 }
 
 }

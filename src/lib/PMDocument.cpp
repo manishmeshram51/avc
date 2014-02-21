@@ -7,6 +7,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include <iostream>
+#include <yaml-cpp/yaml.h>
+
 #include <libpagemaker/libpagemaker.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -26,6 +29,16 @@ bool PMDocument::isSupported(librevenge::RVNGInputStream * /*input*/) try
 catch (...)
 {
   return false;
+}
+
+bool PMDocument::parseToYaml(librevenge::RVNGInputStream *input)
+{
+  PMDCollector collector;
+  PMD_DEBUG_MSG(("About to start parsing...\n"));
+  PMDParser(input->getSubStreamByName("PageMaker"), &collector).parse();
+  PMD_DEBUG_MSG(("About to start printing...\n"));
+  std::cout << collector.getYamlRepresentation();
+  return true;
 }
 
 bool PMDocument::parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter)

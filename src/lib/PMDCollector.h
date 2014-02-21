@@ -8,6 +8,8 @@
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <yaml-cpp/yaml.h>
+
 #include "geometry.h"
 #include "PMDPage.h"
 #include "PMDExceptions.h"
@@ -60,7 +62,7 @@ public:
 
   /* Output functions */
   void draw(librevenge::RVNGDrawingInterface *) const;
-  std::string getJsonRepresentation() const;
+  Yaml::Node getYamlRepresentation() const;
 };
 
 }

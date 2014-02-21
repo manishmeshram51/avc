@@ -1,4 +1,5 @@
 #pragma once
+#include <yaml-cpp/yaml.h>
 #include <vector>
 #include "Units.h"
 namespace libpagemaker
@@ -11,6 +12,15 @@ public:
 
   Point(Unit x, Unit y) : m_x(x), m_y(y)
   { }
+
+  Yaml::Node getYamlRepresentation() const
+  {
+    Yaml::Node pointNode;
+    pointNode["x"] = m_x.m_value;
+    pointNode["y"] = m_y.m_value;
+    pointNode["units"] = Unit.UNIT_NAME;
+    return pointNode;
+  }
 };
 
 typedef Point<PMDShapeUnit> PMDShapePoint;
@@ -21,6 +31,18 @@ class PMDLineSet
 public:
   virtual std::vector<PMDShapePoint> getPoints() const = 0;
   bool virtual getIsClosed() const = 0;
+
+  Yaml::Node getYamlRepresentation() const
+  {
+    Yaml::Node shapeNode;
+    std::vector<PMDShapePoint> points = getPoints();
+    shapeNode["closed"] = getIsClosed();
+    for (unsigned i = 0; i < points.size(); ++i)
+    {
+      shapeNode["points"].push_back(points[i].getYamlRepresentation());
+    }
+    return shapeNode;
+  }
 
   virtual ~PMDLineSet()
   {
