@@ -9,133 +9,123 @@
 #pragma once
 
 #include <cstdio>
+#include <boost/scoped_ptr.hpp>
 #include <yaml.h>
 
 namespace libpagemaker
 {
-class YamlException
-{
-};
+  class YamlException
+  {
+  };
 
-char *getOutputValue(int value, int *printed);
-char *getOutputValue(const char *value, int *printed);
-char *getOutputValue(bool value, int *printed);
-void yamlTryEmit(yaml_emitter_t *emitter,
-                 yaml_event_t *event);
-void yamlBeginMap(yaml_emitter_t *emitter);
+  unsigned char *getOutputValue(int value, int *printed);
+  unsigned char *getOutputValue(const char *value, int *printed);
+  void yamlTryEmit(yaml_emitter_t *emitter,
+    yaml_event_t *event);
+  void yamlBeginMap(yaml_emitter_t *emitter);
 
-template <typename VALUE> void yamlTryPutScalar(
-  yaml_emitter_t *emitter, VALUE value)
-{
-  int printed;
-  char *output = getOutputValue(value, &printed);
-  if (printed < 0 || !output)
+  template <typename VALUE> void yamlTryPutScalar(
+    yaml_emitter_t *emitter, VALUE value)
   {
-    throw YamlException();
+    int printed;
+    boost::scoped_ptr<unsigned char> output(getOutputValue(value, &printed));
+    if (printed < 0 || !output)
+    {
+      throw YamlException();
+    }
+    yaml_event_t event;
+    if (!yaml_scalar_event_initialize(&event,
+      NULL, NULL, output.get(), printed, 1, 0,
+      YAML_ANY_SCALAR_STYLE))
+    {
+      throw YamlException();
+    }
+    yamlTryEmit(emitter, &event);
+    yaml_event_delete(&event);
   }
-  yaml_event_t event;
-  if (!yaml_scalar_event_initialize(&event,
-                                    NULL, NULL, (unsigned char *)(output), printed, 1, 0,
-                                    YAML_ANY_SCALAR_STYLE))
-  {
-    throw YamlException();
-  }
-  yamlTryEmit(emitter, &event);
-  delete[] output;
-}
 
-template <typename VALUE> void yamlMapEntry(
-  yaml_emitter_t *emitter, const char *key, VALUE value)
-{
-  yamlTryPutScalar(emitter, key);
-  yamlTryPutScalar(emitter, value);
-}
+  template <typename VALUE> void yamlMapEntry(
+    yaml_emitter_t *emitter, const char *key, VALUE value)
+  {
+    yamlTryPutScalar(emitter, key);
+    yamlTryPutScalar(emitter, value);
+  }
 
-template <typename OBJECT> void yamlMapObject(
-  yaml_emitter_t *emitter, const char *key, const OBJECT &object)
-{
-  yamlTryPutScalar(emitter, key);
-  object.emitYaml(emitter);
-}
+  template <typename OBJECT> void yamlMapObject(
+    yaml_emitter_t *emitter, const char *key, const OBJECT &object)
+  {
+    yamlTryPutScalar(emitter, key);
+    object.emitYaml(emitter);
+  }
 
-void yamlEndMap(yaml_emitter_t *emitter);
+  void yamlEndMap(yaml_emitter_t *emitter);
+  
+  template <typename SEQUENCE> void yamlForeach(
+    yaml_emitter_t *emitter, const char *key, const SEQUENCE &value)
+  {
+    yamlTryPutScalar(emitter, key);
 
-template <typename SEQUENCE> void yamlForeach(
-  yaml_emitter_t *emitter, const char *key, const SEQUENCE &value)
-{
-  yamlTryPutScalar(emitter, key);
+    yaml_event_t event;
+    if (!yaml_sequence_start_event_initialize(
+      &event, NULL, NULL, 1, YAML_ANY_SEQUENCE_STYLE))
+    {
+      throw YamlException();
+    }
+    yamlTryEmit(emitter, &event);
+    for (unsigned i = 0; i < value.size(); ++i)
+    {
+      value[i].emitYaml(emitter);
+    }
+    if (!yaml_sequence_end_event_initialize(&event))
+    {
+      throw YamlException();
+    }
+    yamlTryEmit(emitter, &event);
+    yaml_event_delete(&event);
+  }
 
-  yaml_event_t event;
-  if (!yaml_sequence_start_event_initialize(
-        &event, NULL, NULL, 1, YAML_ANY_SEQUENCE_STYLE))
+  template <typename SEQUENCE> void yamlIndirectForeach(
+    yaml_emitter_t *emitter, const char *key, const SEQUENCE &value)
   {
-    throw YamlException();
-  }
-  yamlTryEmit(emitter, &event);
-  for (unsigned i = 0; i < value.size(); ++i)
-  {
-    value[i].emitYaml(emitter);
-  }
-  if (!yaml_sequence_end_event_initialize(&event))
-  {
-    throw YamlException();
-  }
-  yamlTryEmit(emitter, &event);
-}
+    yamlTryPutScalar(emitter, key);
 
-template <typename SEQUENCE> void yamlIndirectForeach(
-  yaml_emitter_t *emitter, const char *key, const SEQUENCE &value)
-{
-  yamlTryPutScalar(emitter, key);
+    yaml_event_t event;
+    if (!yaml_sequence_start_event_initialize(
+      &event, NULL, NULL, 1, YAML_ANY_SEQUENCE_STYLE))
+    {
+      throw YamlException();
+    }
+    yamlTryEmit(emitter, &event);
+    for (unsigned i = 0; i < value.size(); ++i)
+    {
+      value[i]->emitYaml(emitter);
+    }
+    if (!yaml_sequence_end_event_initialize(&event))
+    {
+      throw YamlException();
+    }
+    yamlTryEmit(emitter, &event);
+    yaml_event_delete(&event);
+  }
 
-  yaml_event_t event;
-  if (!yaml_sequence_start_event_initialize(
-        &event, NULL, NULL, 1, YAML_ANY_SEQUENCE_STYLE))
+  template <typename DOCUMENT> void dumpAsYaml(FILE *file, const DOCUMENT &document)
   {
-    throw YamlException();
+    yaml_emitter_t emitter;
+    yaml_emitter_initialize(&emitter);
+    yaml_emitter_set_output_file(&emitter, file);
+    yaml_event_t event;
+    if (!yaml_stream_start_event_initialize(&event, YAML_UTF8_ENCODING))
+    {
+      throw YamlException();
+    }
+    yamlTryEmit(&emitter, &event);
+    document.emitYaml(&emitter);
+    if (!yaml_stream_end_event_initialize(&event))
+    {
+      throw YamlException();
+    }
+    yamlTryEmit(&emitter, &event);
   }
-  yamlTryEmit(emitter, &event);
-  for (unsigned i = 0; i < value.size(); ++i)
-  {
-    value[i]->emitYaml(emitter);
-  }
-  if (!yaml_sequence_end_event_initialize(&event))
-  {
-    throw YamlException();
-  }
-  yamlTryEmit(emitter, &event);
-}
-
-template <typename DOCUMENT> void dumpAsYaml(FILE *file, const DOCUMENT &document)
-{
-  yaml_emitter_t emitter;
-  yaml_emitter_initialize(&emitter);
-  yaml_emitter_set_output_file(&emitter, file);
-  yaml_event_t event;
-  if (!yaml_stream_start_event_initialize(&event, YAML_UTF8_ENCODING))
-  {
-    throw YamlException();
-  }
-  yamlTryEmit(&emitter, &event);
-  if (!yaml_document_start_event_initialize(&event,
-      NULL, NULL, NULL, 1))
-  {
-    throw YamlException();
-  }
-  yamlTryEmit(&emitter, &event);
-  document.emitYaml(&emitter);
-  if (!yaml_document_end_event_initialize(&event, 1))
-  {
-    throw YamlException();
-  }
-  yamlTryEmit(&emitter, &event);
-  if (!yaml_stream_end_event_initialize(&event))
-  {
-    throw YamlException();
-  }
-  yamlTryEmit(&emitter, &event);
-  yaml_emitter_delete(&emitter);
-}
 }
 
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

@@ -8,8 +8,8 @@
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include <yaml-cpp/yaml.h>
 
+#include "yaml_utils.h"
 #include "geometry.h"
 #include "PMDPage.h"
 #include "PMDExceptions.h"
@@ -62,7 +62,7 @@ public:
 
   /* Output functions */
   void draw(librevenge::RVNGDrawingInterface *) const;
-  Yaml::Node getYamlRepresentation() const;
+  void emitYaml(yaml_emitter_t *) const;
 };
 
 }

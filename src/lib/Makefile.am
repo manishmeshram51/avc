@@ -32,7 +32,8 @@ libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_SOURCES = \
 	Units.h \
 	geometry.cpp \
 	geometry.h \
-	OutputShape.cpp
+	OutputShape.cpp \
+	yaml_utils.cpp
 
 if OS_WIN32
 

@@ -1,12 +1,8 @@
 #pragma once
 #include "geometry.h"
-<<<<<<< HEAD
 #include "yaml_utils.h"
-=======
->>>>>>> add some stuff
 
 #include <vector>
-#include <yaml-cpp/yaml.h>
 #include <boost/shared_ptr.hpp>
 #include <librevenge/librevenge.h>
 
@@ -35,15 +31,9 @@ public:
     return m_shapes.at(i);
   }
 
-  Yaml::Node getYamlRepresentation() const
+  void emitYaml(yaml_emitter_t *emitter) const
   {
-    Yaml::Node pageNode;
-    for (unsigned i = 0; i < m_shapes.size(); ++i)
-    {
-      const PMDLineSet &shape = *(m_shapes[i]);
-      pageNode["shapes"].push_back(shape.getYamlRepresentation());
-    }
-    return pageNode;
+    yamlIndirectForeach(emitter, "shapes", m_shapes);
   }
 };
 
