@@ -9,6 +9,8 @@
 
 #include <libpagemaker/libpagemaker.h>
 
+#include <boost/scoped_ptr.hpp>
+
 #include "PMDCollector.h"
 #include "PMDParser.h"
 #include "libpagemaker_utils.h"
@@ -30,7 +32,9 @@ bool PMDocument::parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawi
 {
   PMDCollector collector;
   PMD_DEBUG_MSG(("About to start parsing...\n"));
-  PMDParser(input->getSubStreamByName("PageMaker"), &collector).parse();
+  boost::scoped_ptr<librevenge::RVNGInputStream>
+    pmdStream(input->getSubStreamByName("PageMaker"));
+  PMDParser(pmdStream.get(), &collector).parse();
   PMD_DEBUG_MSG(("About to start drawing...\n"));
   collector.draw(painter);
   return true;
