@@ -174,6 +174,7 @@ void PMDCollector::emitYaml(yaml_emitter_t *emitter) const
   }
   yamlMapEntry(emitter, "doubleSided", m_doubleSided);
   yamlForeach(emitter, "pages", m_pages);
+  yamlEndMap(emitter);
 }
 
 }

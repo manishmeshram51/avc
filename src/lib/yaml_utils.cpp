@@ -26,12 +26,25 @@ namespace libpagemaker
     int len = strlen(value) + 1;
     std::fprintf(stderr, "Allocating.\n");
     char *valOut = new char[len];
-    if (valOut == NULL)
+    if (!valOut)
     {
       throw YamlException();
     }
     *printed = len - 1;
     strncpy(valOut, value, len);
+    return valOut;
+  }
+
+  char *getOutputValue(bool value, int *printed)
+  {
+    int length = value ? 4 : 5;
+    char *valOut = new char[length + 1];
+    if (!valOut)
+    {
+      throw YamlException();
+    }
+    strcpy(valOut, value ? "true" : "false");
+    *printed = length;
     return valOut;
   }
 

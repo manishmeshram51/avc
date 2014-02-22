@@ -19,6 +19,7 @@ namespace libpagemaker
 
   char *getOutputValue(int value, int *printed);
   char *getOutputValue(const char *value, int *printed);
+  char *getOutputValue(bool value, int *printed);
   void yamlTryEmit(yaml_emitter_t *emitter,
     yaml_event_t *event);
   void yamlBeginMap(yaml_emitter_t *emitter);
@@ -40,9 +41,7 @@ namespace libpagemaker
       throw YamlException();
     }
     yamlTryEmit(emitter, &event);
-    yaml_event_delete(&event);
-    std::fprintf(stderr, "Not deleting anything.\n");
-    //delete[] output;
+    delete[] output;
   }
 
   template <typename VALUE> void yamlMapEntry(
@@ -82,7 +81,6 @@ namespace libpagemaker
       throw YamlException();
     }
     yamlTryEmit(emitter, &event);
-    yaml_event_delete(&event);
   }
 
   template <typename SEQUENCE> void yamlIndirectForeach(
@@ -106,7 +104,6 @@ namespace libpagemaker
       throw YamlException();
     }
     yamlTryEmit(emitter, &event);
-    yaml_event_delete(&event);
   }
 
   template <typename DOCUMENT> void dumpAsYaml(FILE *file, const DOCUMENT &document)
@@ -137,6 +134,7 @@ namespace libpagemaker
       throw YamlException();
     }
     yamlTryEmit(&emitter, &event);
+    yaml_emitter_delete(&emitter);
   }
 }
 
