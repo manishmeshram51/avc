@@ -33,7 +33,9 @@ public:
 
   void emitYaml(yaml_emitter_t *emitter) const
   {
+    yamlBeginMap(emitter);
     yamlIndirectForeach(emitter, "shapes", m_shapes);
+    yamlEndMap(emitter);
   }
 };
 
