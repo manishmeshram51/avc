@@ -11,26 +11,26 @@
 const unsigned int MAX_BUF = 10;
 namespace libpagemaker
 {
-  unsigned char *getOutputValue(int value, int *printed)
+  char *getOutputValue(int value, int *printed)
   {
     char *buf = new char[MAX_BUF];
     int theoreticalPrinted = std::snprintf(buf, MAX_BUF, "%d", value);
     *printed = (theoreticalPrinted > (int)MAX_BUF) ? MAX_BUF : theoreticalPrinted;
-    return (unsigned char *)buf;
+    return buf;
   }
 
   /* This silly function is necessaryf because libyaml isn't const-correct. */
-  unsigned char *getOutputValue(const char *value, int *printed)
+  char *getOutputValue(const char *value, int *printed)
   {
-    int len = strlen(value);
+    int len = strlen(value) + 1;
     char *valOut = new char[len];
     if (valOut == NULL)
     {
       throw YamlException();
     }
-    *printed = len;
+    *printed = len - 1;
     strncpy(valOut, value, len);
-    return (unsigned char *)valOut;
+    return valOut;
   }
 
   void yamlTryEmit(yaml_emitter_t *emitter,
