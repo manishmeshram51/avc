@@ -9,7 +9,6 @@
 #pragma once
 
 #include <cstdio>
-#include <boost/scoped_array.hpp>
 #include <yaml.h>
 
 namespace libpagemaker
@@ -28,20 +27,22 @@ namespace libpagemaker
     yaml_emitter_t *emitter, VALUE value)
   {
     int printed;
-    boost::scoped_array<char> output(getOutputValue(value, &printed));
+    char *output = getOutputValue(value, &printed);
     if (printed < 0 || !output)
     {
       throw YamlException();
     }
     yaml_event_t event;
     if (!yaml_scalar_event_initialize(&event,
-      NULL, NULL, (unsigned char *)(output.get()), printed, 1, 0,
+      NULL, NULL, (unsigned char *)(output), printed, 1, 0,
       YAML_ANY_SCALAR_STYLE))
     {
       throw YamlException();
     }
     yamlTryEmit(emitter, &event);
     yaml_event_delete(&event);
+    std::fprintf(stderr, "Not deleting anything.\n");
+    //delete[] output;
   }
 
   template <typename VALUE> void yamlMapEntry(

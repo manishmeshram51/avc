@@ -13,6 +13,7 @@ namespace libpagemaker
 {
   char *getOutputValue(int value, int *printed)
   {
+    std::fprintf(stderr, "Allocating.\n");
     char *buf = new char[MAX_BUF];
     int theoreticalPrinted = std::snprintf(buf, MAX_BUF, "%d", value);
     *printed = (theoreticalPrinted > (int)MAX_BUF) ? MAX_BUF : theoreticalPrinted;
@@ -23,6 +24,7 @@ namespace libpagemaker
   char *getOutputValue(const char *value, int *printed)
   {
     int len = strlen(value) + 1;
+    std::fprintf(stderr, "Allocating.\n");
     char *valOut = new char[len];
     if (valOut == NULL)
     {
