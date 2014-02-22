@@ -9,7 +9,7 @@
 #pragma once
 
 #include <cstdio>
-#include <boost/scoped_ptr.hpp>
+#include <boost/scoped_array.hpp>
 #include <yaml.h>
 
 namespace libpagemaker
@@ -18,8 +18,8 @@ namespace libpagemaker
   {
   };
 
-  unsigned char *getOutputValue(int value, int *printed);
-  unsigned char *getOutputValue(const char *value, int *printed);
+  char *getOutputValue(int value, int *printed);
+  char *getOutputValue(const char *value, int *printed);
   void yamlTryEmit(yaml_emitter_t *emitter,
     yaml_event_t *event);
   void yamlBeginMap(yaml_emitter_t *emitter);
@@ -28,14 +28,14 @@ namespace libpagemaker
     yaml_emitter_t *emitter, VALUE value)
   {
     int printed;
-    boost::scoped_ptr<unsigned char> output(getOutputValue(value, &printed));
+    boost::scoped_array<char> output(getOutputValue(value, &printed));
     if (printed < 0 || !output)
     {
       throw YamlException();
     }
     yaml_event_t event;
     if (!yaml_scalar_event_initialize(&event,
-      NULL, NULL, output.get(), printed, 1, 0,
+      NULL, NULL, (unsigned char *)(output.get()), printed, 1, 0,
       YAML_ANY_SCALAR_STYLE))
     {
       throw YamlException();
@@ -119,7 +119,18 @@ namespace libpagemaker
       throw YamlException();
     }
     yamlTryEmit(&emitter, &event);
+    if (!yaml_document_start_event_initialize(&event,
+      NULL, NULL, NULL, 1))
+    {
+      throw YamlException();
+    }
+    yamlTryEmit(&emitter, &event);
     document.emitYaml(&emitter);
+    if (!yaml_document_end_event_initialize(&event, 1))
+    {
+      throw YamlException();
+    }
+    yamlTryEmit(&emitter, &event);
     if (!yaml_stream_end_event_initialize(&event))
     {
       throw YamlException();
