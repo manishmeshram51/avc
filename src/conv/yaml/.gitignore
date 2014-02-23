@@ -4,6 +4,6 @@
 *.la
 Makefile
 Makefile.in
-pmd2yaml
-pmd2yaml.exe
+pmd2raw
+pmd2raw.exe
 *.rc

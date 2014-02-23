@@ -59,7 +59,8 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  if (!libpagemaker::PMDocument::parseToYaml(&input))
+  librevenge::RVNGRawDrawingGenerator painter(printIndentLevel);
+  if (!libpagemaker::PMDocument::parse(&input, &painter))
     return 1;
 
   return 0;
