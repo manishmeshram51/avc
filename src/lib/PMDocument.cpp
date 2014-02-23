@@ -38,7 +38,7 @@ bool PMDocument::parseToYaml(librevenge::RVNGInputStream *input)
   boost::scoped_ptr<librevenge::RVNGInputStream>
     pmdStream(input->getSubStreamByName("PageMaker"));
   PMDParser(pmdStream.get(), &collector).parse();
-  PMD_DEBUG_MSG(("About to start printing...\n"));
+  std::printf("YAML follows\n");
   dumpAsYaml(stdout, collector);
   return true;
 }
