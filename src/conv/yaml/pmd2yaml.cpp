@@ -20,10 +20,9 @@ namespace
 
 int printUsage()
 {
-  printf("Usage: pmd2raw [OPTION] <PageMaker File>\n");
+  printf("Usage: pmd2yaml [OPTION] <PageMaker File>\n");
   printf("\n");
   printf("Options:\n");
-  printf("--callgraph           Display the call graph nesting level\n");
   printf("--help                Shows this help message\n");
   return -1;
 }
@@ -40,9 +39,7 @@ int main(int argc, char *argv[])
 
   for (int i = 1; i < argc; i++)
   {
-    if (!strcmp(argv[i], "--callgraph"))
-      printIndentLevel = true;
-    else if (!file && strncmp(argv[i], "--", 2))
+    if (!file && strncmp(argv[i], "--", 2))
       file = argv[i];
     else
       return printUsage();
@@ -59,8 +56,7 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  librevenge::RVNGRawDrawingGenerator painter(printIndentLevel);
-  if (!libpagemaker::PMDocument::parse(&input, &painter))
+  if (!libpagemaker::PMDocument::parseToYaml(&input))
     return 1;
 
   return 0;

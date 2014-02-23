@@ -94,11 +94,13 @@ AS_CASE([$host],
         LIBPMD_WIN32_RESOURCE=libpagemaker-win32res.lo
         PMD2RAW_WIN32_RESOURCE=pmd2raw-win32res.lo
         PMD2SVG_WIN32_RESOURCE=pmd2svg-win32res.lo
+        PMD2YAML_WIN32_RESOURCE=pmd2yaml-win32res.lo
     ], [
         native_win32=no
         LIBPMD_WIN32_RESOURCE=
         PMD2RAW_WIN32_RESOURCE=
         PMD2SVG_WIN32_RESOURCE=
+        PMD2YAML_WIN32_RESOURCE=
     ]
 )
 AC_MSG_RESULT([$native_win32])
@@ -106,6 +108,7 @@ AM_CONDITIONAL(OS_WIN32, [test "x$native_win32" = "xyes"])
 AC_SUBST(LIBPMD_WIN32_RESOURCE)
 AC_SUBST(PMD2RAW_WIN32_RESOURCE)
 AC_SUBST(PMD2SVG_WIN32_RESOURCE)
+AC_SUBST(PMD2YAML_WIN32_RESOURCE)
 
 AC_MSG_CHECKING([for Win32 platform in general])
 AS_CASE([$host],
@@ -276,6 +279,8 @@ src/conv/raw/Makefile
 src/conv/raw/pmd2raw.rc
 src/conv/svg/Makefile
 src/conv/svg/pmd2svg.rc
+src/conv/yaml/Makefile
+src/conv/yaml/pmd2yaml.rc
 src/lib/Makefile
 src/lib/libpagemaker.rc
 inc/Makefile
