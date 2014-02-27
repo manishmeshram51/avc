@@ -3,7 +3,7 @@
 #include "geometry.h"
 #include "PMDExceptions.h"
 std::pair<libpagemaker::InchPoint, libpagemaker::InchPoint>
-  libpagemaker::getBoundingBox(const PMDLineSet &lineSet, const TransformationMatrix &matrix)
+libpagemaker::getBoundingBox(const PMDLineSet &lineSet, const TransformationMatrix &matrix)
 {
   const std::vector<PMDShapePoint> &points = lineSet.getPoints();
   if (points.empty())
@@ -13,16 +13,16 @@ std::pair<libpagemaker::InchPoint, libpagemaker::InchPoint>
 
   InchPoint firstPoint = matrix.transform(points.at(0));
   double minX = firstPoint.m_x,
-    maxX = firstPoint.m_x,
-    minY = firstPoint.m_y,
-    maxY = firstPoint.m_y;
+         maxX = firstPoint.m_x,
+         minY = firstPoint.m_y,
+         maxY = firstPoint.m_y;
 
   for (std::vector<PMDShapePoint>::const_iterator i = points.begin() + 1; i != points.end();
-    ++i)
+       ++i)
   {
     InchPoint point = matrix.transform(*i);
     double x = point.m_x,
-      y = point.m_y;
+           y = point.m_y;
     if (x < minX) minX = x;
     if (y < minY) minY = y;
     if (x > maxX) maxX = x;
