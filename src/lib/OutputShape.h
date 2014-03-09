@@ -44,7 +44,7 @@ public:
   void addPoint(InchPoint point)
   {
     double x = point.m_x,
-      y = point.m_y;
+           y = point.m_y;
     if (m_points.empty())
     {
       m_left = m_right = x;
