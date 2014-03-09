@@ -41,7 +41,7 @@ void PMDCollector::addShapeToPage(unsigned pageID, boost::shared_ptr<PMDLineSet>
 }
 
 void PMDCollector::paintShape(const OutputShape &shape,
-  librevenge::RVNGDrawingInterface *painter) const
+                              librevenge::RVNGDrawingInterface *painter) const
 {
   librevenge::RVNGPropertyListVector vertices;
   for (unsigned i = 0; i < shape.numPoints(); ++i)
@@ -66,8 +66,8 @@ void PMDCollector::paintShape(const OutputShape &shape,
 
 
 void PMDCollector::writePage(const PMDPage & /*page*/,
-  librevenge::RVNGDrawingInterface *painter,
-  const std::vector<boost::shared_ptr<const OutputShape> > &outputShapes) const
+                             librevenge::RVNGDrawingInterface *painter,
+                             const std::vector<boost::shared_ptr<const OutputShape> > &outputShapes) const
 {
   librevenge::RVNGPropertyList pageProps;
   if (m_pageWidth.is_initialized())
@@ -89,7 +89,7 @@ void PMDCollector::writePage(const PMDPage & /*page*/,
 }
 
 std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > PMDCollector::getOutputShapesByPage_TwoSided()
-  const
+const
 {
   std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > toReturn;
   double centerToEdge_x = m_pageWidth.get().toInches() / 2;
@@ -123,7 +123,7 @@ std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > PMDColle
 }
 
 std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > PMDCollector::getOutputShapesByPage_OneSided()
-  const
+const
 {
   std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > toReturn;
   for (unsigned i = 0; i < m_pages.size(); ++i)
@@ -138,11 +138,11 @@ std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > PMDColle
 }
 
 std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > PMDCollector::getOutputShapesByPage()
-  const
+const
 {
   return m_doubleSided ?
-      getOutputShapesByPage_TwoSided()
-    : getOutputShapesByPage_OneSided();
+         getOutputShapesByPage_TwoSided()
+         : getOutputShapesByPage_OneSided();
 }
 
 /* Output functions */
