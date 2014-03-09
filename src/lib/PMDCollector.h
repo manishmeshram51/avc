@@ -40,11 +40,11 @@ class PMDCollector
   bool m_doubleSided;
 
   void writePage(const PMDPage &,
-    librevenge::RVNGDrawingInterface *,
-    const std::vector<boost::shared_ptr<const OutputShape> > &) const;
+                 librevenge::RVNGDrawingInterface *,
+                 const std::vector<boost::shared_ptr<const OutputShape> > &) const;
 
   void paintShape(const OutputShape &shape,
-    librevenge::RVNGDrawingInterface *) const;
+                  librevenge::RVNGDrawingInterface *) const;
 
   std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > getOutputShapesByPage_OneSided() const;
   std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > getOutputShapesByPage_TwoSided() const;
