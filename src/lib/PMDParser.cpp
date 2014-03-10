@@ -247,6 +247,7 @@ void PMDParser::parseTableOfContents(uint32_t offset, uint16_t length) try
   for (unsigned i = 0; i < length; ++i)
   {
     unsigned numRead = readNextRecordFromTableOfContents(i, i != length);
+    (void)numRead;
     PMD_DEBUG_MSG(("[TOC] Learned about %d TMD records from ToC entry %d.\n",
                    numRead, i));
   }
