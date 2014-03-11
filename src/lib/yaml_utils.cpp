@@ -11,71 +11,71 @@
 const unsigned int MAX_BUF = 10;
 namespace libpagemaker
 {
-  char *getOutputValue(int value, int *printed)
-  {
-    char *buf = new char[MAX_BUF];
-    int theoreticalPrinted = std::snprintf(buf, MAX_BUF, "%d", value);
-    *printed = (theoreticalPrinted > (int)MAX_BUF) ? MAX_BUF : theoreticalPrinted;
-    return buf;
-  }
+char *getOutputValue(int value, int *printed)
+{
+  char *buf = new char[MAX_BUF];
+  int theoreticalPrinted = std::snprintf(buf, MAX_BUF, "%d", value);
+  *printed = (theoreticalPrinted > (int)MAX_BUF) ? MAX_BUF : theoreticalPrinted;
+  return buf;
+}
 
-  /* This silly function is necessaryf because libyaml isn't const-correct. */
-  char *getOutputValue(const char *value, int *printed)
+/* This silly function is necessaryf because libyaml isn't const-correct. */
+char *getOutputValue(const char *value, int *printed)
+{
+  int len = strlen(value) + 1;
+  char *valOut = new char[len];
+  if (!valOut)
   {
-    int len = strlen(value) + 1;
-    char *valOut = new char[len];
-    if (!valOut)
-    {
-      throw YamlException();
-    }
-    *printed = len - 1;
-    strncpy(valOut, value, len);
-    return valOut;
+    throw YamlException();
   }
+  *printed = len - 1;
+  strncpy(valOut, value, len);
+  return valOut;
+}
 
-  char *getOutputValue(bool value, int *printed)
+char *getOutputValue(bool value, int *printed)
+{
+  int length = value ? 4 : 5;
+  char *valOut = new char[length + 1];
+  if (!valOut)
   {
-    int length = value ? 4 : 5;
-    char *valOut = new char[length + 1];
-    if (!valOut)
-    {
-      throw YamlException();
-    }
-    strcpy(valOut, value ? "true" : "false");
-    *printed = length;
-    return valOut;
+    throw YamlException();
   }
+  strcpy(valOut, value ? "true" : "false");
+  *printed = length;
+  return valOut;
+}
 
-  void yamlTryEmit(yaml_emitter_t *emitter,
-    yaml_event_t *event)
+void yamlTryEmit(yaml_emitter_t *emitter,
+                 yaml_event_t *event)
+{
+  if (!yaml_emitter_emit(emitter, event))
   {
-    if (!yaml_emitter_emit(emitter, event))
-    {
-      throw YamlException();
-    }
+    throw YamlException();
   }
+}
 
-  void yamlBeginMap(yaml_emitter_t *emitter)
+void yamlBeginMap(yaml_emitter_t *emitter)
+{
+  yaml_event_t event;
+  if (!yaml_mapping_start_event_initialize(
+        &event, NULL, NULL, 1, YAML_ANY_MAPPING_STYLE))
   {
-    yaml_event_t event;
-    if (!yaml_mapping_start_event_initialize(
-      &event, NULL, NULL, 1, YAML_ANY_MAPPING_STYLE))
-    {
-      throw YamlException();
-    }
-    yamlTryEmit(emitter, &event);
-    yaml_event_delete(&event);
+    throw YamlException();
   }
+  yamlTryEmit(emitter, &event);
+  yaml_event_delete(&event);
+}
 
-  void yamlEndMap(yaml_emitter_t *emitter)
+void yamlEndMap(yaml_emitter_t *emitter)
+{
+  yaml_event_t event;
+  if (!yaml_mapping_end_event_initialize(&event))
   {
-    yaml_event_t event;
-    if (!yaml_mapping_end_event_initialize(&event))
-    {
-      throw YamlException();
-    }
-    yamlTryEmit(emitter, &event);
+    throw YamlException();
   }
+  yamlTryEmit(emitter, &event);
+}
 }
 
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */
