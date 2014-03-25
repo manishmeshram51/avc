@@ -7,15 +7,26 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "yaml_utils.h"
+#include <sstream>
+#include <algorithm>
 
 const unsigned int MAX_BUF = 10;
 namespace libpagemaker
 {
+
+int printInt(char *buf, unsigned MAX_BUF, int value)
+{
+  std::ostringstream stream;
+  stream << value;
+  strncpy(buf, stream.str().c_str(), MAX_BUF - 1);
+  buf[MAX_BUF - 1] = '\0';
+  return std::min<unsigned>(stream.str().size(), MAX_BUF);
+}
+
 char *getOutputValue(int value, int *printed)
 {
   char *buf = new char[MAX_BUF];
-  int theoreticalPrinted = std::snprintf(buf, MAX_BUF, "%d", value);
-  *printed = (theoreticalPrinted > (int)MAX_BUF) ? MAX_BUF : theoreticalPrinted;
+  *printed = printInt(buf, MAX_BUF, value);
   return buf;
 }
 
