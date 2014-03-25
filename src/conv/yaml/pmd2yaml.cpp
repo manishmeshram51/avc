@@ -31,7 +31,6 @@ int printUsage()
 
 int main(int argc, char *argv[])
 {
-  bool printIndentLevel = false;
   char *file = 0;
 
   if (argc < 2)
