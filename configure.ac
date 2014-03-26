@@ -207,32 +207,6 @@ AS_IF([test "x$enable_debug" = "xyes"], [
 ])
 AC_SUBST(DEBUG_CXXFLAGS)
 
-# ============
-# Static tools
-# ============
-AC_ARG_ENABLE([static-tools],
-    [AS_HELP_STRING([--enable-static-tools], [Link tools (binaries) statically])],
-    [enable_static_tools="$enableval"],
-    [enable_static_tools=no]
-)
-AS_IF([test "x$enable_static_tools" = "xyes"], [
-    enable_static="yes"
-], [
-    AC_DISABLE_STATIC
-])
-AM_CONDITIONAL(STATIC_TOOLS, [test "x$enable_static_tools" = "xyes"])
-
-# =============
-# Dummy bitmaps
-# =============
-AC_ARG_WITH(dummy_bitmaps,
-    [AS_HELP_STRING([--with-dummy-bitmaps],
-        [Output dummy bitmaps of 1x1 pixels instead of the real bitmaps (speeds up the validation test)])],
-    [with_dummy_bitmaps="$withval"],
-    [with_dummy_bitmaps=no]
-)
-AM_CONDITIONAL([OUTPUT_DUMMY_BITMAPS], [test "x$with_dummy_bitmaps" = "xyes"])
-
 # =============
 # Documentation
 # =============
@@ -251,22 +225,33 @@ AS_IF([test "x$with_docs" != "xno"], [
 ], [build_docs=no])
 AM_CONDITIONAL([WITH_LIBPMD_DOCS], [test "x$build_docs" != "xno"])
 
-PKG_CHECK_MODULES([REVENGE_GENERATORS],[
-    librevenge-generators-0.0
-])
-PKG_CHECK_MODULES([REVENGE_STREAM],[
-    librevenge-stream-0.0
-])
-AC_SUBST([REVENGE_GENERATORS_CFLAGS])
-AC_SUBST([REVENGE_GENERATORS_LIBS])
-AC_SUBST([REVENGE_STREAM_CFLAGS])
-AC_SUBST([REVENGE_STREAM_LIBS])
-
 PKG_CHECK_MODULES([YAML],[
     yaml-0.1
 ])
 AC_SUBST([YAML_CFLAGS])
 AC_SUBST([YAML_LIBS])
+
+# =====
+# Tools
+# =====
+AC_ARG_ENABLE([tools],
+	[AS_HELP_STRING([--disable-tools], [Build conversion tools])],
+	[enable_tools="$enableval"],
+	[enable_tools=yes]
+)
+AS_IF([test "x$enable_tools" = "xyes"], [
+	PKG_CHECK_MODULES([REVENGE_GENERATORS],[
+		librevenge-generators-0.0
+	])
+	PKG_CHECK_MODULES([REVENGE_STREAM],[
+		librevenge-stream-0.0
+	])
+])
+AC_SUBST([REVENGE_GENERATORS_CFLAGS])
+AC_SUBST([REVENGE_GENERATORS_LIBS])
+AC_SUBST([REVENGE_STREAM_CFLAGS])
+AC_SUBST([REVENGE_STREAM_LIBS])
+AM_CONDITIONAL(BUILD_TOOLS, [test "x$enable_tools" = "xyes"])
 
 # =====================
 # Prepare all .in files
@@ -301,8 +286,6 @@ AC_MSG_NOTICE([
 Build configuration:
     debug:           ${enable_debug}
     docs:            ${build_docs}
-    dummy-bitmaps:   ${with_dummy_bitmaps}
-    static-tools:    ${enable_static_tools}
     werror:          ${enable_werror}
 ==============================================================================
 ])
