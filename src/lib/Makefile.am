@@ -21,6 +21,8 @@ libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_SOURCES = \
 	PMDInternalStream.h \
 	libpagemaker_utils.cpp \
 	libpagemaker_utils.h \
+	OutputShape.h \
+	PMDPage.h \
 	PMDParser.cpp \
 	PMDParser.h \
 	PMDCollector.cpp \
@@ -33,7 +35,8 @@ libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_SOURCES = \
 	geometry.cpp \
 	geometry.h \
 	OutputShape.cpp \
-	yaml_utils.cpp
+	yaml_utils.cpp \
+	yaml_utils.h
 
 if OS_WIN32
 
