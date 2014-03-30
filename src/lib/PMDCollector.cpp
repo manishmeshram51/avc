@@ -148,7 +148,6 @@ const
 /* Output functions */
 void PMDCollector::draw(librevenge::RVNGDrawingInterface *painter) const
 {
-  std::cout << "hi" << std::endl;
   painter->startDocument(librevenge::RVNGPropertyList());
 
   std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > shapesByPage
