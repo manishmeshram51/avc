@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: libpagemaker-@PMD_MAJOR_VERSION@.@PMD_MINOR_VERSION@
 Description: Library for importing and converting PageMaker Documents
 Version: @VERSION@
-Requires: librevenge-0.0
+Requires: librevenge-0.0 librevenge-stream-0.0
 Libs: -L${libdir} -lpagemaker-@PMD_MAJOR_VERSION@.@PMD_MINOR_VERSION@
 Cflags: -I${includedir}/libpagemaker-@PMD_MAJOR_VERSION@.@PMD_MINOR_VERSION@
