@@ -34,6 +34,8 @@ inline boost::optional<unsigned> getRecordSize(uint16_t recType)
     return 472;
   case LINE_SET:
     return 4;
+  case XFORM:
+    return 26;
   default:
     return boost::none;
   }

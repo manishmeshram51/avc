@@ -16,4 +16,8 @@ const unsigned POLYGON_CLOSED_MARKER_OFFSET = 0x38;
 
 const unsigned SHAPE_TYPE_OFFSET = 0;
 const unsigned LEFT_PAGE_RIGHT_BOUND_OFFSET = 0x3A;
+
+const unsigned RECT_XFORM_ID_OFFSET = 0x1C; /* In the SHAPE record. */
+const unsigned XFORM_ID_OFFSET = 0x16; /* In the XForm record. */
+const unsigned XFORM_RECT_ROTATION_OFFSET = 0;
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

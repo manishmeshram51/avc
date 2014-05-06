@@ -14,6 +14,8 @@
 #include "libpagemaker_utils.h"
 #include "geometry.h"
 
+#define UINT32_MAX  ((uint32_t)-1)
+
 namespace libpagemaker
 {
 PMDParser::PMDParser(librevenge::RVNGInputStream *input, PMDCollector *collector)
@@ -94,6 +96,27 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
   PMDShapePoint botRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
                            recordIndex, RECT_BOT_RIGHT_OFFSET, "Can't read rectangle bottom-right point.");
 
+  uint32_t RectXformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, RECT_XFORM_ID_OFFSET, "Can't read rectangle xform id.");
+
+  if ( RectXformId != UINT32_MAX )
+  {
+    PMD_DEBUG_MSG(("Rectangle contains rotation\n"));
+    const PMDRecordContainer *ptrToXformContainer = &(m_recordsInOrder[0x0c]);
+    const PMDRecordContainer &XformContainer = *ptrToXformContainer;
+
+    for (unsigned i = 0; i < XformContainer.m_numRecords; ++i)
+    {
+      uint32_t XformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, XformContainer, i,
+                        XFORM_ID_OFFSET, "Can't find xform id.");
+      if ( XformId == RectXformId )
+      {
+        PMD_DEBUG_MSG(("Rectangle xform id is %d\n",RectXformId));
+        uint32_t RectRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, XformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read rectangle rotation.");
+        PMD_DEBUG_MSG(("Rectangle rotation degrees multplied by 1000 is %d\n",RectRotationDegree));
+        break;
+      }
+    }
+  }
   boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(topLeft, botRight));
   m_collector->addShapeToPage(pageID, newShape);
 }

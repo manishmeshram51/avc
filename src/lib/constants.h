@@ -6,6 +6,7 @@ const uint16_t PAGE = 0x0500;
 const uint16_t GLOBAL_INFO = 0x1800;
 const uint16_t SHAPE = 0x1900;
 const uint16_t LINE_SET = 0x1100;
+const uint16_t XFORM = 0x2800;
 
 /* Shape record types */
 const uint8_t POLYGON_RECORD = 0x0C;
