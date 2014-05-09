@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <string>
 #include <cassert>
 #include <vector>
@@ -14,7 +15,6 @@
 #include "libpagemaker_utils.h"
 #include "geometry.h"
 
-#define UINT32_MAX  ((uint32_t)-1)
 
 namespace libpagemaker
 {
