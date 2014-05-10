@@ -30,6 +30,8 @@ class PMDLineSet
 public:
   virtual std::vector<PMDShapePoint> getPoints() const = 0;
   bool virtual getIsClosed() const = 0;
+  virtual float getRotation() const = 0;
+  PMDShapePoint virtual getRotatingPoint() const = 0;
 
   void emitYaml(yaml_emitter_t *emitter) const
   {
@@ -48,10 +50,23 @@ class PMDPolygon : public PMDLineSet
 {
   std::vector<PMDShapePoint> m_points;
   bool m_isClosed;
+  float m_rotation;
+  PMDShapePoint m_rotatingPoint;
+
 public:
   PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed)
-    : m_points(points), m_isClosed(isClosed)
+    : m_points(points), m_isClosed(isClosed), m_rotation(0), m_rotatingPoint(PMDShapePoint(0,0))
   { }
+
+  float virtual getRotation() const
+  {
+    return m_rotation;
+  }
+
+  PMDShapePoint virtual getRotatingPoint() const
+  {
+    return m_rotatingPoint;
+  }
 
   bool virtual getIsClosed() const
   {
@@ -72,10 +87,23 @@ class PMDRectangle : public PMDLineSet
 {
   PMDShapePoint m_topLeft;
   PMDShapePoint m_botRight;
+  float m_rotation;
+  PMDShapePoint m_rotatingPoint;
+
 public:
-  PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight)
-    : m_topLeft(topLeft), m_botRight(botRight)
+  PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const float rotation, const PMDShapePoint rotatingPoint)
+    : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_rotatingPoint(rotatingPoint)
   { }
+
+  float virtual getRotation() const
+  {
+    return m_rotation;
+  }
+
+  PMDShapePoint virtual getRotatingPoint() const
+  {
+    return m_rotatingPoint;
+  }
 
   bool virtual getIsClosed() const
   {

@@ -95,6 +95,8 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
                           recordIndex, RECT_TOP_LEFT_OFFSET, "Can't read rectangle top-left point.");
   PMDShapePoint botRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
                            recordIndex, RECT_BOT_RIGHT_OFFSET, "Can't read rectangle bottom-right point.");
+  uint32_t RectRotationDegree = 0;
+  PMDShapePoint rotatingPoint = PMDShapePoint(0, 0);
 
   uint32_t RectXformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, RECT_XFORM_ID_OFFSET, "Can't read rectangle xform id.");
 
@@ -111,13 +113,15 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
       if ( XformId == RectXformId )
       {
         PMD_DEBUG_MSG(("Rectangle xform id is %d\n",RectXformId));
-        uint32_t RectRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, XformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read rectangle rotation.");
+        RectRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, XformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read rectangle rotation.");
         PMD_DEBUG_MSG(("Rectangle rotation degrees multplied by 1000 is %d\n",RectRotationDegree));
+        rotatingPoint = tryReadPointFromRecord(m_input, m_bigEndian, XformContainer, i, XFORM_ROTATING_POINT_OFFSET, "Can't read rotating point.");
         break;
       }
     }
   }
-  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(topLeft, botRight));
+  float RotationDegree = -1 * (float)RectRotationDegree/1000;
+  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(topLeft, botRight, RotationDegree, rotatingPoint));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
