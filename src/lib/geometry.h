@@ -32,6 +32,8 @@ public:
   bool virtual getIsClosed() const = 0;
   virtual float getRotation() const = 0;
   PMDShapePoint virtual getRotatingPoint() const = 0;
+  virtual float getLength() const = 0;
+  virtual float getBreadth() const = 0;
 
   void emitYaml(yaml_emitter_t *emitter) const
   {
@@ -63,6 +65,16 @@ public:
     return m_rotation;
   }
 
+  float virtual getLength() const
+  {
+    return 0;
+  }
+
+  float virtual getBreadth() const
+  {
+    return 0;
+  }
+
   PMDShapePoint virtual getRotatingPoint() const
   {
     return m_rotatingPoint;
@@ -89,15 +101,27 @@ class PMDRectangle : public PMDLineSet
   PMDShapePoint m_botRight;
   float m_rotation;
   PMDShapePoint m_rotatingPoint;
+  float m_length;
+  float m_breadth;
 
 public:
-  PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const float rotation, const PMDShapePoint rotatingPoint)
-    : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_rotatingPoint(rotatingPoint)
+  PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const float rotation, const PMDShapePoint rotatingPoint, const float length, const float breadth)
+    : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_rotatingPoint(rotatingPoint), m_length(length), m_breadth(breadth)
   { }
 
   float virtual getRotation() const
   {
     return m_rotation;
+  }
+
+  float virtual getLength() const
+  {
+    return m_length;
+  }
+
+  float virtual getBreadth() const
+  {
+    return m_breadth;
   }
 
   PMDShapePoint virtual getRotatingPoint() const
