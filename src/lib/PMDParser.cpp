@@ -127,7 +127,8 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
       }
     }
   }
-  float rotationDegree = -1 * (float)rectRotationDegree/1000;
+  int32_t temp = (int32_t)rectRotationDegree;
+  float rotationDegree = -1 * (float)temp/1000;
   boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(topLeft, botRight, rotationDegree, rotatingPoint, length, breadth));
   m_collector->addShapeToPage(pageID, newShape);
 }
