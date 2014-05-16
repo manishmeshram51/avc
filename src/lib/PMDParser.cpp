@@ -2,6 +2,7 @@
 #include <string>
 #include <cassert>
 #include <vector>
+#include <limits>
 #include <librevenge/librevenge.h>
 #include <boost/optional.hpp>
 #include <boost/format.hpp>
@@ -14,8 +15,6 @@
 #include "offsets.h"
 #include "libpagemaker_utils.h"
 #include "geometry.h"
-
-#define UINT32_MAX  ((uint32_t)-1)
 
 namespace libpagemaker
 {
@@ -102,7 +101,7 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
   float length = 0;
   float breadth = 0;
 
-  if (rectXformId != UINT32_MAX)
+  if (rectXformId != (std::numeric_limits<uint32_t>::max)())
   {
     PMD_DEBUG_MSG(("Rectangle contains rotation\n"));
     const PMDRecordContainer *ptrToXformContainer = &(m_recordsInOrder[0x0c]);
