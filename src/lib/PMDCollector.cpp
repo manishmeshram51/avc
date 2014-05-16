@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <math.h>
 
 #include "libpagemaker_utils.h"
 
@@ -76,7 +77,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
 
     librevenge::RVNGPropertyList propList;
 
-    if (true)
+    if (false)
     {
       propList.insert("svg:rx",rx);
       propList.insert("svg:ry",ry);
@@ -91,34 +92,43 @@ void PMDCollector::paintShape(const OutputShape &shape,
       double ex = cx + rx;
       double ey = cy;
 
-      librevenge::RVNGPropertyListVector temp;
+      librevenge::RVNGPropertyListVector vec;
       librevenge::RVNGPropertyList node;
 
       node.insert("librevenge:path-action", "M");
       node.insert("svg:x", sx);
       node.insert("svg:y", sy);
-      temp.append(node);
+      vec.append(node);
 
       node.clear();
       node.insert("librevenge:path-action", "A");
+      node.insert("svg:rx", rx);
+      node.insert("svg:ry", ry);
+      node.insert("librevenge:rotate", 0.0 * 180 / M_PI, librevenge::RVNG_GENERIC);
+      node.insert("librevenge:large-arc", false);
+      node.insert("librevenge:sweep", false);
       node.insert("svg:x", ex);
       node.insert("svg:y", ey);
-      temp.append(node);
+      vec.append(node);
 
       node.clear();
       node.insert("librevenge:path-action", "A");
+      node.insert("svg:rx", rx);
+      node.insert("svg:ry", ry);
+      node.insert("librevenge:rotate", 0.0 * 180 / M_PI, librevenge::RVNG_GENERIC);
+      node.insert("librevenge:large-arc", true);
+      node.insert("librevenge:sweep", false);
       node.insert("svg:x", sx);
       node.insert("svg:y", sy);
-      temp.append(node);
+      vec.append(node);
 
       node.clear();
       node.insert("librevenge:path-action", "Z");
-      temp.append(node);
+      vec.append(node);
 
-      propList.insert("svg:d",temp);
+      propList.insert("svg:d",vec);
       painter->drawPath(propList);
     }
-
   }
 }
 
