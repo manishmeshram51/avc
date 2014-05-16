@@ -43,23 +43,82 @@ void PMDCollector::addShapeToPage(unsigned pageID, boost::shared_ptr<PMDLineSet>
 void PMDCollector::paintShape(const OutputShape &shape,
                               librevenge::RVNGDrawingInterface *painter) const
 {
-  librevenge::RVNGPropertyListVector vertices;
-  for (unsigned i = 0; i < shape.numPoints(); ++i)
+  if (shape.shapeTypePolygon())
   {
-    librevenge::RVNGPropertyList vertex;
-    vertex.insert("svg:x", shape.getPoint(i).m_x);
-    vertex.insert("svg:y", shape.getPoint(i).m_y);
-    vertices.append(vertex);
-  }
-  librevenge::RVNGPropertyList points;
-  points.insert("svg:points", vertices);
-  if (shape.getIsClosed())
-  {
-    painter->drawPolygon(points);
+    librevenge::RVNGPropertyListVector vertices;
+    for (unsigned i = 0; i < shape.numPoints(); ++i)
+    {
+      librevenge::RVNGPropertyList vertex;
+      vertex.insert("svg:x", shape.getPoint(i).m_x);
+      vertex.insert("svg:y", shape.getPoint(i).m_y);
+      vertices.append(vertex);
+    }
+    librevenge::RVNGPropertyList points;
+    points.insert("svg:points", vertices);
+    if (shape.getIsClosed())
+    {
+      painter->drawPolygon(points);
+    }
+    else
+    {
+      painter->drawPolyline(points);
+    }
   }
   else
   {
-    painter->drawPolyline(points);
+    double cx = shape.getPoint(0).m_x;
+    double cy = shape.getPoint(0).m_y;
+    double rx = shape.getPoint(1).m_x;
+    double ry = shape.getPoint(1).m_y;
+
+    PMD_DEBUG_MSG(("Cx and Cy are %f , %f \n",cx,cy));
+    PMD_DEBUG_MSG(("Rx and Ry are %f , %f \n",rx,ry));
+
+    librevenge::RVNGPropertyList propList;
+
+    if (true)
+    {
+      propList.insert("svg:rx",rx);
+      propList.insert("svg:ry",ry);
+      propList.insert("svg:cx",cx);
+      propList.insert("svg:cy",cy);
+      painter->drawEllipse(propList);
+    }
+    else
+    {
+      double sx = cx - rx;
+      double sy = cy;
+      double ex = cx + rx;
+      double ey = cy;
+
+      librevenge::RVNGPropertyListVector temp;
+      librevenge::RVNGPropertyList node;
+
+      node.insert("librevenge:path-action", "M");
+      node.insert("svg:x", sx);
+      node.insert("svg:y", sy);
+      temp.append(node);
+
+      node.clear();
+      node.insert("librevenge:path-action", "A");
+      node.insert("svg:x", ex);
+      node.insert("svg:y", ey);
+      temp.append(node);
+
+      node.clear();
+      node.insert("librevenge:path-action", "A");
+      node.insert("svg:x", sx);
+      node.insert("svg:y", sy);
+      temp.append(node);
+
+      node.clear();
+      node.insert("librevenge:path-action", "Z");
+      temp.append(node);
+
+      propList.insert("svg:d",temp);
+      painter->drawPath(propList);
+    }
+
   }
 }
 

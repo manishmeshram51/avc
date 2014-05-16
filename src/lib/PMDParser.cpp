@@ -15,6 +15,7 @@
 #include "libpagemaker_utils.h"
 #include "geometry.h"
 
+#define UINT32_MAX  ((uint32_t)-1)
 
 namespace libpagemaker
 {
@@ -172,6 +173,18 @@ void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
   m_collector->addShapeToPage(pageID, newShape);
 }
 
+void PMDParser::parseEllipse(PMDRecordContainer container, unsigned recordIndex, unsigned pageID)
+{
+
+  PMDShapePoint bboxTopLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
+                              recordIndex, RECT_TOP_LEFT_OFFSET, "Can't read bbox top-left point.");
+  PMDShapePoint bboxBotRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
+                               recordIndex, RECT_BOT_RIGHT_OFFSET, "Can't read bbox bottom-right point.");
+
+  boost::shared_ptr<PMDLineSet> newShape(new PMDEllipse(bboxTopLeft, bboxBotRight));
+  m_collector->addShapeToPage(pageID, newShape);
+}
+
 void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
 {
   const PMDRecordContainer *ptrToContainer =
@@ -192,6 +205,9 @@ void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
       break;
     case POLYGON_RECORD:
       parsePolygon(container, i, pageID);
+      break;
+    case ELLIPSE_RECORD:
+      parseEllipse(container, i, pageID);
       break;
     default:
       PMD_ERR_MSG("Encountered shape of unknown type.\n");

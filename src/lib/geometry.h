@@ -34,6 +34,7 @@ public:
   PMDShapePoint virtual getRotatingPoint() const = 0;
   virtual float getLength() const = 0;
   virtual float getBreadth() const = 0;
+  bool virtual shapeTypePolygon() const = 0;
 
   void emitYaml(yaml_emitter_t *emitter) const
   {
@@ -90,6 +91,10 @@ public:
     return m_points;
   }
 
+  bool virtual shapeTypePolygon() const
+  {
+    return true;
+  }
   virtual ~PMDPolygon()
   {
   }
@@ -146,7 +151,66 @@ public:
     return points;
   }
 
+  bool virtual shapeTypePolygon() const
+  {
+    return true;
+  }
+
   virtual ~PMDRectangle()
+  {
+  }
+};
+
+class PMDEllipse : public PMDLineSet
+{
+  PMDShapePoint m_bboxTopLeft;
+  PMDShapePoint m_bboxBotRight;
+
+public:
+  PMDEllipse(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight)
+  { }
+
+  float virtual getRotation() const
+  {
+    return 0;
+  }
+
+  float virtual getLength() const
+  {
+    return 0;
+  }
+
+  float virtual getBreadth() const
+  {
+    return 0;
+  }
+
+  PMDShapePoint virtual getRotatingPoint() const
+  {
+    return PMDShapePoint(0,0);
+  }
+  bool virtual getIsClosed() const
+  {
+    return true;
+  }
+
+  virtual std::vector<PMDShapePoint> getPoints() const
+  {
+    std::vector<PMDShapePoint> points;
+
+    points.push_back(m_bboxTopLeft);
+    points.push_back(m_bboxBotRight);
+
+    return points;
+  }
+
+  bool virtual shapeTypePolygon() const
+  {
+    return false;
+  }
+
+  virtual ~PMDEllipse()
   {
   }
 };

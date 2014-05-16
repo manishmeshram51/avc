@@ -11,6 +11,7 @@ const uint16_t XFORM = 0x2800;
 /* Shape record types */
 const uint8_t POLYGON_RECORD = 0x0C;
 const uint8_t RECTANGLE_RECORD = 0x04;
+const uint8_t ELLIPSE_RECORD = 0x05;
 
 /* Polygon flags */
 const uint8_t POLYGON_CLOSED = 0x03;
