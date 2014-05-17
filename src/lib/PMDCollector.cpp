@@ -95,11 +95,11 @@ void PMDCollector::paintShape(const OutputShape &shape,
       double ey = cy;
       if (rotation)
       {
-       sx = cx - rx*cos(rotation)/2;
-       sy = cy - ry*sin(rotation)/2;
+        sx = cx - rx*cos(rotation)/2;
+        sy = cy - ry*sin(rotation)/2;
 
-       ex = cx + rx*cos(rotation)/2;
-       ey = cy + ry*sin(rotation)/2;
+        ex = cx + rx*cos(rotation)/2;
+        ey = cy + ry*sin(rotation)/2;
       }
       PMD_DEBUG_MSG(("Sx and Sy are %f , %f \n",sx,sy));
       PMD_DEBUG_MSG(("Ex and Ey are %f , %f \n",ex,ey));
