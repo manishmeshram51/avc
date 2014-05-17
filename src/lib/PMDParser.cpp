@@ -3,6 +3,7 @@
 #include <cassert>
 #include <vector>
 #include <limits>
+#include <math.h>
 #include <librevenge/librevenge.h>
 #include <boost/optional.hpp>
 #include <boost/format.hpp>
@@ -121,15 +122,15 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
         int16_t lengthPartTwo = tryReadRecordAt<int16_t>(m_input, m_bigEndian, xformContainer, i, XFORM_LENGTH_TWO_OFFSET, "Can't read lenght part two.");
         int16_t breadthPartOne = tryReadRecordAt<int16_t>(m_input, m_bigEndian, xformContainer, i, XFORM_BREADTH_ONE_OFFSET, "Can't read breadth part one.");
         int16_t breadthPartTwo = tryReadRecordAt<int16_t>(m_input, m_bigEndian, xformContainer, i, XFORM_BREADTH_TWO_OFFSET, "Can't read breadth part two.");
-        length = (float)(lengthPartTwo - lengthPartOne)/1440;
-        breadth = (float)(breadthPartTwo - breadthPartOne)/1440;
+        length = fabs((float)(lengthPartTwo - lengthPartOne)/1440);
+        breadth = fabs((float)(breadthPartTwo - breadthPartOne)/1440);
         break;
       }
     }
   }
   int32_t temp = (int32_t)rectRotationDegree;
-  float rotationDegree = -1 * (float)temp/1000;
-  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(topLeft, botRight, rotationDegree, rotatingPoint, length, breadth));
+  double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
+  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(topLeft, botRight, rotationRadian, rotatingPoint, length, breadth));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -180,7 +181,41 @@ void PMDParser::parseEllipse(PMDRecordContainer container, unsigned recordIndex,
   PMDShapePoint bboxBotRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
                                recordIndex, RECT_BOT_RIGHT_OFFSET, "Can't read bbox bottom-right point.");
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDEllipse(bboxTopLeft, bboxBotRight));
+  uint32_t ellipseRotationDegree = 0;
+  //PMDShapePoint rotatingPoint = PMDShapePoint(0, 0);
+  uint32_t ellipseXformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, RECT_XFORM_ID_OFFSET, "Can't read ellipse xform id.");
+  double length = 0;
+  double breadth = 0;
+
+  if (ellipseXformId != (std::numeric_limits<uint32_t>::max)())
+  {
+    PMD_DEBUG_MSG(("Ellipse contains rotation\n"));
+    const PMDRecordContainer *ptrToXformContainer = &(m_recordsInOrder[0x0c]);
+    const PMDRecordContainer &xformContainer = *ptrToXformContainer;
+
+    for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
+    {
+      uint32_t xformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i,
+                         XFORM_ID_OFFSET, "Can't find xform id.");
+      if (xformId == ellipseXformId)
+      {
+        ellipseRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read ellipse rotation.");
+        PMD_DEBUG_MSG(("Ellipse rotation degrees multplied by 1000 is %d\n",ellipseRotationDegree));
+        //rotatingPoint = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_ROTATING_POINT_OFFSET, "Can't read rotating point.");
+        int16_t lengthPartOne = tryReadRecordAt<int16_t>(m_input, m_bigEndian, xformContainer, i, XFORM_LENGTH_ONE_OFFSET, "Can't read lengthPartOne.");
+        int16_t lengthPartTwo = tryReadRecordAt<int16_t>(m_input, m_bigEndian, xformContainer, i, XFORM_LENGTH_TWO_OFFSET, "Can't read lenght part two.");
+        int16_t breadthPartOne = tryReadRecordAt<int16_t>(m_input, m_bigEndian, xformContainer, i, XFORM_BREADTH_ONE_OFFSET, "Can't read breadth part one.");
+        int16_t breadthPartTwo = tryReadRecordAt<int16_t>(m_input, m_bigEndian, xformContainer, i, XFORM_BREADTH_TWO_OFFSET, "Can't read breadth part two.");
+        length = fabs((double)(lengthPartTwo - lengthPartOne)/1440);
+        breadth = fabs((double)(breadthPartTwo - breadthPartOne)/1440);
+        break;
+      }
+    }
+  }
+  int32_t temp = (int32_t)ellipseRotationDegree;
+  double rotationRadian = -1 * (double)temp/1000 *(M_PI/180);
+
+  boost::shared_ptr<PMDLineSet> newShape(new PMDEllipse(bboxTopLeft, bboxBotRight, rotationRadian, length, breadth));
   m_collector->addShapeToPage(pageID, newShape);
 }
 

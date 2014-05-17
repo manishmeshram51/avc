@@ -30,7 +30,7 @@ class PMDLineSet
 public:
   virtual std::vector<PMDShapePoint> getPoints() const = 0;
   bool virtual getIsClosed() const = 0;
-  virtual float getRotation() const = 0;
+  virtual double getRotation() const = 0;
   PMDShapePoint virtual getRotatingPoint() const = 0;
   virtual float getLength() const = 0;
   virtual float getBreadth() const = 0;
@@ -53,7 +53,7 @@ class PMDPolygon : public PMDLineSet
 {
   std::vector<PMDShapePoint> m_points;
   bool m_isClosed;
-  float m_rotation;
+  double m_rotation;
   PMDShapePoint m_rotatingPoint;
 
 public:
@@ -61,7 +61,7 @@ public:
     : m_points(points), m_isClosed(isClosed), m_rotation(0), m_rotatingPoint(PMDShapePoint(0,0))
   { }
 
-  float virtual getRotation() const
+  double virtual getRotation() const
   {
     return m_rotation;
   }
@@ -104,17 +104,17 @@ class PMDRectangle : public PMDLineSet
 {
   PMDShapePoint m_topLeft;
   PMDShapePoint m_botRight;
-  float m_rotation;
+  double m_rotation;
   PMDShapePoint m_rotatingPoint;
   float m_length;
   float m_breadth;
 
 public:
-  PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const float rotation, const PMDShapePoint rotatingPoint, const float length, const float breadth)
+  PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const double rotation, const PMDShapePoint rotatingPoint, const float length, const float breadth)
     : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_rotatingPoint(rotatingPoint), m_length(length), m_breadth(breadth)
   { }
 
-  float virtual getRotation() const
+  double virtual getRotation() const
   {
     return m_rotation;
   }
@@ -165,25 +165,28 @@ class PMDEllipse : public PMDLineSet
 {
   PMDShapePoint m_bboxTopLeft;
   PMDShapePoint m_bboxBotRight;
+  double m_rotation;
+  double m_length;
+  double m_breadth;
 
 public:
-  PMDEllipse(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight)
-    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight)
+  PMDEllipse(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double length, const double breadth)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_length(length), m_breadth(breadth)
   { }
 
-  float virtual getRotation() const
+  double virtual getRotation() const
   {
-    return 0;
+    return m_rotation;
   }
 
   float virtual getLength() const
   {
-    return 0;
+    return m_length;
   }
 
   float virtual getBreadth() const
   {
-    return 0;
+    return m_breadth;
   }
 
   PMDShapePoint virtual getRotatingPoint() const

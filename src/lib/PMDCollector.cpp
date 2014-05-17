@@ -72,9 +72,11 @@ void PMDCollector::paintShape(const OutputShape &shape,
     double rx = shape.getPoint(1).m_x;
     double ry = shape.getPoint(1).m_y;
 
-    PMD_DEBUG_MSG(("Cx and Cy are %f , %f \n",cx,cy));
-    PMD_DEBUG_MSG(("Rx and Ry are %f , %f \n",rx,ry));
+    double rotation = shape.getRotation();
 
+    PMD_DEBUG_MSG(("\n\nCx and Cy are %f , %f \n",cx,cy));
+    PMD_DEBUG_MSG(("Rx and Ry are %f , %f \n",rx,ry));
+    PMD_DEBUG_MSG(("Rotation is %f \n",rotation));
     librevenge::RVNGPropertyList propList;
 
     if (false)
@@ -91,6 +93,16 @@ void PMDCollector::paintShape(const OutputShape &shape,
       double sy = cy;
       double ex = cx + rx;
       double ey = cy;
+      if (rotation)
+      {
+       sx = cx - rx*cos(rotation)/2;
+       sy = cy - ry*sin(rotation)/2;
+
+       ex = cx + rx*cos(rotation)/2;
+       ey = cy + ry*sin(rotation)/2;
+      }
+      PMD_DEBUG_MSG(("Sx and Sy are %f , %f \n",sx,sy));
+      PMD_DEBUG_MSG(("Ex and Ey are %f , %f \n",ex,ey));
 
       librevenge::RVNGPropertyListVector vec;
       librevenge::RVNGPropertyList node;
@@ -104,7 +116,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
       node.insert("librevenge:path-action", "A");
       node.insert("svg:rx", rx);
       node.insert("svg:ry", ry);
-      node.insert("librevenge:rotate", 0.0 * 180 / M_PI, librevenge::RVNG_GENERIC);
+      node.insert("librevenge:rotate", rotation * 180 / M_PI, librevenge::RVNG_GENERIC);
       node.insert("librevenge:large-arc", false);
       node.insert("librevenge:sweep", false);
       node.insert("svg:x", ex);
@@ -115,7 +127,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
       node.insert("librevenge:path-action", "A");
       node.insert("svg:rx", rx);
       node.insert("svg:ry", ry);
-      node.insert("librevenge:rotate", 0.0 * 180 / M_PI, librevenge::RVNG_GENERIC);
+      node.insert("librevenge:rotate", rotation * 180 / M_PI, librevenge::RVNG_GENERIC);
       node.insert("librevenge:large-arc", true);
       node.insert("librevenge:sweep", false);
       node.insert("svg:x", sx);

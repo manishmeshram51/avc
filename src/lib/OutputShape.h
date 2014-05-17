@@ -11,10 +11,11 @@ class OutputShape
   bool m_isClosed;
   bool m_shapeType;
   std::vector<InchPoint> m_points;
+  double m_rotation;
   double m_left, m_top, m_right, m_bot;
 public:
-  OutputShape(bool isClosed, bool shapeType)
-    : m_isClosed(isClosed), m_shapeType(shapeType), m_points(),
+  OutputShape(bool isClosed, bool shapeType, double rotation)
+    : m_isClosed(isClosed), m_shapeType(shapeType), m_points(), m_rotation(rotation),
       m_left(), m_top(), m_right(), m_bot()
   { }
 
@@ -36,6 +37,11 @@ public:
   bool shapeTypePolygon() const
   {
     return m_shapeType;
+  }
+
+  double getRotation() const
+  {
+    return m_rotation;
   }
 
   std::pair<InchPoint, InchPoint> getBoundingBox() const
