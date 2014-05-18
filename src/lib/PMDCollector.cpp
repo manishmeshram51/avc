@@ -89,20 +89,11 @@ void PMDCollector::paintShape(const OutputShape &shape,
     }
     else
     {
-      double sx = cx - rx;
-      double sy = cy;
-      double ex = cx + rx;
-      double ey = cy;
-      if (rotation)
-      {
-        sx = cx - rx*cos(rotation)/2;
-        sy = cy - ry*sin(rotation)/2;
+      double sx = cx - rx*cos(rotation);
+      double sy = cy - rx*sin(rotation);
 
-        ex = cx + rx*cos(rotation)/2;
-        ey = cy + ry*sin(rotation)/2;
-      }
-      PMD_DEBUG_MSG(("Sx and Sy are %f , %f \n",sx,sy));
-      PMD_DEBUG_MSG(("Ex and Ey are %f , %f \n",ex,ey));
+      double ex = cx + rx*cos(rotation);
+      double ey = cy + rx*sin(rotation);
 
       librevenge::RVNGPropertyListVector vec;
       librevenge::RVNGPropertyList node;
