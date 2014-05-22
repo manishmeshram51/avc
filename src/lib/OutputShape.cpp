@@ -27,7 +27,7 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
       float length = ptrToLineSet->getLength();
       float breadth = ptrToLineSet->getBreadth();
 
-      if (ptrToLineSet->shapeType() == SHAPE_TYPE_RECT)
+      if (pmdPoints.size() == 4 && ptrToLineSet->getIsClosed())
       {
         double x1 = pmdRotatingPoint.m_x.toInches() + translate.m_x;
         double y1 = pmdRotatingPoint.m_y.toInches() + translate.m_y;
@@ -57,29 +57,42 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
 
         double xTemp =0;
         double yTemp =0;
-
-        for (unsigned i = pmdPoints.size()/2 + 1; i < pmdPoints.size(); ++i)
+        if (ptrToLineSet->getIsClosed())
         {
-          xTemp = pmdPoints[i].m_x.toInches() - pmdPoints[i-1].m_x.toInches();
-          yTemp = pmdPoints[i].m_y.toInches() - pmdPoints[i-1].m_y.toInches();
+          for (unsigned i = pmdPoints.size()/2 + 1; i < pmdPoints.size(); ++i)
+          {
+            xTemp = pmdPoints[i].m_x.toInches() - pmdPoints[i-1].m_x.toInches();
+            yTemp = pmdPoints[i].m_y.toInches() - pmdPoints[i-1].m_y.toInches();
+            x += xTemp*cos(pmdRotation) - yTemp*sin(pmdRotation);
+            y += xTemp*sin(pmdRotation) + yTemp*cos(pmdRotation);
+            ptrToOutputShape->addPoint(InchPoint(x, y));
+          }
+
+          xTemp = pmdPoints[0].m_x.toInches() - pmdPoints[pmdPoints.size() -1].m_x.toInches();
+          yTemp = pmdPoints[0].m_y.toInches() - pmdPoints[pmdPoints.size() -1].m_y.toInches();
           x += xTemp*cos(pmdRotation) - yTemp*sin(pmdRotation);
           y += xTemp*sin(pmdRotation) + yTemp*cos(pmdRotation);
           ptrToOutputShape->addPoint(InchPoint(x, y));
+
+          for (unsigned i = 1; i < pmdPoints.size()/2; ++i)
+          {
+            xTemp = pmdPoints[i].m_x.toInches() - pmdPoints[i-1].m_x.toInches();
+            yTemp = pmdPoints[i].m_y.toInches() - pmdPoints[i-1].m_y.toInches();
+            x += xTemp*cos(pmdRotation) - yTemp*sin(pmdRotation);
+            y += xTemp*sin(pmdRotation) + yTemp*cos(pmdRotation);
+            ptrToOutputShape->addPoint(InchPoint(x, y));
+          }
         }
-
-        xTemp = pmdPoints[0].m_x.toInches() - pmdPoints[pmdPoints.size() -1].m_x.toInches();
-        yTemp = pmdPoints[0].m_y.toInches() - pmdPoints[pmdPoints.size() -1].m_y.toInches();
-        x += xTemp*cos(pmdRotation) - yTemp*sin(pmdRotation);
-        y += xTemp*sin(pmdRotation) + yTemp*cos(pmdRotation);
-        ptrToOutputShape->addPoint(InchPoint(x, y));
-
-        for (unsigned i = 1; i < pmdPoints.size()/2; ++i)
+        else
         {
-          xTemp = pmdPoints[i].m_x.toInches() - pmdPoints[i-1].m_x.toInches();
-          yTemp = pmdPoints[i].m_y.toInches() - pmdPoints[i-1].m_y.toInches();
-          x += xTemp*cos(pmdRotation) - yTemp*sin(pmdRotation);
-          y += xTemp*sin(pmdRotation) + yTemp*cos(pmdRotation);
-          ptrToOutputShape->addPoint(InchPoint(x, y));
+          for (unsigned i = 1; i < pmdPoints.size(); ++i)
+          {
+            xTemp = pmdPoints[i].m_x.toInches() - pmdPoints[i-1].m_x.toInches();
+            yTemp = pmdPoints[i].m_y.toInches() - pmdPoints[i-1].m_y.toInches();
+            x += xTemp*cos(pmdRotation) - yTemp*sin(pmdRotation);
+            y += xTemp*sin(pmdRotation) + yTemp*cos(pmdRotation);
+            ptrToOutputShape->addPoint(InchPoint(x, y));
+          }
         }
       }
     }
