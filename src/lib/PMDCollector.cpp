@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 #include <math.h>
-
+#include "constants.h"
 #include "libpagemaker_utils.h"
 
 namespace libpagemaker
@@ -44,7 +44,7 @@ void PMDCollector::addShapeToPage(unsigned pageID, boost::shared_ptr<PMDLineSet>
 void PMDCollector::paintShape(const OutputShape &shape,
                               librevenge::RVNGDrawingInterface *painter) const
 {
-  if (shape.shapeTypePolygon())
+  if (shape.shapeType() == SHAPE_TYPE_LINE || shape.shapeType() == SHAPE_TYPE_POLY || shape.shapeType() == SHAPE_TYPE_RECT)
   {
     librevenge::RVNGPropertyListVector vertices;
     for (unsigned i = 0; i < shape.numPoints(); ++i)

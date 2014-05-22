@@ -2,6 +2,7 @@
 #include <vector>
 #include "Units.h"
 #include "yaml_utils.h"
+#include "constants.h"
 namespace libpagemaker
 {
 template <typename Unit> class Point
@@ -32,9 +33,9 @@ public:
   bool virtual getIsClosed() const = 0;
   virtual double getRotation() const = 0;
   PMDShapePoint virtual getRotatingPoint() const = 0;
-  virtual float getLength() const = 0;
-  virtual float getBreadth() const = 0;
-  bool virtual shapeTypePolygon() const = 0;
+  virtual double getLength() const = 0;
+  virtual double getBreadth() const = 0;
+  uint8_t virtual shapeType() const = 0;
 
   void emitYaml(yaml_emitter_t *emitter) const
   {
@@ -49,16 +50,82 @@ public:
   }
 };
 
+class PMDLine : public PMDLineSet
+{
+  PMDShapePoint m_first;
+  PMDShapePoint m_second;
+  bool m_mirrored;
+
+public:
+  PMDLine(const PMDShapePoint &first, const PMDShapePoint &second, const bool mirrored)
+    : m_first(first), m_second(second), m_mirrored(mirrored)
+  { }
+
+  double virtual getRotation() const
+  {
+    return 0;
+  }
+
+  double virtual getLength() const
+  {
+    return 0;
+  }
+
+  double virtual getBreadth() const
+  {
+    return 0;
+  }
+
+  PMDShapePoint virtual getRotatingPoint() const
+  {
+    return PMDShapePoint(0,0);
+  }
+
+  bool virtual getIsClosed() const
+  {
+    return false;
+  }
+
+  virtual std::vector<PMDShapePoint> getPoints() const
+  {
+    std::vector<PMDShapePoint> points;
+
+    if (m_mirrored)
+    {
+      points.push_back(PMDShapePoint(m_second.m_x,m_first.m_y));
+      points.push_back(PMDShapePoint(m_first.m_x,m_second.m_y));
+    }
+    else
+    {
+      points.push_back(m_first);
+      points.push_back(m_second);
+    }
+    return points;
+  }
+
+  uint8_t virtual shapeType() const
+  {
+    return SHAPE_TYPE_LINE;
+  }
+
+  virtual ~PMDLine()
+  {
+  }
+};
+
+
 class PMDPolygon : public PMDLineSet
 {
   std::vector<PMDShapePoint> m_points;
   bool m_isClosed;
   double m_rotation;
   PMDShapePoint m_rotatingPoint;
+  double m_length;
+  double m_breadth;
 
 public:
-  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed)
-    : m_points(points), m_isClosed(isClosed), m_rotation(0), m_rotatingPoint(PMDShapePoint(0,0))
+  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const double rotationRadian, const PMDShapePoint &rotatingPoint, const double length, const double breadth)
+    : m_points(points), m_isClosed(isClosed), m_rotation(rotationRadian), m_rotatingPoint(rotatingPoint), m_length(length), m_breadth(breadth)
   { }
 
   double virtual getRotation() const
@@ -66,14 +133,14 @@ public:
     return m_rotation;
   }
 
-  float virtual getLength() const
+  double virtual getLength() const
   {
-    return 0;
+    return m_length;
   }
 
-  float virtual getBreadth() const
+  double virtual getBreadth() const
   {
-    return 0;
+    return m_breadth;
   }
 
   PMDShapePoint virtual getRotatingPoint() const
@@ -91,9 +158,9 @@ public:
     return m_points;
   }
 
-  bool virtual shapeTypePolygon() const
+  uint8_t virtual shapeType() const
   {
-    return true;
+    return SHAPE_TYPE_POLY;
   }
   virtual ~PMDPolygon()
   {
@@ -106,11 +173,11 @@ class PMDRectangle : public PMDLineSet
   PMDShapePoint m_botRight;
   double m_rotation;
   PMDShapePoint m_rotatingPoint;
-  float m_length;
-  float m_breadth;
+  double m_length;
+  double m_breadth;
 
 public:
-  PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const double rotation, const PMDShapePoint rotatingPoint, const float length, const float breadth)
+  PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const double rotation, const PMDShapePoint rotatingPoint, const double length, const double breadth)
     : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_rotatingPoint(rotatingPoint), m_length(length), m_breadth(breadth)
   { }
 
@@ -119,12 +186,12 @@ public:
     return m_rotation;
   }
 
-  float virtual getLength() const
+  double virtual getLength() const
   {
     return m_length;
   }
 
-  float virtual getBreadth() const
+  double virtual getBreadth() const
   {
     return m_breadth;
   }
@@ -151,9 +218,9 @@ public:
     return points;
   }
 
-  bool virtual shapeTypePolygon() const
+  uint8_t virtual shapeType() const
   {
-    return true;
+    return SHAPE_TYPE_RECT;
   }
 
   virtual ~PMDRectangle()
@@ -179,12 +246,12 @@ public:
     return m_rotation;
   }
 
-  float virtual getLength() const
+  double virtual getLength() const
   {
     return m_length;
   }
 
-  float virtual getBreadth() const
+  double virtual getBreadth() const
   {
     return m_breadth;
   }
@@ -208,9 +275,9 @@ public:
     return points;
   }
 
-  bool virtual shapeTypePolygon() const
+  uint8_t virtual shapeType() const
   {
-    return false;
+    return SHAPE_TYPE_ELLIPSE;
   }
 
   virtual ~PMDEllipse()

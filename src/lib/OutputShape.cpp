@@ -6,9 +6,9 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
   boost::shared_ptr<const PMDLineSet> ptrToLineSet, InchPoint translate)
 {
   boost::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(
-    new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeTypePolygon(), ptrToLineSet->getRotation()));
+    new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeType(), ptrToLineSet->getRotation()));
 
-  if (ptrToLineSet->shapeTypePolygon())
+  if (ptrToLineSet->shapeType() == SHAPE_TYPE_LINE || ptrToLineSet->shapeType() == SHAPE_TYPE_POLY || ptrToLineSet->shapeType() == SHAPE_TYPE_RECT)
   {
     std::vector<PMDShapePoint> pmdPoints = ptrToLineSet->getPoints();
     double pmdRotation = ptrToLineSet->getRotation();
@@ -23,28 +23,65 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
     }
     else
     {
-
       PMDShapePoint pmdRotatingPoint = ptrToLineSet->getRotatingPoint();
       float length = ptrToLineSet->getLength();
       float breadth = ptrToLineSet->getBreadth();
 
-      double x1 = pmdRotatingPoint.m_x.toInches() + translate.m_x;
-      double y1 = pmdRotatingPoint.m_y.toInches() + translate.m_y;
+      if (ptrToLineSet->shapeType() == SHAPE_TYPE_RECT)
+      {
+        double x1 = pmdRotatingPoint.m_x.toInches() + translate.m_x;
+        double y1 = pmdRotatingPoint.m_y.toInches() + translate.m_y;
 
-      double x2 = x1 + length*cos(pmdRotation);
-      double y2 = y1 + length*sin(pmdRotation);
+        double x2 = x1 + length*cos(pmdRotation);
+        double y2 = y1 + length*sin(pmdRotation);
 
-      double x4 = x1 - breadth*sin(pmdRotation);
-      double y4 = y1 + breadth*cos(pmdRotation);
+        double x4 = x1 - breadth*sin(pmdRotation);
+        double y4 = y1 + breadth*cos(pmdRotation);
 
-      double x3 = x4 + length*cos(pmdRotation);
-      double y3 = y4 + length*sin(pmdRotation);
+        double x3 = x4 + length*cos(pmdRotation);
+        double y3 = y4 + length*sin(pmdRotation);
 
-      ptrToOutputShape->addPoint(InchPoint(x1, y1));
-      ptrToOutputShape->addPoint(InchPoint(x2, y2));
-      ptrToOutputShape->addPoint(InchPoint(x3, y3));
-      ptrToOutputShape->addPoint(InchPoint(x4, y4));
+        ptrToOutputShape->addPoint(InchPoint(x1, y1));
+        ptrToOutputShape->addPoint(InchPoint(x2, y2));
+        ptrToOutputShape->addPoint(InchPoint(x3, y3));
+        ptrToOutputShape->addPoint(InchPoint(x4, y4));
+      }
+      else
+      {
+        double rx = pmdRotatingPoint.m_x.toInches() + translate.m_x;
+        double ry = pmdRotatingPoint.m_y.toInches() + translate.m_y;
 
+        double x = rx + (length/2)*cos(pmdRotation);
+        double y = ry + (length/2)*sin(pmdRotation);
+        ptrToOutputShape->addPoint(InchPoint(x, y));
+
+        double xTemp =0;
+        double yTemp =0;
+
+        for (unsigned i = pmdPoints.size()/2 + 1; i < pmdPoints.size(); ++i)
+        {
+          xTemp = pmdPoints[i].m_x.toInches() - pmdPoints[i-1].m_x.toInches();
+          yTemp = pmdPoints[i].m_y.toInches() - pmdPoints[i-1].m_y.toInches();
+          x += xTemp*cos(pmdRotation) - yTemp*sin(pmdRotation);
+          y += xTemp*sin(pmdRotation) + yTemp*cos(pmdRotation);
+          ptrToOutputShape->addPoint(InchPoint(x, y));
+        }
+
+        xTemp = pmdPoints[0].m_x.toInches() - pmdPoints[pmdPoints.size() -1].m_x.toInches();
+        yTemp = pmdPoints[0].m_y.toInches() - pmdPoints[pmdPoints.size() -1].m_y.toInches();
+        x += xTemp*cos(pmdRotation) - yTemp*sin(pmdRotation);
+        y += xTemp*sin(pmdRotation) + yTemp*cos(pmdRotation);
+        ptrToOutputShape->addPoint(InchPoint(x, y));
+
+        for (unsigned i = 1; i < pmdPoints.size()/2; ++i)
+        {
+          xTemp = pmdPoints[i].m_x.toInches() - pmdPoints[i-1].m_x.toInches();
+          yTemp = pmdPoints[i].m_y.toInches() - pmdPoints[i-1].m_y.toInches();
+          x += xTemp*cos(pmdRotation) - yTemp*sin(pmdRotation);
+          y += xTemp*sin(pmdRotation) + yTemp*cos(pmdRotation);
+          ptrToOutputShape->addPoint(InchPoint(x, y));
+        }
+      }
     }
     return ptrToOutputShape;
   }

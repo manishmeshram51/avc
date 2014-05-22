@@ -9,13 +9,13 @@ namespace libpagemaker
 class OutputShape
 {
   bool m_isClosed;
-  bool m_shapeType;
+  uint8_t m_shapeType;
   std::vector<InchPoint> m_points;
   double m_rotation;
   double m_left, m_top, m_right, m_bot;
 public:
-  OutputShape(bool isClosed, bool shapeType, double rotation)
-    : m_isClosed(isClosed), m_shapeType(shapeType), m_points(), m_rotation(rotation),
+  OutputShape(bool isClosed, int shape, double rotation)
+    : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation),
       m_left(), m_top(), m_right(), m_bot()
   { }
 
@@ -34,7 +34,7 @@ public:
     return m_isClosed;
   }
 
-  bool shapeTypePolygon() const
+  uint8_t shapeType() const
   {
     return m_shapeType;
   }

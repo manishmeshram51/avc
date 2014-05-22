@@ -8,6 +8,7 @@ const unsigned PAGE_HEIGHT_OFFSET = 0x3C; /* In the GLOBAL_INFO record. */
 const unsigned PAGE_WIDTH_OFFSET = 0x08;  /* in the first PAGE record. */
 const unsigned PAGE_SHAPE_SEQNUM_OFFSET = 0x02;  /* in the first PAGE record. */
 
+const unsigned LINE_MIRRORED_OFFSET = 0x26;
 const unsigned RECT_TOP_LEFT_OFFSET = 0x06;
 const unsigned RECT_BOT_RIGHT_OFFSET = 0x0A;
 
