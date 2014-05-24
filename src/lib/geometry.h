@@ -36,6 +36,8 @@ public:
   virtual double getLength() const = 0;
   virtual double getBreadth() const = 0;
   uint8_t virtual shapeType() const = 0;
+  PMDShapePoint virtual getTopLeft() const = 0;
+  PMDShapePoint virtual getBotRight() const = 0;
 
   void emitYaml(yaml_emitter_t *emitter) const
   {
@@ -86,6 +88,16 @@ public:
     return false;
   }
 
+  PMDShapePoint virtual getTopLeft() const
+  {
+    return PMDShapePoint(0,0);
+  }
+
+  PMDShapePoint virtual getBotRight() const
+  {
+    return PMDShapePoint(0,0);
+  }
+
   virtual std::vector<PMDShapePoint> getPoints() const
   {
     std::vector<PMDShapePoint> points;
@@ -122,10 +134,12 @@ class PMDPolygon : public PMDLineSet
   PMDShapePoint m_rotatingPoint;
   double m_length;
   double m_breadth;
+  PMDShapePoint m_topLeft;
+  PMDShapePoint m_botRight;
 
 public:
-  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const double rotationRadian, const PMDShapePoint &rotatingPoint, const double length, const double breadth)
-    : m_points(points), m_isClosed(isClosed), m_rotation(rotationRadian), m_rotatingPoint(rotatingPoint), m_length(length), m_breadth(breadth)
+  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const double rotationRadian, const PMDShapePoint &rotatingPoint, const double length, const double breadth, const PMDShapePoint &topLeft, const PMDShapePoint &botRight)
+    : m_points(points), m_isClosed(isClosed), m_rotation(rotationRadian), m_rotatingPoint(rotatingPoint), m_length(length), m_breadth(breadth), m_topLeft(topLeft), m_botRight(botRight)
   { }
 
   double virtual getRotation() const
@@ -146,6 +160,16 @@ public:
   PMDShapePoint virtual getRotatingPoint() const
   {
     return m_rotatingPoint;
+  }
+
+  PMDShapePoint virtual getTopLeft() const
+  {
+    return m_topLeft;
+  }
+
+  PMDShapePoint virtual getBotRight() const
+  {
+    return m_botRight;
   }
 
   bool virtual getIsClosed() const
@@ -199,6 +223,16 @@ public:
   PMDShapePoint virtual getRotatingPoint() const
   {
     return m_rotatingPoint;
+  }
+
+  PMDShapePoint virtual getTopLeft() const
+  {
+    return PMDShapePoint(0,0);
+  }
+
+  PMDShapePoint virtual getBotRight() const
+  {
+    return PMDShapePoint(0,0);
   }
 
   bool virtual getIsClosed() const
@@ -273,6 +307,16 @@ public:
     points.push_back(m_bboxBotRight);
 
     return points;
+  }
+
+  PMDShapePoint virtual getTopLeft() const
+  {
+    return PMDShapePoint(0,0);
+  }
+
+  PMDShapePoint virtual getBotRight() const
+  {
+    return PMDShapePoint(0,0);
   }
 
   uint8_t virtual shapeType() const

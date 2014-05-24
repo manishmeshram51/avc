@@ -154,6 +154,10 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
 void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
                              unsigned pageID)
 {
+  PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
+                          recordIndex, RECT_TOP_LEFT_OFFSET, "Can't read bbox top-left point.");
+  PMDShapePoint botRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
+                           recordIndex, RECT_BOT_RIGHT_OFFSET, "Can't read bbox bottom-right point.");
   uint16_t lineSetSeqNum = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, recordIndex,
                            POLYGON_LINE_SEQNUM_OFFSET, "Can't find seqNum of line set record in polygon record.");
   uint8_t closedMarker = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex,
@@ -223,7 +227,7 @@ void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
   double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
   PMD_DEBUG_MSG(("Polygon Angle in Radian %f\n",rotationRadian));
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, rotationRadian, rotatingPoint, length, breadth));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, rotationRadian, rotatingPoint, length, breadth, topLeft, botRight));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
