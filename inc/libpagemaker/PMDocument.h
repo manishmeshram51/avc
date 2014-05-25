@@ -12,6 +12,16 @@
 
 #include <librevenge/librevenge.h>
 
+#ifdef DLL_EXPORT
+#ifdef LIBPAGEMAKER_BUILD
+#define PAGEMAKERAPI __declspec(dllexport)
+#else
+#define PAGEMAKERAPI __declspec(dllimport)
+#endif
+#else
+#define PAGEMAKERAPI
+#endif
+
 namespace libpagemaker
 {
 
@@ -28,7 +38,7 @@ public:
     indicates whether the content from the input stream is a
     PageMaker document that libpagemaker is able to parse
   */
-  static bool isSupported(librevenge::RVNGInputStream *input);
+  static PAGEMAKERAPI bool isSupported(librevenge::RVNGInputStream *input);
 
   /**
     Parses the input stream content.
@@ -40,9 +50,9 @@ public:
     \param painter A librevenge::RVNGDrawingInterface implementation
     \return A value that indicates whether the parsing was successful
   */
-  static bool parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter);
+  static PAGEMAKERAPI bool parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter);
 
-  static bool parseToYaml(librevenge::RVNGInputStream *input);
+  static PAGEMAKERAPI bool parseToYaml(librevenge::RVNGInputStream *input);
 };
 
 } // namespace libpagemaker
