@@ -12,7 +12,8 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
   {
     std::vector<PMDShapePoint> pmdPoints = ptrToLineSet->getPoints();
     double pmdRotation = ptrToLineSet->getRotation();
-    if (pmdRotation == 0)
+    double pmdSkew = ptrToLineSet->getSkew();
+    if (pmdRotation == 0 && pmdSkew == 0)
     {
       for (unsigned i = 0; i < pmdPoints.size(); ++i)
       {
@@ -45,6 +46,11 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
         double x3 = x4 + length*cos(pmdRotation);
         double y3 = y4 + length*sin(pmdRotation);
 
+        x3 += breadth*cos(pmdRotation)*sin(pmdSkew)/cos(pmdSkew);
+        y3 += breadth*sin(pmdRotation)*sin(pmdSkew)/cos(pmdSkew);
+        x4 += breadth*cos(pmdRotation)*sin(pmdSkew)/cos(pmdSkew);
+        y4 += breadth*sin(pmdRotation)*sin(pmdSkew)/cos(pmdSkew);
+
         ptrToOutputShape->addPoint(InchPoint(x1, y1));
         ptrToOutputShape->addPoint(InchPoint(x2, y2));
         ptrToOutputShape->addPoint(InchPoint(x3, y3));
@@ -58,11 +64,32 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
         double tx = (botRight.m_x.toInches() + topLeft.m_x.toInches())/2 + translate.m_x;
         double ty = (botRight.m_y.toInches() + topLeft.m_y.toInches())/2 + translate.m_y;
 
-
         for (unsigned i = 0; i < pmdPoints.size(); ++i)
         {
           double  x = pmdPoints[i].m_x.toInches()*cos(pmdRotation) - pmdPoints[i].m_y.toInches()*sin(pmdRotation) + tx;
           double  y = pmdPoints[i].m_x.toInches()*sin(pmdRotation) + pmdPoints[i].m_y.toInches()*cos(pmdRotation) + ty;
+
+          double u = (breadth*cos(pmdRotation)*sin(pmdSkew)/cos(pmdSkew))/2;
+          double v = (breadth*sin(pmdRotation)*sin(pmdSkew)/cos(pmdSkew))/2;
+          if ((i < 1) || (i > pmdPoints.size()-2))
+          {
+            x += u;
+            y += v;
+          }
+
+          else if (i > 1 && i < (pmdPoints.size() -2))
+          {
+            x -= u;
+            y -= v;
+          }
+
+          if ((pmdPoints.size() == 3 && i == 1) || (pmdPoints.size() == 4 && i == 1) || (pmdPoints.size() == 4 && i == 2))
+          {
+            x -= u;
+            y -= v;
+          }
+          PMD_DEBUG_MSG(("x %f\n",x));
+          PMD_DEBUG_MSG(("y %f\n\n",y));
           ptrToOutputShape->addPoint(InchPoint(x, y));
         }
       }

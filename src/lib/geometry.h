@@ -32,6 +32,7 @@ public:
   virtual std::vector<PMDShapePoint> getPoints() const = 0;
   bool virtual getIsClosed() const = 0;
   virtual double getRotation() const = 0;
+  double virtual getSkew() const = 0;
   PMDShapePoint virtual getRotatingPoint() const = 0;
   PMDShapePoint virtual getXformTopLeft() const = 0;
   PMDShapePoint virtual getXformBotRight() const = 0;
@@ -64,6 +65,11 @@ public:
   { }
 
   double virtual getRotation() const
+  {
+    return 0;
+  }
+
+  double virtual getSkew() const
   {
     return 0;
   }
@@ -131,12 +137,15 @@ class PMDPolygon : public PMDLineSet
   std::vector<PMDShapePoint> m_points;
   bool m_isClosed;
   double m_rotation;
+  double m_skew;
   PMDShapePoint m_topLeft;
   PMDShapePoint m_botRight;
+  PMDShapePoint m_xformTopLeft;
+  PMDShapePoint m_xformBotRight;
 
 public:
-  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const double rotationRadian, const PMDShapePoint &topLeft, const PMDShapePoint &botRight)
-    : m_points(points), m_isClosed(isClosed), m_rotation(rotationRadian), m_topLeft(topLeft), m_botRight(botRight)
+  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const double rotation, const double skew, const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight)
+    : m_points(points), m_isClosed(isClosed), m_rotation(rotation), m_skew(skew), m_topLeft(topLeft), m_botRight(botRight), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight)
   { }
 
   double virtual getRotation() const
@@ -144,14 +153,19 @@ public:
     return m_rotation;
   }
 
+  double virtual getSkew() const
+  {
+    return m_skew;
+  }
+
   PMDShapePoint virtual getXformTopLeft() const
   {
-    return PMDShapePoint(0,0);
+    return m_xformTopLeft;
   }
 
   PMDShapePoint virtual getXformBotRight() const
   {
-    return PMDShapePoint(0,0);
+    return m_xformBotRight;
   }
 
   PMDShapePoint virtual getRotatingPoint() const
@@ -193,18 +207,24 @@ class PMDRectangle : public PMDLineSet
   PMDShapePoint m_topLeft;
   PMDShapePoint m_botRight;
   double m_rotation;
+  double m_skew;
   PMDShapePoint m_rotatingPoint;
   PMDShapePoint m_xformTopLeft;
   PMDShapePoint m_xformBotRight;
 
 public:
-  PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const double rotation, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight)
-    : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight)
+  PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight)
+    : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight)
   { }
 
   double virtual getRotation() const
   {
     return m_rotation;
+  }
+
+  double virtual getSkew() const
+  {
+    return m_skew;
   }
 
   PMDShapePoint virtual getXformTopLeft() const
@@ -275,6 +295,11 @@ public:
   double virtual getRotation() const
   {
     return m_rotation;
+  }
+
+  double virtual getSkew() const
+  {
+    return 0;
   }
 
   PMDShapePoint virtual getXformTopLeft() const

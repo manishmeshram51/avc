@@ -21,6 +21,7 @@ const unsigned LEFT_PAGE_RIGHT_BOUND_OFFSET = 0x3A;
 const unsigned SHAPE_XFORM_ID_OFFSET = 0x1C; /* In the SHAPE record. */
 const unsigned XFORM_ID_OFFSET = 0x16; /* In the XForm record. */
 const unsigned XFORM_RECT_ROTATION_OFFSET = 0;
+const unsigned XFORM_SKEW_OFFSET = 0x04;
 const unsigned XFORM_ROTATING_POINT_OFFSET = 0x12;
 
 const unsigned XFORM_TOP_LEFT_OFFSET = 0x0A;

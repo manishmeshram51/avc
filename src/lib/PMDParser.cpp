@@ -114,6 +114,7 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
   PMDShapePoint botRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
                            recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read rectangle bottom-right point.");
   uint32_t rectRotationDegree = 0;
+  uint32_t rectSkewDegree = 0;
   PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
   PMDShapePoint xformBotRight = PMDShapePoint(0,0);
   PMDShapePoint rotatingPoint = PMDShapePoint(0, 0);
@@ -132,6 +133,7 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
       if (xformId == rectXformId)
       {
         rectRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read rectangle rotation.");
+        rectSkewDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_SKEW_OFFSET, "Can't read rectangle skew.");
         rotatingPoint = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_ROTATING_POINT_OFFSET, "Can't read rotating point.");
         xformTopLeft = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_TOP_LEFT_OFFSET, "Can't read xform top-left point.");
         xformBotRight = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_BOT_RIGHT_OFFSET, "Can't read xform bot-right point.");
@@ -141,7 +143,9 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
   }
   int32_t temp = (int32_t)rectRotationDegree;
   double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
-  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(topLeft, botRight, rotationRadian, rotatingPoint, xformTopLeft, xformBotRight));
+  temp = (int32_t)rectSkewDegree;
+  double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
+  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(topLeft, botRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -156,6 +160,11 @@ void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
                            POLYGON_LINE_SEQNUM_OFFSET, "Can't find seqNum of line set record in polygon record.");
   uint8_t closedMarker = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex,
                          POLYGON_CLOSED_MARKER_OFFSET, "Can't find the byte telling whether the polygon is open or closed.");
+
+  uint32_t polySkewDegree = 0;
+  PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
+  PMDShapePoint xformBotRight = PMDShapePoint(0,0);
+
   bool closed;
   switch (closedMarker)
   {
@@ -203,14 +212,19 @@ void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
       if (xformId == polyXformId)
       {
         polyRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read polygon rotation.");
+        polySkewDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_SKEW_OFFSET, "Can't read polygon skew.");
+        xformTopLeft = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_TOP_LEFT_OFFSET, "Can't read xform top-left point.");
+        xformBotRight = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_BOT_RIGHT_OFFSET, "Can't read xform bot-right point.");
         break;
       }
     }
   }
   int32_t temp = (int32_t)polyRotationDegree;
   double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
+  temp = (int32_t)polySkewDegree;
+  double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, rotationRadian, topLeft, botRight));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, rotationRadian, skewRadian, topLeft, botRight, xformTopLeft, xformBotRight));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
