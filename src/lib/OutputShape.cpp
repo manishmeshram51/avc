@@ -66,30 +66,11 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
 
         for (unsigned i = 0; i < pmdPoints.size(); ++i)
         {
-          double  x = pmdPoints[i].m_x.toInches()*cos(pmdRotation) - pmdPoints[i].m_y.toInches()*sin(pmdRotation) + tx;
-          double  y = pmdPoints[i].m_x.toInches()*sin(pmdRotation) + pmdPoints[i].m_y.toInches()*cos(pmdRotation) + ty;
 
-          double u = (breadth*cos(pmdRotation)*sin(pmdSkew)/cos(pmdSkew))/2;
-          double v = (breadth*sin(pmdRotation)*sin(pmdSkew)/cos(pmdSkew))/2;
-          if ((i < 1) || (i > pmdPoints.size()-2))
-          {
-            x += u;
-            y += v;
-          }
+          double temp = pmdPoints[i].m_x.toInches() + tan(pmdSkew)*pmdPoints[i].m_y.toInches();
+          double  x = temp*cos(pmdRotation) - pmdPoints[i].m_y.toInches()*sin(pmdRotation) + tx;
+          double  y = temp*sin(pmdRotation) + pmdPoints[i].m_y.toInches()*cos(pmdRotation) + ty;
 
-          else if (i > 1 && i < (pmdPoints.size() -2))
-          {
-            x -= u;
-            y -= v;
-          }
-
-          if ((pmdPoints.size() == 3 && i == 1) || (pmdPoints.size() == 4 && i == 1) || (pmdPoints.size() == 4 && i == 2))
-          {
-            x -= u;
-            y -= v;
-          }
-          PMD_DEBUG_MSG(("x %f\n",x));
-          PMD_DEBUG_MSG(("y %f\n\n",y));
           ptrToOutputShape->addPoint(InchPoint(x, y));
         }
       }
