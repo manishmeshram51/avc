@@ -12,10 +12,11 @@ class OutputShape
   uint8_t m_shapeType;
   std::vector<InchPoint> m_points;
   double m_rotation;
+  double m_skew;
   double m_left, m_top, m_right, m_bot;
 public:
-  OutputShape(bool isClosed, int shape, double rotation)
-    : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation),
+  OutputShape(bool isClosed, int shape, double rotation, double skew)
+    : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
       m_left(), m_top(), m_right(), m_bot()
   { }
 
@@ -42,6 +43,11 @@ public:
   double getRotation() const
   {
     return m_rotation;
+  }
+
+  double getSkew() const
+  {
+    return m_skew;
   }
 
   std::pair<InchPoint, InchPoint> getBoundingBox() const

@@ -284,12 +284,13 @@ class PMDEllipse : public PMDLineSet
   PMDShapePoint m_bboxTopLeft;
   PMDShapePoint m_bboxBotRight;
   double m_rotation;
+  double m_skew;
   PMDShapePoint m_xformTopLeft;
   PMDShapePoint m_xformBotRight;
 
 public:
-  PMDEllipse(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight)
-    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight)
+  PMDEllipse(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight)
   { }
 
   double virtual getRotation() const
@@ -299,7 +300,7 @@ public:
 
   double virtual getSkew() const
   {
-    return 0;
+    return m_skew;
   }
 
   PMDShapePoint virtual getXformTopLeft() const

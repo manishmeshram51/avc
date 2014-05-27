@@ -237,6 +237,7 @@ void PMDParser::parseEllipse(PMDRecordContainer container, unsigned recordIndex,
                                recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read bbox bottom-right point.");
 
   uint32_t ellipseRotationDegree = 0;
+  uint32_t ellipseSkewDegree = 0;
   PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
   PMDShapePoint xformBotRight = PMDShapePoint(0,0);
   uint32_t ellipseXformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_XFORM_ID_OFFSET, "Can't read ellipse xform id.");
@@ -253,6 +254,7 @@ void PMDParser::parseEllipse(PMDRecordContainer container, unsigned recordIndex,
       if (xformId == ellipseXformId)
       {
         ellipseRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read ellipse rotation.");
+        ellipseSkewDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_SKEW_OFFSET, "Can't read ellipse skew.");
         xformTopLeft = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_TOP_LEFT_OFFSET, "Can't read xform top-left point.");
         xformBotRight = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_BOT_RIGHT_OFFSET, "Can't read xform bot-right point.");
         break;
@@ -261,8 +263,10 @@ void PMDParser::parseEllipse(PMDRecordContainer container, unsigned recordIndex,
   }
   int32_t temp = (int32_t)ellipseRotationDegree;
   double rotationRadian = -1 * (double)temp/1000 *(M_PI/180);
+  temp = (int32_t)ellipseSkewDegree;
+  double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDEllipse(bboxTopLeft, bboxBotRight, rotationRadian, xformTopLeft, xformBotRight));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDEllipse(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, xformTopLeft, xformBotRight));
   m_collector->addShapeToPage(pageID, newShape);
 }
 

@@ -6,7 +6,7 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
   boost::shared_ptr<const PMDLineSet> ptrToLineSet, InchPoint translate)
 {
   boost::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(
-    new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeType(), ptrToLineSet->getRotation()));
+    new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeType(), ptrToLineSet->getRotation(), ptrToLineSet->getSkew()));
 
   if (ptrToLineSet->shapeType() == SHAPE_TYPE_LINE || ptrToLineSet->shapeType() == SHAPE_TYPE_POLY || ptrToLineSet->shapeType() == SHAPE_TYPE_RECT)
   {
@@ -80,14 +80,15 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
   else
   {
     std::vector<PMDShapePoint> pmdPoints = ptrToLineSet->getPoints();
-    double pmdRotation = ptrToLineSet->getRotation() *(M_PI/180);
+    double pmdRotation = ptrToLineSet->getRotation();
+    double pmdSkew = ptrToLineSet->getSkew();
 
     double cx = (pmdPoints[0].m_x.toInches() + pmdPoints[1].m_x.toInches())/2 + translate.m_x;
     double cy = (pmdPoints[0].m_y.toInches() + pmdPoints[1].m_y.toInches())/2 + translate.m_y;
     double rx = 0;
     double ry = 0;
 
-    if (pmdRotation == 0)
+    if (pmdRotation == 0 && pmdSkew == 0)
     {
       rx = fabs(pmdPoints[1].m_x.toInches() - pmdPoints[0].m_x.toInches())/2;
       ry = fabs(pmdPoints[1].m_y.toInches() - pmdPoints[0].m_y.toInches())/2;

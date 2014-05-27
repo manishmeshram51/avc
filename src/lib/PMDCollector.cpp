@@ -73,10 +73,12 @@ void PMDCollector::paintShape(const OutputShape &shape,
     double ry = shape.getPoint(1).m_y;
 
     double rotation = shape.getRotation();
+    double skew = shape.getSkew();
 
     PMD_DEBUG_MSG(("\n\nCx and Cy are %f , %f \n",cx,cy));
     PMD_DEBUG_MSG(("Rx and Ry are %f , %f \n",rx,ry));
     PMD_DEBUG_MSG(("Rotation is %f \n",rotation));
+    PMD_DEBUG_MSG(("Skew is %f \n",skew));
     librevenge::RVNGPropertyList propList;
 
     if (false)
@@ -94,6 +96,9 @@ void PMDCollector::paintShape(const OutputShape &shape,
 
       double ex = cx + rx*cos(rotation);
       double ey = cy + rx*sin(rotation);
+
+      if ((rotation == 0 || rotation < skew) && skew != 0)
+        rotation += (ry*skew/rx)/2;
 
       librevenge::RVNGPropertyListVector vec;
       librevenge::RVNGPropertyList node;
