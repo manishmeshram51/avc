@@ -97,8 +97,8 @@ void PMDCollector::paintShape(const OutputShape &shape,
       double ex = cx + rx*cos(rotation);
       double ey = cy + rx*sin(rotation);
 
-      if ((rotation == 0 || rotation < skew) && skew != 0)
-        rotation += (ry*skew/rx)/2;
+      //if ((rotation == 0 || rotation < skew) && skew != 0)
+        //rotation += (ry*skew/rx)/2;
 
       librevenge::RVNGPropertyListVector vec;
       librevenge::RVNGPropertyList node;
