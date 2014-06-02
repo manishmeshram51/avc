@@ -26,4 +26,9 @@ const unsigned XFORM_ROTATING_POINT_OFFSET = 0x12;
 
 const unsigned XFORM_TOP_LEFT_OFFSET = 0x0A;
 const unsigned XFORM_BOT_RIGHT_OFFSET = 0x0E;
+
+const unsigned SHAPE_FILL_COLOR_OFFSET = 0x04;
+const unsigned SHAPE_FILL_TYPE_OFFSET = 0x26;
+const unsigned SHAPE_FILL_OVERPRINT_OFFSET = 0x02;
+const unsigned SHAPE_FILL_TINT_OFFSET = 0xe0;
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

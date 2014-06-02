@@ -120,6 +120,16 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
   PMDShapePoint rotatingPoint = PMDShapePoint(0, 0);
   uint32_t rectXformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_XFORM_ID_OFFSET, "Can't read rectangle xform id.");
 
+  uint8_t fillColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_COLOR_OFFSET, "Can't read rectangle fill color.");
+  uint8_t fillType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TYPE_OFFSET, "Can't read rectangle fill type.");
+  uint8_t fillOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_OVERPRINT_OFFSET, "Can't read rectangle fill overprint.");
+  uint8_t fillTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TINT_OFFSET, "Can't read rectangle fill tint.");
+
+  PMD_DEBUG_MSG(("Rectangle fill color, %d \n",fillColor));
+  PMD_DEBUG_MSG(("Rectangle fill type, %d \n",fillType));
+  PMD_DEBUG_MSG(("Rectangle fill overprint, %d \n",fillOverprint));
+  PMD_DEBUG_MSG(("Rectangle fill tine, %d \n",fillTint));
+
   if (rectXformId != (std::numeric_limits<uint32_t>::max)())
   {
     PMD_DEBUG_MSG(("Rectangle contains rotation\n"));
