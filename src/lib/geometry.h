@@ -39,6 +39,11 @@ public:
   uint8_t virtual shapeType() const = 0;
   PMDShapePoint virtual getTopLeft() const = 0;
   PMDShapePoint virtual getBotRight() const = 0;
+  uint8_t virtual getFillType() const = 0;
+  uint8_t virtual getFillColor() const = 0;
+  uint8_t virtual getFillOverprint() const = 0;
+  uint8_t virtual getFillTint() const = 0;
+
 
   void emitYaml(yaml_emitter_t *emitter) const
   {
@@ -126,6 +131,28 @@ public:
     return SHAPE_TYPE_LINE;
   }
 
+  uint8_t virtual getFillType() const
+  {
+    return 0;
+  }
+
+  uint8_t virtual getFillColor() const
+  {
+    return 0;
+  }
+
+  uint8_t virtual getFillOverprint() const
+  {
+    return 0;
+  }
+
+  uint8_t virtual getFillTint() const
+  {
+    return 0;
+  }
+
+
+
   virtual ~PMDLine()
   {
   }
@@ -142,10 +169,14 @@ class PMDPolygon : public PMDLineSet
   PMDShapePoint m_botRight;
   PMDShapePoint m_xformTopLeft;
   PMDShapePoint m_xformBotRight;
+  uint8_t m_fillType;
+  uint8_t m_fillColor;
+  uint8_t m_fillOverprint;
+  uint8_t m_fillTint;
 
 public:
-  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const double rotation, const double skew, const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight)
-    : m_points(points), m_isClosed(isClosed), m_rotation(rotation), m_skew(skew), m_topLeft(topLeft), m_botRight(botRight), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight)
+  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const double rotation, const double skew, const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const uint8_t fillType, const uint8_t fillColor, const uint8_t fillOverprint, const uint8_t fillTint)
+    : m_points(points), m_isClosed(isClosed), m_rotation(rotation), m_skew(skew), m_topLeft(topLeft), m_botRight(botRight), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint)
   { }
 
   double virtual getRotation() const
@@ -197,6 +228,27 @@ public:
   {
     return SHAPE_TYPE_POLY;
   }
+
+  uint8_t virtual getFillType() const
+  {
+    return m_fillType;
+  }
+
+  uint8_t virtual getFillColor() const
+  {
+    return m_fillColor;
+  }
+
+  uint8_t virtual getFillOverprint() const
+  {
+    return m_fillOverprint;
+  }
+
+  uint8_t virtual getFillTint() const
+  {
+    return m_fillTint;
+  }
+
   virtual ~PMDPolygon()
   {
   }
@@ -211,10 +263,14 @@ class PMDRectangle : public PMDLineSet
   PMDShapePoint m_rotatingPoint;
   PMDShapePoint m_xformTopLeft;
   PMDShapePoint m_xformBotRight;
+  uint8_t m_fillType;
+  uint8_t m_fillColor;
+  uint8_t m_fillOverprint;
+  uint8_t m_fillTint;
 
 public:
-  PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight)
-    : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight)
+  PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const uint8_t fillType, const uint8_t fillColor, const uint8_t fillOverprint, const uint8_t fillTint)
+    : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint)
   { }
 
   double virtual getRotation() const
@@ -272,6 +328,26 @@ public:
   uint8_t virtual shapeType() const
   {
     return SHAPE_TYPE_RECT;
+  }
+
+  uint8_t virtual getFillType() const
+  {
+    return m_fillType;
+  }
+
+  uint8_t virtual getFillColor() const
+  {
+    return m_fillColor;
+  }
+
+  uint8_t virtual getFillOverprint() const
+  {
+    return m_fillOverprint;
+  }
+
+  uint8_t virtual getFillTint() const
+  {
+    return m_fillTint;
   }
 
   virtual ~PMDRectangle()
@@ -345,6 +421,26 @@ public:
   uint8_t virtual shapeType() const
   {
     return SHAPE_TYPE_ELLIPSE;
+  }
+
+  uint8_t virtual getFillType() const
+  {
+    return 0;
+  }
+
+  uint8_t virtual getFillColor() const
+  {
+    return 0;
+  }
+
+  uint8_t virtual getFillOverprint() const
+  {
+    return 0;
+  }
+
+  uint8_t virtual getFillTint() const
+  {
+    return 0;
   }
 
   virtual ~PMDEllipse()

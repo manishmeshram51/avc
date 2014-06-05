@@ -56,6 +56,62 @@ void PMDCollector::paintShape(const OutputShape &shape,
     }
     librevenge::RVNGPropertyList points;
     points.insert("svg:points", vertices);
+    uint8_t fillType = shape.getFillType();
+    uint8_t fillColor = shape.getFillColor();
+    //uint8_t fillOverprint = shape.getFillOverprint();
+    uint8_t fillTint = shape.getFillTint();
+
+    switch (fillType)
+    {
+    case FILL_SOLID:
+      points.insert("draw:fill", "solid");
+      break;
+    case FILL_NONE:
+      points.insert("draw:fill", "none");
+      break;
+    default:
+      points.insert("draw:fill", "none");
+    }
+
+    switch (fillColor)
+    {
+    case NONE:
+      points.insert("draw:fill-color", "#FFFFFF");
+      break;
+    case REGISTRATION:
+      points.insert("draw:fill-color", "#000000");
+      break;
+    case PAPER:
+      points.insert("draw:fill-color", "#FFFFFF");
+      break;
+    case BLACK:
+      points.insert("draw:fill-color", "#000000");
+      break;
+    case RED:
+      points.insert("draw:fill-color", "#FF0000");
+      break;
+    case GREEN:
+      points.insert("draw:fill-color", "#00FF00");
+      break;
+    case BLUE:
+      points.insert("draw:fill-color", "#0000FF");
+      break;
+    case CYAN:
+      points.insert("draw:fill-color", "#00FFFF");
+      break;
+    case MAGENTA:
+      points.insert("draw:fill-color", "#FF00FF");
+      break;
+    case YELLOW:
+      points.insert("draw:fill-color", "#FFFF00");
+      break;
+    }
+
+    if (fillColor == NONE)
+      points.insert("draw:opacity", 0);
+    else
+      points.insert("draw:opacity", fillTint);
+
     if (shape.getIsClosed())
     {
       painter->drawPolygon(points);

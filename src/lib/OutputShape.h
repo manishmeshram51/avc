@@ -14,10 +14,15 @@ class OutputShape
   double m_rotation;
   double m_skew;
   double m_left, m_top, m_right, m_bot;
+  uint8_t m_fillType;
+  uint8_t m_fillColor;
+  uint8_t m_fillOverprint;
+  uint8_t m_fillTint;
+
 public:
-  OutputShape(bool isClosed, int shape, double rotation, double skew)
+  OutputShape(bool isClosed, int shape, double rotation, double skew, uint8_t fillType, uint8_t fillColor, uint8_t fillOverprint, uint8_t fillTint)
     : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
-      m_left(), m_top(), m_right(), m_bot()
+      m_left(), m_top(), m_right(), m_bot(), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint)
   { }
 
   unsigned numPoints() const
@@ -38,6 +43,26 @@ public:
   uint8_t shapeType() const
   {
     return m_shapeType;
+  }
+
+  uint8_t getFillType() const
+  {
+    return m_fillType;
+  }
+
+  uint8_t virtual getFillColor() const
+  {
+    return m_fillColor;
+  }
+
+  uint8_t virtual getFillOverprint() const
+  {
+    return m_fillOverprint;
+  }
+
+  uint8_t virtual getFillTint() const
+  {
+    return m_fillTint;
   }
 
   double getRotation() const

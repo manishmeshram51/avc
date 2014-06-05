@@ -125,11 +125,6 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
   uint8_t fillOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_OVERPRINT_OFFSET, "Can't read rectangle fill overprint.");
   uint8_t fillTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TINT_OFFSET, "Can't read rectangle fill tint.");
 
-  PMD_DEBUG_MSG(("Rectangle fill color, %d \n",fillColor));
-  PMD_DEBUG_MSG(("Rectangle fill type, %d \n",fillType));
-  PMD_DEBUG_MSG(("Rectangle fill overprint, %d \n",fillOverprint));
-  PMD_DEBUG_MSG(("Rectangle fill tine, %d \n",fillTint));
-
   if (rectXformId != (std::numeric_limits<uint32_t>::max)())
   {
     PMD_DEBUG_MSG(("Rectangle contains rotation\n"));
@@ -155,7 +150,7 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
   double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
   temp = (int32_t)rectSkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
-  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(topLeft, botRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(topLeft, botRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, fillType, fillColor, fillOverprint, fillTint));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -210,6 +205,11 @@ void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
   uint32_t polyRotationDegree = 0;
   uint32_t polyXformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_XFORM_ID_OFFSET, "Can't read polygon xform id.");
 
+  uint8_t fillColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_COLOR_OFFSET, "Can't read polygon fill color.");
+  uint8_t fillType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TYPE_OFFSET, "Can't read polygon fill type.");
+  uint8_t fillOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_OVERPRINT_OFFSET, "Can't read polygon fill overprint.");
+  uint8_t fillTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TINT_OFFSET, "Can't read polygon fill tint.");
+
   if (polyXformId != (std::numeric_limits<uint32_t>::max)())
   {
     const PMDRecordContainer *ptrToXformContainer = &(m_recordsInOrder[0x0c]);
@@ -234,7 +234,7 @@ void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
   temp = (int32_t)polySkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, rotationRadian, skewRadian, topLeft, botRight, xformTopLeft, xformBotRight));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, rotationRadian, skewRadian, topLeft, botRight, xformTopLeft, xformBotRight, fillType, fillColor, fillOverprint, fillTint));
   m_collector->addShapeToPage(pageID, newShape);
 }
 

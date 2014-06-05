@@ -6,7 +6,7 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
   boost::shared_ptr<const PMDLineSet> ptrToLineSet, InchPoint translate)
 {
   boost::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(
-    new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeType(), ptrToLineSet->getRotation(), ptrToLineSet->getSkew()));
+    new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeType(), ptrToLineSet->getRotation(), ptrToLineSet->getSkew(), ptrToLineSet->getFillType(), ptrToLineSet->getFillColor(), ptrToLineSet->getFillOverprint(), ptrToLineSet->getFillTint()));
 
   if (ptrToLineSet->shapeType() == SHAPE_TYPE_LINE || ptrToLineSet->shapeType() == SHAPE_TYPE_POLY || ptrToLineSet->shapeType() == SHAPE_TYPE_RECT)
   {
