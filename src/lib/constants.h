@@ -32,17 +32,16 @@ const uint8_t SHAPE_TYPE_ELLIPSE = 4;
 const uint8_t FILL_NONE = 0;
 const uint8_t FILL_PAPER = 1;
 const uint8_t FILL_SOLID = 2;
-const uint8_t VERTICAL_BARS = 3;
-const uint8_t TIGHT_VERTICAL_BARS = 4;
-const uint8_t HORIZONTAL_BARS = 5;
-const uint8_t TIGHT_HORIZONTAL_BARS = 6;
-const uint8_t TILTED_BARS = 7;
-const uint8_t TIGHT_TILTED_BARS = 8;
-const uint8_t GRID_BARS = 9;
-const uint8_t TIGHT_GRID_BARS = 0x0A;
+const uint8_t FILL_VERTICAL_BARS = 3;
+const uint8_t FILL_TIGHT_VERTICAL_BARS = 4;
+const uint8_t FILL_HORIZONTAL_BARS = 5;
+const uint8_t FILL_TIGHT_HORIZONTAL_BARS = 6;
+const uint8_t FILL_TILTED_BARS = 7;
+const uint8_t FILL_TIGHT_TILTED_BARS = 8;
+const uint8_t FILL_GRID_BARS = 9;
+const uint8_t FILL_TIGHT_GRID_BARS = 0x0A;
 
-
-
+/* Color Constants */
 const uint8_t NONE = 0;
 const uint8_t REGISTRATION = 1;
 const uint8_t PAPER = 2;
@@ -53,5 +52,17 @@ const uint8_t BLUE = 6;
 const uint8_t CYAN = 7;
 const uint8_t MAGENTA = 8;
 const uint8_t YELLOW = 9;
+
+
+
+/* Stroke Constants */
+const uint8_t STROKE_NORMAL = 0;
+const uint8_t STROKE_LIGHT_LIGHT = 1;
+const uint8_t STROKE_DARK_LIGHT = 2;
+const uint8_t STROKE_LIGHT_DARK = 3;
+const uint8_t STROKE_LIGHT_DARK_LIGHT = 4;
+const uint8_t STROKE_DASHED = 5;
+const uint8_t STROKE_SQUARE_DOTS = 6;
+const uint8_t STROKE_CIRCULAR_DOTS = 7;
 
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

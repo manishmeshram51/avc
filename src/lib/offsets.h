@@ -31,4 +31,11 @@ const unsigned SHAPE_FILL_COLOR_OFFSET = 0x04;
 const unsigned SHAPE_FILL_TYPE_OFFSET = 0x26;
 const unsigned SHAPE_FILL_OVERPRINT_OFFSET = 0x02;
 const unsigned SHAPE_FILL_TINT_OFFSET = 0xe0;
+
+
+const unsigned SHAPE_STROKE_COLOR_OFFSET = 0x28;
+const unsigned SHAPE_STROKE_TYPE_OFFSET = 0x20;
+const unsigned SHAPE_STROKE_OVERPRINT_OFFSET = 0x2a;
+const unsigned SHAPE_STROKE_TINT_OFFSET = 0x2c;
+const unsigned SHAPE_STROKE_WIDTH_OFFSET = 0x23;
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

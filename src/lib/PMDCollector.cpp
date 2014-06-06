@@ -61,6 +61,13 @@ void PMDCollector::paintShape(const OutputShape &shape,
     //uint8_t fillOverprint = shape.getFillOverprint();
     uint8_t fillTint = shape.getFillTint();
 
+    uint8_t strokeType = shape.getStrokeType();
+    double strokeWidth = shape.getStrokeWidth();
+    strokeWidth = strokeWidth/360;
+    uint8_t strokeColor = shape.getStrokeColor();
+    //uint8_t strokeOverprint = shape.getStrokeOverprint();
+    uint8_t strokeTint = shape.getStrokeTint();
+
     switch (fillType)
     {
     case FILL_SOLID:
@@ -73,6 +80,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
       points.insert("draw:fill", "none");
     }
 
+    PMD_DEBUG_MSG(("Color %d\n",fillColor));
     switch (fillColor)
     {
     case NONE:
@@ -111,6 +119,57 @@ void PMDCollector::paintShape(const OutputShape &shape,
       points.insert("draw:opacity", 0);
     else
       points.insert("draw:opacity", fillTint);
+
+    switch (strokeType)
+    {
+    case STROKE_NORMAL:
+      points.insert("draw:stroke", "solid");
+      points.insert("svg:stroke-width", strokeWidth);
+      break;
+    case STROKE_DASHED:
+      points.insert("draw:stroke", "dash");
+      points.insert("svg:stroke-linecap", "square");
+      points.insert("svg:stroke-width", strokeWidth);
+      break;
+    default:
+      points.insert("draw:stroke", "none");
+    }
+
+    switch (strokeColor)
+    {
+    case NONE:
+      points.insert("svg:stroke-color", "#FFFFFF");
+      break;
+    case REGISTRATION:
+      points.insert("svg:stroke-color", "#000000");
+      break;
+    case PAPER:
+      points.insert("svg:stroke-color", "#FFFFFF");
+      break;
+    case BLACK:
+      points.insert("svg:stroke-color", "#000000");
+      break;
+    case RED:
+      points.insert("svg:stroke-color", "#FF0000");
+      break;
+    case GREEN:
+      points.insert("svg:stroke-color", "#00FF00");
+      break;
+    case BLUE:
+      points.insert("svg:stroke-color", "#0000FF");
+      break;
+    case CYAN:
+      points.insert("svg:stroke-color", "#00FFFF");
+      break;
+    case MAGENTA:
+      points.insert("svg:stroke-color", "#FF00FF");
+      break;
+    case YELLOW:
+      points.insert("svg:stroke-color", "#FFFF00");
+      break;
+    }
+
+    points.insert("svg:stroke-opacity", strokeTint);
 
     if (shape.getIsClosed())
     {

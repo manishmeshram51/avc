@@ -125,6 +125,13 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
   uint8_t fillOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_OVERPRINT_OFFSET, "Can't read rectangle fill overprint.");
   uint8_t fillTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TINT_OFFSET, "Can't read rectangle fill tint.");
 
+  uint8_t strokeColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_COLOR_OFFSET, "Can't read rectangle stroke color.");
+  uint8_t strokeType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TYPE_OFFSET, "Can't read rectangle stroke type.");
+  uint8_t strokeWidth = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_WIDTH_OFFSET, "Can't read rectangle stroke width.");
+  uint8_t strokeTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TINT_OFFSET, "Can't read rectangle stroke tint.");
+  uint8_t strokeOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_OVERPRINT_OFFSET, "Can't read rectangle stroke overprint.");
+
+
   if (rectXformId != (std::numeric_limits<uint32_t>::max)())
   {
     PMD_DEBUG_MSG(("Rectangle contains rotation\n"));
@@ -150,7 +157,7 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
   double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
   temp = (int32_t)rectSkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
-  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(topLeft, botRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, fillType, fillColor, fillOverprint, fillTint));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(topLeft, botRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, fillType, fillColor, fillOverprint, fillTint,  strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -210,6 +217,12 @@ void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
   uint8_t fillOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_OVERPRINT_OFFSET, "Can't read polygon fill overprint.");
   uint8_t fillTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TINT_OFFSET, "Can't read polygon fill tint.");
 
+  uint8_t strokeColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_COLOR_OFFSET, "Can't read polygon stroke color.");
+  uint8_t strokeType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TYPE_OFFSET, "Can't read polygon stroke type.");
+  uint8_t strokeWidth = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_WIDTH_OFFSET, "Can't read polygon stroke width.");
+  uint8_t strokeTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TINT_OFFSET, "Can't read polygon stroke tint.");
+  uint8_t strokeOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_OVERPRINT_OFFSET, "Can't read polygon stroke overprint.");
+
   if (polyXformId != (std::numeric_limits<uint32_t>::max)())
   {
     const PMDRecordContainer *ptrToXformContainer = &(m_recordsInOrder[0x0c]);
@@ -234,7 +247,7 @@ void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
   temp = (int32_t)polySkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, rotationRadian, skewRadian, topLeft, botRight, xformTopLeft, xformBotRight, fillType, fillColor, fillOverprint, fillTint));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, rotationRadian, skewRadian, topLeft, botRight, xformTopLeft, xformBotRight, fillType, fillColor, fillOverprint, fillTint, strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
   m_collector->addShapeToPage(pageID, newShape);
 }
 

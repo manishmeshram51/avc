@@ -18,11 +18,16 @@ class OutputShape
   uint8_t m_fillColor;
   uint8_t m_fillOverprint;
   uint8_t m_fillTint;
+  uint8_t m_strokeType;
+  uint8_t m_strokeWidth;
+  uint8_t m_strokeColor;
+  uint8_t m_strokeOverprint;
+  uint8_t m_strokeTint;
 
 public:
-  OutputShape(bool isClosed, int shape, double rotation, double skew, uint8_t fillType, uint8_t fillColor, uint8_t fillOverprint, uint8_t fillTint)
+  OutputShape(bool isClosed, int shape, double rotation, double skew, uint8_t fillType, uint8_t fillColor, uint8_t fillOverprint, uint8_t fillTint, uint8_t strokeType, uint8_t strokeWidth, uint8_t strokeColor, uint8_t strokeOverprint, uint8_t strokeTint)
     : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
-      m_left(), m_top(), m_right(), m_bot(), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint)
+      m_left(), m_top(), m_right(), m_bot(), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
   { }
 
   unsigned numPoints() const
@@ -63,6 +68,31 @@ public:
   uint8_t virtual getFillTint() const
   {
     return m_fillTint;
+  }
+
+  uint8_t virtual getStrokeType() const
+  {
+    return m_strokeType;
+  }
+
+  uint8_t virtual getStrokeWidth() const
+  {
+    return m_strokeWidth;
+  }
+
+  uint8_t virtual getStrokeColor() const
+  {
+    return m_strokeColor;
+  }
+
+  uint8_t virtual getStrokeOverprint() const
+  {
+    return m_strokeOverprint;
+  }
+
+  uint8_t virtual getStrokeTint() const
+  {
+    return m_strokeTint;
   }
 
   double getRotation() const
