@@ -80,7 +80,6 @@ void PMDCollector::paintShape(const OutputShape &shape,
       points.insert("draw:fill", "none");
     }
 
-    PMD_DEBUG_MSG(("Color %d\n",fillColor));
     switch (fillColor)
     {
     case NONE:
@@ -124,16 +123,15 @@ void PMDCollector::paintShape(const OutputShape &shape,
     {
     case STROKE_NORMAL:
       points.insert("draw:stroke", "solid");
-      points.insert("svg:stroke-width", strokeWidth);
       break;
     case STROKE_DASHED:
-      points.insert("draw:stroke", "dash");
-      points.insert("svg:stroke-linecap", "square");
-      points.insert("svg:stroke-width", strokeWidth);
+      points.insert("draw:stroke","dash");
       break;
     default:
-      points.insert("draw:stroke", "none");
+      points.insert("draw:stroke", "solid");
     }
+
+    points.insert("svg:stroke-width", strokeWidth);
 
     switch (strokeColor)
     {
@@ -250,6 +248,120 @@ void PMDCollector::paintShape(const OutputShape &shape,
       vec.append(node);
 
       propList.insert("svg:d",vec);
+
+      uint8_t fillType = shape.getFillType();
+      uint8_t fillColor = shape.getFillColor();
+      //uint8_t fillOverprint = shape.getFillOverprint();
+      uint8_t fillTint = shape.getFillTint();
+
+      uint8_t strokeType = shape.getStrokeType();
+      double strokeWidth = shape.getStrokeWidth();
+      strokeWidth = strokeWidth/360;
+      uint8_t strokeColor = shape.getStrokeColor();
+      //uint8_t strokeOverprint = shape.getStrokeOverprint();
+      uint8_t strokeTint = shape.getStrokeTint();
+
+      switch (fillType)
+      {
+      case FILL_SOLID:
+        propList.insert("draw:fill", "solid");
+        break;
+      case FILL_NONE:
+        propList.insert("draw:fill", "none");
+        break;
+      default:
+        propList.insert("draw:fill", "none");
+      }
+
+      switch (fillColor)
+      {
+      case NONE:
+        propList.insert("draw:fill-color", "#FFFFFF");
+        break;
+      case REGISTRATION:
+        propList.insert("draw:fill-color", "#000000");
+        break;
+      case PAPER:
+        propList.insert("draw:fill-color", "#FFFFFF");
+        break;
+      case BLACK:
+        propList.insert("draw:fill-color", "#000000");
+        break;
+      case RED:
+        propList.insert("draw:fill-color", "#FF0000");
+        break;
+      case GREEN:
+        propList.insert("draw:fill-color", "#00FF00");
+        break;
+      case BLUE:
+        propList.insert("draw:fill-color", "#0000FF");
+        break;
+      case CYAN:
+        propList.insert("draw:fill-color", "#00FFFF");
+        break;
+      case MAGENTA:
+        propList.insert("draw:fill-color", "#FF00FF");
+        break;
+      case YELLOW:
+        propList.insert("draw:fill-color", "#FFFF00");
+        break;
+      }
+
+      if (fillColor == NONE)
+        propList.insert("draw:opacity", 0);
+      else
+        propList.insert("draw:opacity", fillTint);
+
+      switch (strokeType)
+      {
+      case STROKE_NORMAL:
+        propList.insert("draw:stroke", "solid");
+        break;
+      case STROKE_DASHED:
+        propList.insert("draw:stroke","dash");
+        break;
+      default:
+        propList.insert("draw:stroke", "solid");
+      }
+
+      propList.insert("svg:stroke-width", strokeWidth);
+
+      switch (strokeColor)
+      {
+      case NONE:
+        propList.insert("svg:stroke-color", "#FFFFFF");
+        break;
+      case REGISTRATION:
+        propList.insert("svg:stroke-color", "#000000");
+        break;
+      case PAPER:
+        propList.insert("svg:stroke-color", "#FFFFFF");
+        break;
+      case BLACK:
+        propList.insert("svg:stroke-color", "#000000");
+        break;
+      case RED:
+        propList.insert("svg:stroke-color", "#FF0000");
+        break;
+      case GREEN:
+        propList.insert("svg:stroke-color", "#00FF00");
+        break;
+      case BLUE:
+        propList.insert("svg:stroke-color", "#0000FF");
+        break;
+      case CYAN:
+        propList.insert("svg:stroke-color", "#00FFFF");
+        break;
+      case MAGENTA:
+        propList.insert("svg:stroke-color", "#FF00FF");
+        break;
+      case YELLOW:
+        propList.insert("svg:stroke-color", "#FFFF00");
+        break;
+      }
+
+      propList.insert("svg:stroke-opacity", strokeTint);
+
       painter->drawPath(propList);
     }
   }

@@ -102,7 +102,13 @@ void PMDParser::parseLine(PMDRecordContainer container, unsigned recordIndex,
   if (temp != 257 && temp != 0)
     mirrored = true;
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDLine(topLeft, botRight, mirrored));
+  uint8_t strokeColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_COLOR_OFFSET, "Can't read rectangle stroke color.");
+  uint8_t strokeType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TYPE_OFFSET, "Can't read rectangle stroke type.");
+  uint8_t strokeWidth = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_WIDTH_OFFSET, "Can't read rectangle stroke width.");
+  uint8_t strokeTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TINT_OFFSET, "Can't read rectangle stroke tint.");
+  uint8_t strokeOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_OVERPRINT_OFFSET, "Can't read rectangle stroke overprint.");
+
+  boost::shared_ptr<PMDLineSet> newShape(new PMDLine(topLeft, botRight, mirrored, strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -265,6 +271,17 @@ void PMDParser::parseEllipse(PMDRecordContainer container, unsigned recordIndex,
   PMDShapePoint xformBotRight = PMDShapePoint(0,0);
   uint32_t ellipseXformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_XFORM_ID_OFFSET, "Can't read ellipse xform id.");
 
+  uint8_t fillColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_COLOR_OFFSET, "Can't read rectangle fill color.");
+  uint8_t fillType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TYPE_OFFSET, "Can't read rectangle fill type.");
+  uint8_t fillOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_OVERPRINT_OFFSET, "Can't read rectangle fill overprint.");
+  uint8_t fillTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TINT_OFFSET, "Can't read rectangle fill tint.");
+
+  uint8_t strokeColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_COLOR_OFFSET, "Can't read rectangle stroke color.");
+  uint8_t strokeType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TYPE_OFFSET, "Can't read rectangle stroke type.");
+  uint8_t strokeWidth = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_WIDTH_OFFSET, "Can't read rectangle stroke width.");
+  uint8_t strokeTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TINT_OFFSET, "Can't read rectangle stroke tint.");
+  uint8_t strokeOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_OVERPRINT_OFFSET, "Can't read rectangle stroke overprint.");
+
   if (ellipseXformId != (std::numeric_limits<uint32_t>::max)())
   {
     const PMDRecordContainer *ptrToXformContainer = &(m_recordsInOrder[0x0c]);
@@ -289,7 +306,7 @@ void PMDParser::parseEllipse(PMDRecordContainer container, unsigned recordIndex,
   temp = (int32_t)ellipseSkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDEllipse(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, xformTopLeft, xformBotRight));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDEllipse(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, xformTopLeft, xformBotRight, fillType, fillColor, fillOverprint, fillTint, strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
   m_collector->addShapeToPage(pageID, newShape);
 }
 

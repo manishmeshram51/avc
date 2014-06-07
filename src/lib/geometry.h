@@ -67,10 +67,15 @@ class PMDLine : public PMDLineSet
   PMDShapePoint m_topLeft;
   PMDShapePoint m_botRight;
   bool m_mirrored;
+  uint8_t m_strokeType;
+  uint8_t m_strokeWidth;
+  uint8_t m_strokeColor;
+  uint8_t m_strokeOverprint;
+  uint8_t m_strokeTint;
 
 public:
-  PMDLine(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const bool mirrored)
-    : m_topLeft(topLeft), m_botRight(botRight), m_mirrored(mirrored)
+  PMDLine(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const bool mirrored, const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
+    : m_topLeft(topLeft), m_botRight(botRight), m_mirrored(mirrored), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
   { }
 
   double virtual getRotation() const
@@ -137,7 +142,7 @@ public:
 
   uint8_t virtual getFillType() const
   {
-    return 0;
+    return FILL_SOLID;
   }
 
   uint8_t virtual getFillColor() const
@@ -157,27 +162,27 @@ public:
 
   uint8_t virtual getStrokeType() const
   {
-    return 0;
+    return m_strokeType;
   }
 
   uint8_t virtual getStrokeWidth() const
   {
-    return 0;
+    return m_strokeWidth;
   }
 
   uint8_t virtual getStrokeColor() const
   {
-    return 0;
+    return m_strokeColor;
   }
 
   uint8_t virtual getStrokeOverprint() const
   {
-    return 0;
+    return m_strokeOverprint;
   }
 
   uint8_t virtual getStrokeTint() const
   {
-    return 0;
+    return m_strokeTint;
   }
 
   virtual ~PMDLine()
@@ -450,10 +455,19 @@ class PMDEllipse : public PMDLineSet
   double m_skew;
   PMDShapePoint m_xformTopLeft;
   PMDShapePoint m_xformBotRight;
+  uint8_t m_fillType;
+  uint8_t m_fillColor;
+  uint8_t m_fillOverprint;
+  uint8_t m_fillTint;
+  uint8_t m_strokeType;
+  uint8_t m_strokeWidth;
+  uint8_t m_strokeColor;
+  uint8_t m_strokeOverprint;
+  uint8_t m_strokeTint;
 
 public:
-  PMDEllipse(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight)
-    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight)
+  PMDEllipse(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const uint8_t fillType, const uint8_t fillColor, const uint8_t fillOverprint, const uint8_t fillTint,  const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
   { }
 
   double virtual getRotation() const
@@ -512,47 +526,47 @@ public:
 
   uint8_t virtual getFillType() const
   {
-    return 0;
+    return m_fillType;
   }
 
   uint8_t virtual getFillColor() const
   {
-    return 0;
+    return m_fillColor;
   }
 
   uint8_t virtual getFillOverprint() const
   {
-    return 0;
+    return m_fillOverprint;
   }
 
   uint8_t virtual getFillTint() const
   {
-    return 0;
+    return m_fillTint;
   }
 
   uint8_t virtual getStrokeType() const
   {
-    return 0;
+    return m_strokeType;
   }
 
   uint8_t virtual getStrokeWidth() const
   {
-    return 0;
+    return m_strokeWidth;
   }
 
   uint8_t virtual getStrokeColor() const
   {
-    return 0;
+    return m_strokeColor;
   }
 
   uint8_t virtual getStrokeOverprint() const
   {
-    return 0;
+    return m_strokeOverprint;
   }
 
   uint8_t virtual getStrokeTint() const
   {
-    return 0;
+    return m_strokeTint;
   }
 
   virtual ~PMDEllipse()
