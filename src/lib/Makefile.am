@@ -17,8 +17,6 @@ libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_DEPENDENCIES = @LIBPMD_W
 libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_LDFLAGS = $(version_info) -export-dynamic -no-undefines
 libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_SOURCES = \
 	PMDocument.cpp \
-	PMDInternalStream.cpp \
-	PMDInternalStream.h \
 	libpagemaker_utils.cpp \
 	libpagemaker_utils.h \
 	OutputShape.h \
