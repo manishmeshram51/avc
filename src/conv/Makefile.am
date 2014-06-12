@@ -1,5 +1,5 @@
 if BUILD_TOOLS
 
-SUBDIRS = raw svg yaml
+SUBDIRS = raw svg
 
 endif

@@ -1,6 +1,16 @@
-#pragma once
+/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/*
+ * This file is part of the libpagemaker project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+#ifndef __PMDPAGE_H__
+#define __PMDPAGE_H__
+
 #include "geometry.h"
-#include "yaml_utils.h"
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -30,14 +40,10 @@ public:
   {
     return m_shapes.at(i);
   }
-
-  void emitYaml(yaml_emitter_t *emitter) const
-  {
-    yamlBeginMap(emitter);
-    yamlIndirectForeach(emitter, "shapes", m_shapes);
-    yamlEndMap(emitter);
-  }
 };
 
 }
+
+#endif /* __PMDPAGE_H__ */
+
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

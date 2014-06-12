@@ -1,4 +1,14 @@
-#pragma once
+/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/*
+ * This file is part of the libpagemaker project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+#ifndef __LIBPAGEMAKER_OFFSETS_H__
+#define __LIBPAGEMAKER_OFFSETS_H__
 
 const unsigned TABLE_OF_CONTENTS_OFFSET_OFFSET = 0x30;
 const unsigned TABLE_OF_CONTENTS_LENGTH_OFFSET = 0x2E;
@@ -32,10 +42,12 @@ const unsigned SHAPE_FILL_TYPE_OFFSET = 0x26;
 const unsigned SHAPE_FILL_OVERPRINT_OFFSET = 0x02;
 const unsigned SHAPE_FILL_TINT_OFFSET = 0xe0;
 
-
 const unsigned SHAPE_STROKE_COLOR_OFFSET = 0x28;
 const unsigned SHAPE_STROKE_TYPE_OFFSET = 0x20;
 const unsigned SHAPE_STROKE_OVERPRINT_OFFSET = 0x2a;
 const unsigned SHAPE_STROKE_TINT_OFFSET = 0x2c;
 const unsigned SHAPE_STROKE_WIDTH_OFFSET = 0x23;
+
+#endif /* __LIBPAGEMAKER_OFFSETS_H__ */
+
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

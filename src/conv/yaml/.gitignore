@@ -1,9 +1,0 @@
-.deps
-.libs
-*.lo
-*.la
-Makefile
-Makefile.in
-pmd2yaml
-pmd2yaml.exe
-*.rc

@@ -1,8 +1,19 @@
-#pragma once
+/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/*
+ * This file is part of the libpagemaker project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+#ifndef __LIBPAGEMAKER_GEOMETRY_H__
+#define __LIBPAGEMAKER_GEOMETRY_H__
+
 #include <vector>
 #include "Units.h"
-#include "yaml_utils.h"
 #include "constants.h"
+
 namespace libpagemaker
 {
 template <typename Unit> class Point
@@ -13,14 +24,6 @@ public:
 
   Point(Unit x, Unit y) : m_x(x), m_y(y)
   { }
-
-  void emitYaml(yaml_emitter_t *emitter) const
-  {
-    yamlBeginMap(emitter);
-    yamlMapObject(emitter, "x", m_x);
-    yamlMapObject(emitter, "y", m_y);
-    yamlEndMap(emitter);
-  }
 };
 
 typedef Point<PMDShapeUnit> PMDShapePoint;
@@ -48,14 +51,6 @@ public:
   uint8_t virtual getStrokeColor() const = 0;
   uint8_t virtual getStrokeOverprint() const = 0;
   uint8_t virtual getStrokeTint() const = 0;
-
-  void emitYaml(yaml_emitter_t *emitter) const
-  {
-    yamlBeginMap(emitter);
-    yamlMapEntry(emitter, "closed", getIsClosed());
-    yamlForeach(emitter, "points", getPoints());
-    yamlEndMap(emitter);
-  }
 
   virtual ~PMDLineSet()
   {
@@ -595,5 +590,7 @@ public:
 std::pair<InchPoint, InchPoint>
 getBoundingBox(const PMDLineSet &lineSet, const TransformationMatrix &matrix);
 }
+
+#endif /* __LIBPAGEMAKER_GEOMETRY_H__ */
 
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

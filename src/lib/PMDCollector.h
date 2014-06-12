@@ -1,4 +1,15 @@
-#pragma once
+/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/*
+ * This file is part of the libpagemaker project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+#ifndef __PMDCOLLECTOR_H__
+#define __PMDCOLLECTOR_H__
+
 #include <stdint.h>
 
 #include <map>
@@ -9,7 +20,6 @@
 #include <boost/shared_ptr.hpp>
 
 
-#include "yaml_utils.h"
 #include "geometry.h"
 #include "PMDPage.h"
 #include "PMDExceptions.h"
@@ -62,8 +72,9 @@ public:
 
   /* Output functions */
   void draw(librevenge::RVNGDrawingInterface *) const;
-  void emitYaml(yaml_emitter_t *) const;
 };
 
 }
+
+#endif /* __PMDCOLLECTOR_H__ */
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

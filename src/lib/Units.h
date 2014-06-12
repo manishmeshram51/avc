@@ -1,6 +1,16 @@
-#pragma once
+/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/*
+ * This file is part of the libpagemaker project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+#ifndef LIBPAGEMAKER_UNITS_H
+#define LIBPAGEMAKER_UNITS_H
+
 #include <string>
-#include "yaml_utils.h"
 
 namespace libpagemaker
 {
@@ -18,11 +28,6 @@ public:
   double toInches() const
   {
     return m_value / ((double)PER_INCH);
-  }
-
-  void emitYaml(yaml_emitter_t *emitter) const
-  {
-    yamlTryPutScalar(emitter, m_value);
   }
 };
 
@@ -54,5 +59,7 @@ typedef LengthUnit<PAGE_UNITS_PER_INCH> PMDPageUnit;
 typedef LengthUnit<SHAPE_UNITS_PER_INCH> PMDShapeUnit;
 
 }
+
+#endif /* LIBPAGEMAKER_UNITS_H */
 
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

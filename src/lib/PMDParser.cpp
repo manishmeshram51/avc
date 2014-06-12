@@ -78,10 +78,10 @@ PMDShapePoint tryReadPointFromRecord(librevenge::RVNGInputStream *input,
 void PMDParser::parseGlobalInfo(PMDRecordContainer container)
 {
   uint16_t pageHeight = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, 0,
-                        PAGE_HEIGHT_OFFSET, "Can't find page height in global attributes record.");
+                                                  PAGE_HEIGHT_OFFSET, "Can't find page height in global attributes record.");
 
   uint16_t leftPageRightBound = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, 0,
-                                LEFT_PAGE_RIGHT_BOUND_OFFSET, "Can't find the right boundary of the left page.");
+                                                          LEFT_PAGE_RIGHT_BOUND_OFFSET, "Can't find the right boundary of the left page.");
 
   bool doubleSided = (leftPageRightBound == 0);
   m_collector->setDoubleSided(doubleSided);
@@ -93,9 +93,9 @@ void PMDParser::parseLine(PMDRecordContainer container, unsigned recordIndex,
                           unsigned pageID)
 {
   PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                          recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read line first point.");
+                                                 recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read line first point.");
   PMDShapePoint botRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                           recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read line second point.");
+                                                  recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read line second point.");
   bool mirrored = false;
   uint16_t temp = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, recordIndex , LINE_MIRRORED_OFFSET, "Can't read line mirror.");
 
@@ -116,9 +116,9 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
                                unsigned pageID)
 {
   PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                          recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read rectangle top-left point.");
+                                                 recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read rectangle top-left point.");
   PMDShapePoint botRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                           recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read rectangle bottom-right point.");
+                                                  recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read rectangle bottom-right point.");
   uint32_t rectRotationDegree = 0;
   uint32_t rectSkewDegree = 0;
   PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
@@ -147,7 +147,7 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
     for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
     {
       uint32_t xformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i,
-                         XFORM_ID_OFFSET, "Can't find xform id.");
+                                                   XFORM_ID_OFFSET, "Can't find xform id.");
       if (xformId == rectXformId)
       {
         rectRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read rectangle rotation.");
@@ -171,13 +171,13 @@ void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
                              unsigned pageID)
 {
   PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                          recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read bbox top-left point.");
+                                                 recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read bbox top-left point.");
   PMDShapePoint botRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                           recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read bbox bottom-right point.");
+                                                  recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read bbox bottom-right point.");
   uint16_t lineSetSeqNum = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, recordIndex,
-                           POLYGON_LINE_SEQNUM_OFFSET, "Can't find seqNum of line set record in polygon record.");
+                                                     POLYGON_LINE_SEQNUM_OFFSET, "Can't find seqNum of line set record in polygon record.");
   uint8_t closedMarker = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex,
-                         POLYGON_CLOSED_MARKER_OFFSET, "Can't find the byte telling whether the polygon is open or closed.");
+                                                  POLYGON_CLOSED_MARKER_OFFSET, "Can't find the byte telling whether the polygon is open or closed.");
 
   uint32_t polySkewDegree = 0;
   PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
@@ -237,7 +237,7 @@ void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
     for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
     {
       uint32_t xformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i,
-                         XFORM_ID_OFFSET, "Can't find xform id.");
+                                                   XFORM_ID_OFFSET, "Can't find xform id.");
       if (xformId == polyXformId)
       {
         polyRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read polygon rotation.");
@@ -261,9 +261,9 @@ void PMDParser::parseEllipse(PMDRecordContainer container, unsigned recordIndex,
 {
 
   PMDShapePoint bboxTopLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                              recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read bbox top-left point.");
+                                                     recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read bbox top-left point.");
   PMDShapePoint bboxBotRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                               recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read bbox bottom-right point.");
+                                                      recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read bbox bottom-right point.");
 
   uint32_t ellipseRotationDegree = 0;
   uint32_t ellipseSkewDegree = 0;
@@ -290,7 +290,7 @@ void PMDParser::parseEllipse(PMDRecordContainer container, unsigned recordIndex,
     for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
     {
       uint32_t xformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i,
-                         XFORM_ID_OFFSET, "Can't find xform id.");
+                                                   XFORM_ID_OFFSET, "Can't find xform id.");
       if (xformId == ellipseXformId)
       {
         ellipseRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read ellipse rotation.");
@@ -322,7 +322,7 @@ void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
   for (unsigned i = 0; i < container.m_numRecords; ++i)
   {
     uint8_t shapeType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, i,
-                        SHAPE_TYPE_OFFSET, "Can't find shape type in shape.");
+                                                 SHAPE_TYPE_OFFSET, "Can't find shape type in shape.");
     switch (shapeType)
     {
     case LINE_RECORD:
@@ -347,13 +347,13 @@ void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
 void PMDParser::parsePages(PMDRecordContainer container)
 {
   uint16_t pageWidth = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, 0, PAGE_WIDTH_OFFSET,
-                       "Can't find page width in first page record.");
+                                                 "Can't find page width in first page record.");
   m_collector->setPageWidth(pageWidth);
   for (unsigned i = 0; i < container.m_numRecords; ++i)
   {
     uint16_t shapesSeqNum = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, i,
-                            PAGE_SHAPE_SEQNUM_OFFSET,
-                            (boost::format("Can't find shape record sequence number in page record at index %d") % i).str());
+                                                      PAGE_SHAPE_SEQNUM_OFFSET,
+                                                      (boost::format("Can't find shape record sequence number in page record at index %d") % i).str());
     unsigned pageID = m_collector->addPage();
     parseShapes(shapesSeqNum, pageID);
   }

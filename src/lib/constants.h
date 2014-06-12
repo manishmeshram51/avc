@@ -1,4 +1,15 @@
-#pragma once
+/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/*
+ * This file is part of the libpagemaker project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+#ifndef __LIBPAGEMAKER_CONSTANTS_H__
+#define __LIBPAGEMAKER_CONSTANTS_H__
+
 #include <stdint.h>
 
 /* PMD record types */
@@ -53,8 +64,6 @@ const uint8_t CYAN = 7;
 const uint8_t MAGENTA = 8;
 const uint8_t YELLOW = 9;
 
-
-
 /* Stroke Constants */
 const uint8_t STROKE_NORMAL = 0;
 const uint8_t STROKE_LIGHT_LIGHT = 1;
@@ -64,5 +73,7 @@ const uint8_t STROKE_LIGHT_DARK_LIGHT = 4;
 const uint8_t STROKE_DASHED = 5;
 const uint8_t STROKE_SQUARE_DOTS = 6;
 const uint8_t STROKE_CIRCULAR_DOTS = 7;
+
+#endif /* __LIBPAGEMAKER_CONSTANTS_H__ */
 
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

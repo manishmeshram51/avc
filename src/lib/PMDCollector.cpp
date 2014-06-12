@@ -186,7 +186,9 @@ void PMDCollector::paintShape(const OutputShape &shape,
     double ry = shape.getPoint(1).m_y;
 
     double rotation = shape.getRotation();
+#ifdef DEBUG
     double skew = shape.getSkew();
+#endif
 
     PMD_DEBUG_MSG(("\n\nCx and Cy are %f , %f \n",cx,cy));
     PMD_DEBUG_MSG(("Rx and Ry are %f , %f \n",rx,ry));
@@ -211,7 +213,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
       double ey = cy + rx*sin(rotation);
 
       //if ((rotation == 0 || rotation < skew) && skew != 0)
-        //rotation += (ry*skew/rx)/2;
+      //rotation += (ry*skew/rx)/2;
 
       librevenge::RVNGPropertyListVector vec;
       librevenge::RVNGPropertyList node;
@@ -462,22 +464,6 @@ void PMDCollector::draw(librevenge::RVNGDrawingInterface *painter) const
     writePage(m_pages[i], painter, shapes);
   }
   painter->endDocument();
-}
-
-void PMDCollector::emitYaml(yaml_emitter_t *emitter) const
-{
-  yamlBeginMap(emitter);
-  if (m_pageWidth.is_initialized())
-  {
-    yamlMapObject(emitter, "pageWidth", m_pageWidth.get());
-  }
-  if (m_pageHeight.is_initialized())
-  {
-    yamlMapObject(emitter, "pageHeight", m_pageHeight.get());
-  }
-  yamlMapEntry(emitter, "doubleSided", m_doubleSided);
-  yamlForeach(emitter, "pages", m_pages);
-  yamlEndMap(emitter);
 }
 
 }

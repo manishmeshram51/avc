@@ -15,7 +15,6 @@
 
 #include "PMDCollector.h"
 #include "PMDParser.h"
-#include "yaml_utils.h"
 #include "libpagemaker_utils.h"
 
 namespace libpagemaker
@@ -29,18 +28,6 @@ bool PMDocument::isSupported(librevenge::RVNGInputStream * /*input*/) try
 catch (...)
 {
   return false;
-}
-
-bool PMDocument::parseToYaml(librevenge::RVNGInputStream *input)
-{
-  PMDCollector collector;
-  PMD_DEBUG_MSG(("About to start parsing...\n"));
-  boost::scoped_ptr<librevenge::RVNGInputStream>
-  pmdStream(input->getSubStreamByName("PageMaker"));
-  PMDParser(pmdStream.get(), &collector).parse();
-  std::printf("YAML follows\n");
-  dumpAsYaml(stdout, collector);
-  return true;
 }
 
 bool PMDocument::parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter)
