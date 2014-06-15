@@ -112,6 +112,139 @@ void PMDParser::parseLine(PMDRecordContainer container, unsigned recordIndex,
   m_collector->addShapeToPage(pageID, newShape);
 }
 
+void PMDParser::parseTextBox(PMDRecordContainer container, unsigned recordIndex,
+                             unsigned pageID)
+{
+  PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
+                          recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read text box top-left point.");
+  PMDShapePoint botRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
+                           recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read text box bottom-right point.");
+  uint32_t textBoxRotationDegree = 0;
+  uint32_t textBoxSkewDegree = 0;
+  PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
+  PMDShapePoint xformBotRight = PMDShapePoint(0,0);
+  PMDShapePoint rotatingPoint = PMDShapePoint(0, 0);
+
+  uint16_t textBoxTextPropsOne = 0;
+  uint16_t textBoxTextPropsTwo = 0;
+  uint16_t textBoxText = 0;
+  uint16_t textBoxChars = 0;
+  uint16_t textBoxPara = 0;
+  uint16_t textBoxTextStyle = 0;
+
+  uint32_t textBoxXformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_XFORM_ID_OFFSET, "Can't read text box xform id.");
+
+  if (textBoxXformId != (std::numeric_limits<uint32_t>::max)())
+  {
+    const PMDRecordContainer *ptrToXformContainer = &(m_recordsInOrder[0x0c]);
+    const PMDRecordContainer &xformContainer = *ptrToXformContainer;
+
+    for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
+    {
+      uint32_t xformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i,
+                         XFORM_ID_OFFSET, "Can't find xform id.");
+      if (xformId == textBoxXformId)
+      {
+        textBoxRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read text box rotation.");
+        textBoxSkewDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_SKEW_OFFSET, "Can't read text box skew.");
+        rotatingPoint = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_ROTATING_POINT_OFFSET, "Can't read rotating point.");
+        xformTopLeft = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_TOP_LEFT_OFFSET, "Can't read xform top-left point.");
+        xformBotRight = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_BOT_RIGHT_OFFSET, "Can't read xform bot-right point.");
+        break;
+      }
+    }
+  }
+  int32_t temp = (int32_t)textBoxRotationDegree;
+  double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
+  temp = (int32_t)textBoxSkewDegree;
+  double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
+
+  uint32_t textBoxTextBlockId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_TEXT_BLOCK_ID_OFFSET, "Can't read text box text block id.");
+
+  const PMDRecordContainer *ptrToTextBlockContainer = &(m_recordsInOrder[TEXT_BLOCK_OFFSET]);
+  const PMDRecordContainer &textBlockContainer = *ptrToTextBlockContainer;
+
+  for (unsigned i = 0; i < textBlockContainer.m_numRecords; ++i)
+  {
+    uint32_t textBlockId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, textBlockContainer, i,
+                           TEXT_BLOCK_ID_OFFSET, "Can't find textBlock id.");
+
+    if (textBlockId == textBoxTextBlockId)
+    {
+      textBoxTextPropsOne = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_TEXT_PROPS_ONE_OFFSET, "Can't read text box props one.");
+      textBoxTextPropsTwo = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_TEXT_PROPS_TWO_OFFSET, "Can't read text box props two.");
+      textBoxText = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_TEXT_OFFSET, "Can't read text box text.");
+      textBoxChars = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_CHARS_OFFSET, "Can't read text box chars.");
+      textBoxPara = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_PARA_OFFSET, "Can't read text box para.");
+      textBoxTextStyle = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_TEXT_STYLE_OFFSET, "Can't read text box style.");
+      PMD_DEBUG_MSG(("Text Box Props One is %x \n",textBoxTextPropsOne));
+      PMD_DEBUG_MSG(("Text Box Props Two is %x \n",textBoxTextPropsTwo));
+      PMD_DEBUG_MSG(("Text Box Style is %x \n",textBoxTextStyle));
+      break;
+    }
+
+  }
+  const PMDRecordContainer *ptrToTextContainer =
+    (textBoxText < m_recordsInOrder.size()) ? &(m_recordsInOrder[textBoxText]) : NULL;
+  if (!ptrToTextContainer)
+  {
+    PMD_ERR_MSG("No text with the given sequence number.\n");
+    return;
+  }
+  std::string text = "";
+  const PMDRecordContainer &textContainer = *(ptrToTextContainer);
+  for (unsigned i = 0; i < textContainer.m_numRecords; ++i)
+  {
+    text.push_back(tryReadRecordAt<uint8_t>(m_input, m_bigEndian, textContainer, 0, i,"Can't read text box text."));
+  }
+
+
+  const PMDRecordContainer *ptrToCharsContainer =
+    (textBoxChars < m_recordsInOrder.size()) ? &(m_recordsInOrder[textBoxChars]) : NULL;
+  if (!ptrToCharsContainer)
+  {
+    PMD_ERR_MSG("No chars with the given sequence number.\n");
+    return;
+  }
+
+  std::vector<PMDCharProperties> charProps;
+  const PMDRecordContainer &charsContainer = *(ptrToCharsContainer);
+  for (unsigned i = 0; i < charsContainer.m_numRecords; ++i)
+  {
+    uint16_t length = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x00,"Can't read text box text length.");
+    uint16_t fontFace = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x02,"Can't read text box text font face.");
+    uint16_t fontSize = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x04,"Can't read text box text font size.");
+    uint8_t boldItalicUnderline = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, charsContainer, i, 0x0a,"Can't read text box text bold-italic-undeline.");
+    uint8_t superSubscript = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, charsContainer, i, 0x0b,"Can't read text box text subsuperscript.");
+    int16_t kerning = tryReadRecordAt<int16_t>(m_input, m_bigEndian, charsContainer, i, 0x10,"Can't read text box text kerning.");
+
+    charProps.push_back(PMDCharProperties(length,fontFace,fontSize,boldItalicUnderline,superSubscript,kerning));
+  }
+
+  const PMDRecordContainer *ptrToParaContainer =
+    (textBoxPara < m_recordsInOrder.size()) ? &(m_recordsInOrder[textBoxPara]) : NULL;
+  if (!ptrToParaContainer)
+  {
+    PMD_ERR_MSG("No para with the given sequence number.\n");
+    return;
+  }
+
+  std::vector<PMDParaProperties> paraProps;
+  const PMDRecordContainer &paraContainer = *(ptrToParaContainer);
+  for (unsigned i = 0; i < paraContainer.m_numRecords; ++i)
+  {
+    uint16_t length = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, paraContainer, i, 0x00,"Can't read text box para length.");
+    uint8_t align = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, paraContainer, i, 0x03,"Can't read text box para align.");
+
+    paraProps.push_back(PMDParaProperties(length,align));
+  }
+
+
+  boost::shared_ptr<PMDLineSet> newShape(new PMDTextBox(topLeft, botRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, text, charProps, paraProps));
+  m_collector->addShapeToPage(pageID, newShape);
+
+}
+
 void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordIndex,
                                unsigned pageID)
 {
@@ -336,6 +469,10 @@ void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
       break;
     case ELLIPSE_RECORD:
       parseEllipse(container, i, pageID);
+      break;
+    case TEXT_RECORD:
+      parseTextBox(container, i, pageID);
+      //parseRectangle(container, i, pageID);
       break;
     default:
       PMD_ERR_MSG("Encountered shape of unknown type.\n");

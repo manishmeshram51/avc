@@ -7,6 +7,8 @@
 #include "constants.h"
 #include "libpagemaker_utils.h"
 
+#define emTopt 11.95516799999881
+
 namespace libpagemaker
 {
 PMDCollector::PMDCollector() :
@@ -177,6 +179,242 @@ void PMDCollector::paintShape(const OutputShape &shape,
     {
       painter->drawPolyline(points);
     }
+  }
+  else if (shape.shapeType() == SHAPE_TYPE_TEXTBOX)
+  {
+    librevenge::RVNGPropertyList textbox;
+
+    textbox.insert("svg:x",shape.getPoint(0).m_x, librevenge::RVNG_INCH);
+    textbox.insert("svg:y",shape.getPoint(0).m_y, librevenge::RVNG_INCH);
+    textbox.insert("svg:width",shape.getPoint(1).m_x, librevenge::RVNG_INCH);
+    textbox.insert("svg:height",shape.getPoint(1).m_y, librevenge::RVNG_INCH);
+    //textbox.insert("text:anchor-type", "page");
+    //textbox.insert("text:anchor-page-number", 1);
+    //textbox.insert("style:vertical-rel", "page");
+    //textbox.insert("style:horizontal-rel", "page");
+    //textbox.insert("style:horizontal-pos", "from-left");
+    //textbox.insert("style:vertical-pos", "from-top");
+    textbox.insert("draw:stroke", "none");
+    textbox.insert("draw:fill", "none");
+
+    painter->startTextObject(textbox);
+
+    uint16_t para_start = 0;
+    uint16_t para_end = 0;
+    uint16_t para_length = 0;
+
+    std::vector<PMDParaProperties> paraProperties = shape.getParaProperties();
+
+    for (unsigned p = 0; p < paraProperties.size(); ++p)
+    {
+
+      para_length = paraProperties[p].m_length;
+      para_end = para_start + para_length - 1;
+
+      librevenge::RVNGPropertyList paraProps;
+
+      switch (paraProperties[p].m_align)
+      {
+      case 1:
+        paraProps.insert("fo:text-align", "right");
+        break;
+      case 2:
+        paraProps.insert("fo:text-align", "center");
+        break;
+      case 3:
+        paraProps.insert("fo:text-align", "justify");
+        break;
+      case 4:
+        paraProps.insert("fo:text-align-last", "left"); // It has to be force-justify
+        break;
+      case 0:
+      default:
+        paraProps.insert("fo:text-align", "left");
+        break;
+      }
+
+
+      painter->openParagraph(paraProps);
+
+      PMD_DEBUG_MSG(("\n\nPara Start is %d \n",para_start));
+      PMD_DEBUG_MSG(("Para End is %d \n\n",para_end));
+
+      //charProps.insert("fo:color", "#FF0000");
+      //charProps.insert("style:font-name", "Ubuntu");
+
+      std::string text_temp = shape.getText();
+      std::vector<PMDCharProperties> charProperties = shape.getCharProperties();
+
+      uint16_t char_start = 0;
+      uint16_t char_end = 0;
+      uint16_t char_length = 0;
+
+      uint16_t j = 0;
+      bool capsFlag = false;
+
+
+      for (unsigned i = 0; i < charProperties.size(); ++i)
+      {
+
+        char_length = charProperties[i].m_length;
+        uint16_t char_end_temp = char_start + char_length -1;
+
+        if (para_start > char_start)
+          char_start = para_start;
+
+        if (char_end_temp > para_end)
+          char_end = para_end;
+        else
+          char_end = char_end_temp;
+
+        if (char_start <= char_end && para_start < char_end_temp)
+        {
+          PMD_DEBUG_MSG(("Start is %d \n",char_start));
+          PMD_DEBUG_MSG(("End is %d \n",char_end));
+
+          librevenge::RVNGPropertyList charProps;
+          charProps.insert("fo:font-size",(double)charProperties[i].m_fontSize/10,librevenge::RVNG_POINT);
+
+          switch (charProperties[i].m_boldItalicUnderline)
+          {
+          case 1:
+            charProps.insert("fo:font-weight", "bold");
+            break;
+          case 2:
+            charProps.insert("fo:font-style", "italic");
+            break;
+          case 3:
+            charProps.insert("fo:font-weight", "bold");
+            charProps.insert("fo:font-style", "italic");
+            break;
+          case 4:
+            charProps.insert("style:text-underline-type", "single");
+            break;
+          case 5:
+            charProps.insert("fo:font-weight", "bold");
+            charProps.insert("style:text-underline-type", "single");
+            break;
+          case 6:
+            charProps.insert("fo:font-style", "italic");
+            charProps.insert("style:text-underline-type", "single");
+            break;
+          case 7:
+            charProps.insert("fo:font-weight", "bold");
+            charProps.insert("fo:font-style", "italic");
+            charProps.insert("style:text-underline-type", "single");
+            break;
+          default:
+            break;
+          }
+
+          switch (charProperties[i].m_superSubscript)
+          {
+          case 1:
+            charProps.insert("style:text-line-through-style","solid");
+            break;
+          case 2:
+            charProps.insert("style:text-position", "50% 67%");
+            break;
+          case 3:
+            charProps.insert("style:text-line-through-style","solid");
+            charProps.insert("style:text-position", "50% 67%");
+            break;
+          case 4:
+            charProps.insert("style:text-position", "-50% 67%");
+            break;
+          case 5:
+            charProps.insert("style:text-line-through-style","solid");
+            charProps.insert("style:text-position", "-50% 67%");
+            break;
+          case 8: // Small Caps
+            capsFlag = true;
+            //charProps.insert("fo:font-variant","small-caps"); // Present in Open Document Schema Central but not working
+            break;
+          case 9:
+            capsFlag = true;
+            charProps.insert("style:text-line-through-style","solid");
+            break;
+          case 0x0a:
+            capsFlag = true;
+            charProps.insert("style:text-position", "50% 67%");
+            break;
+          case 0x0b:
+            capsFlag = true;
+            charProps.insert("style:text-line-through-style","solid");
+            charProps.insert("style:text-position", "50% 67%");
+            break;
+          case 0x0c:
+            capsFlag = true;
+            charProps.insert("style:text-position", "-50% 67%");
+            break;
+          case 0x0d:
+            capsFlag = true;
+            charProps.insert("style:text-line-through-style","solid");
+            charProps.insert("style:text-position", "-50% 67%");
+            break;
+          case 0x10: // Large Caps
+            capsFlag = true;
+            break;
+          case 0x11:
+            capsFlag = true;
+            charProps.insert("style:text-line-through-style","solid");
+            break;
+          case 0x12:
+            capsFlag = true;
+            charProps.insert("style:text-position", "50% 67%");
+            break;
+          case 0x13:
+            capsFlag = true;
+            charProps.insert("style:text-line-through-style","solid");
+            charProps.insert("style:text-position", "50% 67%");
+            break;
+          case 0x14:
+            capsFlag = true;
+            charProps.insert("style:text-position", "-50% 67%");
+            break;
+          case 0x15:
+            capsFlag = true;
+            charProps.insert("style:text-line-through-style","solid");
+            charProps.insert("style:text-position", "-50% 67%");
+            break;
+          default:
+            capsFlag = false;
+            break;
+          }
+
+          if (charProperties[i].m_kerning != 0)
+          {
+            charProps.insert("style:letter-kerning","true");
+            charProps.insert("fo:letter-spacing",((double)charProperties[i].m_kerning/1000)*emTopt,librevenge::RVNG_POINT);
+          }
+
+
+          painter->openSpan(charProps);
+
+          std::string c;
+
+          for (j=char_start; j<=char_end; j++)
+          {
+            if (capsFlag && text_temp[j] >=97 && text_temp[j] <=122)
+              c.push_back(text_temp[j] - 32);
+            else
+              c.push_back(text_temp[j]);
+          }
+
+          char_start = j;
+          librevenge::RVNGString text(c.c_str());
+
+          painter->insertText(text);
+          painter->closeSpan();
+        }
+      }
+
+      painter->closeParagraph();
+
+      para_start = para_end + 1;
+
+    }
+    painter->endTextObject();
   }
   else
   {

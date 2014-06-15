@@ -48,6 +48,16 @@ const unsigned SHAPE_STROKE_OVERPRINT_OFFSET = 0x2a;
 const unsigned SHAPE_STROKE_TINT_OFFSET = 0x2c;
 const unsigned SHAPE_STROKE_WIDTH_OFFSET = 0x23;
 
+const unsigned TEXT_BLOCK_OFFSET = 0x02;
+const unsigned SHAPE_TEXT_BLOCK_ID_OFFSET = 0x20; /* In the SHAPE record. */
+const unsigned TEXT_BLOCK_ID_OFFSET = 0x20; /* In the TEXT BLOCK record. */
+const unsigned TEXT_BLOCK_TEXT_PROPS_ONE_OFFSET = 0x00;
+const unsigned TEXT_BLOCK_TEXT_PROPS_TWO_OFFSET = 0x02;
+const unsigned TEXT_BLOCK_TEXT_OFFSET = 0x04;
+const unsigned TEXT_BLOCK_CHARS_OFFSET = 0x06;
+const unsigned TEXT_BLOCK_PARA_OFFSET = 0x08;
+const unsigned TEXT_BLOCK_TEXT_STYLE_OFFSET = 0x0A;
+
 #endif /* __LIBPAGEMAKER_OFFSETS_H__ */
 
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

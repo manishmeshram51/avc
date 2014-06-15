@@ -34,6 +34,7 @@ class PMDParser
   void parsePages(PMDRecordContainer);
   void parseShapes(uint16_t seqNum, unsigned pageID);
   void parseLine(PMDRecordContainer, unsigned recordIndex, unsigned pageID);
+  void parseTextBox(PMDRecordContainer, unsigned recordIndex, unsigned pageID);
   void parseRectangle(PMDRecordContainer, unsigned recordIndex, unsigned pageID);
   void parsePolygon(PMDRecordContainer, unsigned recordIndex, unsigned pageID);
   void parseEllipse(PMDRecordContainer, unsigned recordIndex, unsigned pageID);

@@ -18,12 +18,16 @@ const uint16_t GLOBAL_INFO = 0x1800;
 const uint16_t SHAPE = 0x1900;
 const uint16_t LINE_SET = 0x1100;
 const uint16_t XFORM = 0x2800;
+const uint16_t TEXT_BLOCK = 0x1a00;
+const uint16_t CHARS = 0x1c00;
+const uint16_t PARA = 0x0b00;
 
 /* Shape record types */
 const uint8_t POLYGON_RECORD = 0x0C;
 const uint8_t LINE_RECORD = 0x03;
 const uint8_t RECTANGLE_RECORD = 0x04;
 const uint8_t ELLIPSE_RECORD = 0x05;
+const uint8_t TEXT_RECORD = 0x01;
 
 /* Polygon flags */
 const uint8_t REGULAR_POLYGON = 0x00;
@@ -38,6 +42,7 @@ const uint8_t SHAPE_TYPE_LINE = 1;
 const uint8_t SHAPE_TYPE_POLY = 2;
 const uint8_t SHAPE_TYPE_RECT = 3;
 const uint8_t SHAPE_TYPE_ELLIPSE = 4;
+const uint8_t SHAPE_TYPE_TEXTBOX = 5;
 
 /* Fill Constants */
 const uint8_t FILL_NONE = 0;

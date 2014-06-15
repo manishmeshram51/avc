@@ -29,6 +29,42 @@ public:
 typedef Point<PMDShapeUnit> PMDShapePoint;
 typedef Point<double> InchPoint;
 
+class PMDParaProperties
+{
+public:
+  uint16_t m_length;
+  uint8_t m_align;
+
+  PMDParaProperties(const uint16_t length, const uint8_t align)
+    : m_length(length), m_align(align)
+  { }
+
+  virtual ~PMDParaProperties()
+  {
+  }
+
+};
+
+class PMDCharProperties
+{
+public:
+  uint16_t m_length;
+  uint16_t m_fontFace;
+  uint16_t m_fontSize;
+  uint8_t m_boldItalicUnderline;
+  uint8_t m_superSubscript;
+  int16_t m_kerning;
+
+  PMDCharProperties(const uint16_t length, const uint16_t fontFace, const uint16_t fontSize, const uint8_t boldItalicUnderline, const uint8_t superSubscript, const int16_t kerning)
+    : m_length(length), m_fontFace(fontFace), m_fontSize(fontSize), m_boldItalicUnderline(boldItalicUnderline), m_superSubscript(superSubscript), m_kerning(kerning)
+  { }
+
+  virtual ~PMDCharProperties()
+  {
+  }
+
+};
+
 class PMDLineSet
 {
 public:
@@ -51,6 +87,9 @@ public:
   uint8_t virtual getStrokeColor() const = 0;
   uint8_t virtual getStrokeOverprint() const = 0;
   uint8_t virtual getStrokeTint() const = 0;
+  virtual std::string getText() const = 0;
+  virtual std::vector<PMDCharProperties> getCharProperties() const = 0;
+  virtual std::vector<PMDParaProperties> getParaProperties() const = 0;
 
   virtual ~PMDLineSet()
   {
@@ -180,6 +219,25 @@ public:
     return m_strokeTint;
   }
 
+  virtual std::string getText() const
+  {
+    return "";
+  }
+
+  virtual std::vector<PMDCharProperties> getCharProperties() const
+  {
+    std::vector<PMDCharProperties> temp;
+    temp.push_back(PMDCharProperties(0,0,0,0,0,0));
+    return temp;
+  }
+
+  virtual std::vector<PMDParaProperties> getParaProperties() const
+  {
+    std::vector<PMDParaProperties> temp;
+    temp.push_back(PMDParaProperties(0,0));
+    return temp;
+  }
+
   virtual ~PMDLine()
   {
   }
@@ -306,7 +364,163 @@ public:
     return m_strokeTint;
   }
 
+  virtual std::string getText() const
+  {
+    return "";
+  }
+
+  virtual std::vector<PMDCharProperties> getCharProperties() const
+  {
+    std::vector<PMDCharProperties> temp;
+    temp.push_back(PMDCharProperties(0,0,0,0,0,0));
+    return temp;
+  }
+
+  virtual std::vector<PMDParaProperties> getParaProperties() const
+  {
+    std::vector<PMDParaProperties> temp;
+    temp.push_back(PMDParaProperties(0,0));
+    return temp;
+  }
+
   virtual ~PMDPolygon()
+  {
+  }
+};
+
+class PMDTextBox : public PMDLineSet
+{
+  PMDShapePoint m_topLeft;
+  PMDShapePoint m_botRight;
+  double m_rotation;
+  double m_skew;
+  PMDShapePoint m_rotatingPoint;
+  PMDShapePoint m_xformTopLeft;
+  PMDShapePoint m_xformBotRight;
+  std::string m_text;
+  std::vector<PMDCharProperties> m_charProps;
+  std::vector<PMDParaProperties> m_paraProps;
+
+public:
+  PMDTextBox(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const std::string text, const std::vector<PMDCharProperties> charProps, const std::vector<PMDParaProperties> paraProps)
+    : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_text(text), m_charProps(charProps), m_paraProps(paraProps)
+  { }
+
+  double virtual getRotation() const
+  {
+    return m_rotation;
+  }
+
+  double virtual getSkew() const
+  {
+    return m_skew;
+  }
+
+  PMDShapePoint virtual getXformTopLeft() const
+  {
+    return m_xformTopLeft;
+  }
+
+  PMDShapePoint virtual getXformBotRight() const
+  {
+    return m_xformBotRight;
+  }
+
+  PMDShapePoint virtual getRotatingPoint() const
+  {
+    return m_rotatingPoint;
+  }
+
+  PMDShapePoint virtual getTopLeft() const
+  {
+    return m_topLeft;
+  }
+
+  PMDShapePoint virtual getBotRight() const
+  {
+    return m_botRight;
+  }
+
+  bool virtual getIsClosed() const
+  {
+    return true;
+  }
+
+  virtual std::vector<PMDShapePoint> getPoints() const
+  {
+    std::vector<PMDShapePoint> points;
+
+    points.push_back(m_topLeft);
+
+    return points;
+  }
+
+  uint8_t virtual shapeType() const
+  {
+    return SHAPE_TYPE_TEXTBOX;
+  }
+
+  uint8_t virtual getFillType() const
+  {
+    return 0;
+  }
+
+  uint8_t virtual getFillColor() const
+  {
+    return 0;
+  }
+
+  uint8_t virtual getFillOverprint() const
+  {
+    return 0;
+  }
+
+  uint8_t virtual getFillTint() const
+  {
+    return 0;
+  }
+
+  uint8_t virtual getStrokeType() const
+  {
+    return 0;
+  }
+
+  uint8_t virtual getStrokeWidth() const
+  {
+    return 0;
+  }
+
+  uint8_t virtual getStrokeColor() const
+  {
+    return 0;
+  }
+
+  uint8_t virtual getStrokeOverprint() const
+  {
+    return 0;
+  }
+
+  uint8_t virtual getStrokeTint() const
+  {
+    return 0;
+  }
+
+  virtual std::string getText() const
+  {
+    return m_text;
+  }
+
+  virtual std::vector<PMDCharProperties> getCharProperties() const
+  {
+    return m_charProps;
+  }
+
+  virtual std::vector<PMDParaProperties> getParaProperties() const
+  {
+    return m_paraProps;
+  }
+
+  virtual ~PMDTextBox()
   {
   }
 };
@@ -437,6 +651,25 @@ public:
     return m_strokeTint;
   }
 
+  virtual std::string getText() const
+  {
+    return "";
+  }
+
+  virtual std::vector<PMDCharProperties> getCharProperties() const
+  {
+    std::vector<PMDCharProperties> temp;
+    temp.push_back(PMDCharProperties(0,0,0,0,0,0));
+    return temp;
+  }
+
+  virtual std::vector<PMDParaProperties> getParaProperties() const
+  {
+    std::vector<PMDParaProperties> temp;
+    temp.push_back(PMDParaProperties(0,0));
+    return temp;
+  }
+
   virtual ~PMDRectangle()
   {
   }
@@ -562,6 +795,25 @@ public:
   uint8_t virtual getStrokeTint() const
   {
     return m_strokeTint;
+  }
+
+  virtual std::string getText() const
+  {
+    return "";
+  }
+
+  virtual std::vector<PMDCharProperties> getCharProperties() const
+  {
+    std::vector<PMDCharProperties> temp;
+    temp.push_back(PMDCharProperties(0,0,0,0,0,0));
+    return temp;
+  }
+
+  virtual std::vector<PMDParaProperties> getParaProperties() const
+  {
+    std::vector<PMDParaProperties> temp;
+    temp.push_back(PMDParaProperties(0,0));
+    return temp;
   }
 
   virtual ~PMDEllipse()
