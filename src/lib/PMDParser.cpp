@@ -198,7 +198,6 @@ void PMDParser::parseTextBox(PMDRecordContainer container, unsigned recordIndex,
     text.push_back(tryReadRecordAt<uint8_t>(m_input, m_bigEndian, textContainer, 0, i,"Can't read text box text."));
   }
 
-
   const PMDRecordContainer *ptrToCharsContainer =
     (textBoxChars < m_recordsInOrder.size()) ? &(m_recordsInOrder[textBoxChars]) : NULL;
   if (!ptrToCharsContainer)
@@ -235,8 +234,13 @@ void PMDParser::parseTextBox(PMDRecordContainer container, unsigned recordIndex,
   {
     uint16_t length = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, paraContainer, i, 0x00,"Can't read text box para length.");
     uint8_t align = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, paraContainer, i, 0x03,"Can't read text box para align.");
+    uint16_t leftIndent = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, paraContainer, i, 0x0a,"Can't read text box para align.");
+    uint16_t firstIndent = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, paraContainer, i, 0x0c,"Can't read text box para align.");
+    uint16_t rightIndent = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, paraContainer, i, 0x0e,"Can't read text box para align.");
+    uint16_t beforeIndent = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, paraContainer, i, 0x10,"Can't read text box para align."); // Above Para Spacing
+    uint16_t afterIndent = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, paraContainer, i, 0x12,"Can't read text box para align.");  // Below Para Spacing
 
-    paraProps.push_back(PMDParaProperties(length,align));
+    paraProps.push_back(PMDParaProperties(length,align,leftIndent,firstIndent,rightIndent,beforeIndent,afterIndent));
   }
 
 

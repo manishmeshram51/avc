@@ -21,6 +21,7 @@ const uint16_t XFORM = 0x2800;
 const uint16_t TEXT_BLOCK = 0x1a00;
 const uint16_t CHARS = 0x1c00;
 const uint16_t PARA = 0x0b00;
+const uint16_t FONTS = 0x1300;
 
 /* Shape record types */
 const uint8_t POLYGON_RECORD = 0x0C;

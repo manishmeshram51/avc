@@ -34,9 +34,14 @@ class PMDParaProperties
 public:
   uint16_t m_length;
   uint8_t m_align;
+  uint16_t m_leftIndent;
+  uint16_t m_firstIndent;
+  uint16_t m_rightIndent;
+  uint16_t m_beforeIndent;
+  uint16_t m_afterIndent;
 
-  PMDParaProperties(const uint16_t length, const uint8_t align)
-    : m_length(length), m_align(align)
+  PMDParaProperties(const uint16_t length, const uint8_t align,const uint16_t leftIndent,const uint16_t firstIndent,const uint16_t rightIndent,const uint16_t beforeIndent,const uint16_t afterIndent)
+    : m_length(length), m_align(align), m_leftIndent(leftIndent), m_firstIndent(firstIndent), m_rightIndent(rightIndent), m_beforeIndent(beforeIndent), m_afterIndent(afterIndent)
   { }
 
   virtual ~PMDParaProperties()
@@ -234,7 +239,7 @@ public:
   virtual std::vector<PMDParaProperties> getParaProperties() const
   {
     std::vector<PMDParaProperties> temp;
-    temp.push_back(PMDParaProperties(0,0));
+    temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
     return temp;
   }
 
@@ -379,7 +384,7 @@ public:
   virtual std::vector<PMDParaProperties> getParaProperties() const
   {
     std::vector<PMDParaProperties> temp;
-    temp.push_back(PMDParaProperties(0,0));
+    temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
     return temp;
   }
 
@@ -666,7 +671,7 @@ public:
   virtual std::vector<PMDParaProperties> getParaProperties() const
   {
     std::vector<PMDParaProperties> temp;
-    temp.push_back(PMDParaProperties(0,0));
+    temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
     return temp;
   }
 
@@ -812,7 +817,7 @@ public:
   virtual std::vector<PMDParaProperties> getParaProperties() const
   {
     std::vector<PMDParaProperties> temp;
-    temp.push_back(PMDParaProperties(0,0));
+    temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
     return temp;
   }
 
