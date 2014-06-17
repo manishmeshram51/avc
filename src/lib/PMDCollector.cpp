@@ -286,7 +286,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
         else
           charEnd = charEndTemp;
 
-        if (charStart <= charEnd && paraStart < charEndTemp)
+        if (charStart <= charEnd && paraStart <= charEndTemp)
         {
           PMD_DEBUG_MSG(("Start is %d \n",charStart));
           PMD_DEBUG_MSG(("End is %d \n",charEnd));
@@ -445,6 +445,8 @@ void PMDCollector::paintShape(const OutputShape &shape,
           charStart = j;
           painter->closeSpan();
         }
+        else
+          charStart = charEnd + 1;
       }
 
       painter->closeParagraph();
