@@ -196,6 +196,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
     //textbox.insert("style:vertical-pos", "from-top");
     textbox.insert("draw:stroke", "none");
     textbox.insert("draw:fill", "none");
+    textbox.insert("librevenge:rotate", shape.getRotation() * 180 / M_PI);
 
     painter->startTextObject(textbox);
 
@@ -326,24 +327,53 @@ void PMDCollector::paintShape(const OutputShape &shape,
             break;
           }
 
+          librevenge::RVNGString superscriptPosSizeString = "";
+          librevenge::RVNGString subscriptPosSizeString = "";
+          double superPos = (double)charProperties[i].m_superPos/10;
+          double subPos = (double)charProperties[i].m_subPos/10;
+          double superSubSize = (double)charProperties[i].m_superSubSize/10;
+
+          std::ostringstream sstream;
+          sstream << superSubSize;
+          std::string varAsString = sstream.str();
+
+          std::ostringstream sstream1;
+          sstream1 << superPos;
+          std::string varAsString1 = sstream1.str();
+
+          std::ostringstream sstream2;
+          sstream2 << subPos;
+          std::string varAsString2 = sstream2.str();
+
+          superscriptPosSizeString.append(varAsString1.c_str());
+          superscriptPosSizeString.append("% ");
+          superscriptPosSizeString.append(varAsString.c_str());
+          superscriptPosSizeString.append("%");
+
+          subscriptPosSizeString.append("-");
+          subscriptPosSizeString.append(varAsString2.c_str());
+          subscriptPosSizeString.append("% ");
+          subscriptPosSizeString.append(varAsString.c_str());
+          subscriptPosSizeString.append("%");
+
           switch (charProperties[i].m_superSubscript)
           {
           case 1:
             charProps.insert("style:text-line-through-style","solid");
             break;
           case 2:
-            charProps.insert("style:text-position", "50% 67%");
+            charProps.insert("style:text-position", superscriptPosSizeString);
             break;
           case 3:
             charProps.insert("style:text-line-through-style","solid");
-            charProps.insert("style:text-position", "50% 67%");
+            charProps.insert("style:text-position", superscriptPosSizeString);
             break;
           case 4:
-            charProps.insert("style:text-position", "-50% 67%");
+            charProps.insert("style:text-position", subscriptPosSizeString);
             break;
           case 5:
             charProps.insert("style:text-line-through-style","solid");
-            charProps.insert("style:text-position", "-50% 67%");
+            charProps.insert("style:text-position", subscriptPosSizeString);
             break;
           case 8: // Small Caps
             capsFlag = true;
@@ -357,24 +387,24 @@ void PMDCollector::paintShape(const OutputShape &shape,
           case 0x0a:
             capsFlag = true;
             charProps.insert("fo:font-variant","small-caps");
-            charProps.insert("style:text-position", "50% 67%");
+            charProps.insert("style:text-position", superscriptPosSizeString);
             break;
           case 0x0b:
             capsFlag = true;
             charProps.insert("fo:font-variant","small-caps");
             charProps.insert("style:text-line-through-style","solid");
-            charProps.insert("style:text-position", "50% 67%");
+            charProps.insert("style:text-position", superscriptPosSizeString);
             break;
           case 0x0c:
             capsFlag = true;
             charProps.insert("fo:font-variant","small-caps");
-            charProps.insert("style:text-position", "-50% 67%");
+            charProps.insert("style:text-position", subscriptPosSizeString);
             break;
           case 0x0d:
             capsFlag = true;
             charProps.insert("fo:font-variant","small-caps");
             charProps.insert("style:text-line-through-style","solid");
-            charProps.insert("style:text-position", "-50% 67%");
+            charProps.insert("style:text-position", subscriptPosSizeString);
             break;
           case 0x10: // Large Caps
             capsFlag = true;
@@ -385,21 +415,21 @@ void PMDCollector::paintShape(const OutputShape &shape,
             break;
           case 0x12:
             capsFlag = true;
-            charProps.insert("style:text-position", "50% 67%");
+            charProps.insert("style:text-position", superscriptPosSizeString);
             break;
           case 0x13:
             capsFlag = true;
             charProps.insert("style:text-line-through-style","solid");
-            charProps.insert("style:text-position", "50% 67%");
+            charProps.insert("style:text-position", superscriptPosSizeString);
             break;
           case 0x14:
             capsFlag = true;
-            charProps.insert("style:text-position", "-50% 67%");
+            charProps.insert("style:text-position", subscriptPosSizeString);
             break;
           case 0x15:
             capsFlag = true;
             charProps.insert("style:text-line-through-style","solid");
-            charProps.insert("style:text-position", "-50% 67%");
+            charProps.insert("style:text-position", subscriptPosSizeString);
             break;
           default:
             capsFlag = false;

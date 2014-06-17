@@ -216,8 +216,11 @@ void PMDParser::parseTextBox(PMDRecordContainer container, unsigned recordIndex,
     uint8_t boldItalicUnderline = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, charsContainer, i, 0x0a,"Can't read text box text bold-italic-undeline.");
     uint8_t superSubscript = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, charsContainer, i, 0x0b,"Can't read text box text subsuperscript.");
     int16_t kerning = tryReadRecordAt<int16_t>(m_input, m_bigEndian, charsContainer, i, 0x10,"Can't read text box text kerning.");
+    uint16_t superSubSize = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x14,"Can't read text box text subsuperscript.");
+    uint16_t superPos = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x18,"Can't read text box text subsuperscript.");
+    uint16_t subPos = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x16,"Can't read text box text subsuperscript.");
 
-    charProps.push_back(PMDCharProperties(length,fontFace,fontSize,boldItalicUnderline,superSubscript,kerning));
+    charProps.push_back(PMDCharProperties(length,fontFace,fontSize,boldItalicUnderline,superSubscript,kerning,superSubSize,superPos,subPos));
   }
 
   const PMDRecordContainer *ptrToParaContainer =

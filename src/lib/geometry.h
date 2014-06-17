@@ -59,9 +59,12 @@ public:
   uint8_t m_boldItalicUnderline;
   uint8_t m_superSubscript;
   int16_t m_kerning;
+  uint16_t m_superSubSize;
+  uint16_t m_superPos;
+  uint16_t m_subPos;
 
-  PMDCharProperties(const uint16_t length, const uint16_t fontFace, const uint16_t fontSize, const uint8_t boldItalicUnderline, const uint8_t superSubscript, const int16_t kerning)
-    : m_length(length), m_fontFace(fontFace), m_fontSize(fontSize), m_boldItalicUnderline(boldItalicUnderline), m_superSubscript(superSubscript), m_kerning(kerning)
+  PMDCharProperties(const uint16_t length, const uint16_t fontFace, const uint16_t fontSize, const uint8_t boldItalicUnderline, const uint8_t superSubscript, const int16_t kerning, const uint16_t superSubSize, const uint16_t superPos, const uint16_t subPos)
+    : m_length(length), m_fontFace(fontFace), m_fontSize(fontSize), m_boldItalicUnderline(boldItalicUnderline), m_superSubscript(superSubscript), m_kerning(kerning), m_superSubSize(superSubSize), m_superPos(superPos), m_subPos(subPos)
   { }
 
   virtual ~PMDCharProperties()
@@ -232,7 +235,7 @@ public:
   virtual std::vector<PMDCharProperties> getCharProperties() const
   {
     std::vector<PMDCharProperties> temp;
-    temp.push_back(PMDCharProperties(0,0,0,0,0,0));
+    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0));
     return temp;
   }
 
@@ -377,7 +380,7 @@ public:
   virtual std::vector<PMDCharProperties> getCharProperties() const
   {
     std::vector<PMDCharProperties> temp;
-    temp.push_back(PMDCharProperties(0,0,0,0,0,0));
+    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0));
     return temp;
   }
 
@@ -664,7 +667,7 @@ public:
   virtual std::vector<PMDCharProperties> getCharProperties() const
   {
     std::vector<PMDCharProperties> temp;
-    temp.push_back(PMDCharProperties(0,0,0,0,0,0));
+    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0));
     return temp;
   }
 
@@ -810,7 +813,7 @@ public:
   virtual std::vector<PMDCharProperties> getCharProperties() const
   {
     std::vector<PMDCharProperties> temp;
-    temp.push_back(PMDCharProperties(0,0,0,0,0,0));
+    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0));
     return temp;
   }
 
