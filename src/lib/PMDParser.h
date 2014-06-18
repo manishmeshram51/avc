@@ -31,6 +31,7 @@ class PMDParser
 
   /* Private functions. */
   void parseGlobalInfo(PMDRecordContainer);
+  void parseColors(PMDRecordContainer);
   void parsePages(PMDRecordContainer);
   void parseShapes(uint16_t seqNum, unsigned pageID);
   void parseLine(PMDRecordContainer, unsigned recordIndex, unsigned pageID);

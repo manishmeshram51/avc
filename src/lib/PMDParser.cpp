@@ -16,6 +16,7 @@
 #include "offsets.h"
 #include "libpagemaker_utils.h"
 #include "geometry.h"
+#include "PMDColor.h"
 
 namespace libpagemaker
 {
@@ -217,14 +218,15 @@ void PMDParser::parseTextBox(PMDRecordContainer container, unsigned recordIndex,
     uint16_t length = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x00,"Can't read text box text length.");
     uint16_t fontFace = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x02,"Can't read text box text font face.");
     uint16_t fontSize = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x04,"Can't read text box text font size.");
+    uint8_t fontColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, charsContainer, i, 0x08,"Can't read text box text font color.");
     uint8_t boldItalicUnderline = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, charsContainer, i, 0x0a,"Can't read text box text bold-italic-undeline.");
     uint8_t superSubscript = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, charsContainer, i, 0x0b,"Can't read text box text subsuperscript.");
     int16_t kerning = tryReadRecordAt<int16_t>(m_input, m_bigEndian, charsContainer, i, 0x10,"Can't read text box text kerning.");
-    uint16_t superSubSize = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x14,"Can't read text box text subsuperscript.");
-    uint16_t superPos = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x18,"Can't read text box text subsuperscript.");
-    uint16_t subPos = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x16,"Can't read text box text subsuperscript.");
+    uint16_t superSubSize = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x14,"Can't read text box text subsuperscript size.");
+    uint16_t superPos = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x18,"Can't read text box text superscript position.");
+    uint16_t subPos = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x16,"Can't read text box text subscript position.");
 
-    charProps.push_back(PMDCharProperties(length,fontFace,fontSize,boldItalicUnderline,superSubscript,kerning,superSubSize,superPos,subPos));
+    charProps.push_back(PMDCharProperties(length,fontFace,fontSize,fontColor,boldItalicUnderline,superSubscript,kerning,superSubSize,superPos,subPos));
   }
 
   const PMDRecordContainer *ptrToParaContainer =
@@ -492,6 +494,42 @@ void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
   }
 }
 
+void PMDParser::parseColors(PMDRecordContainer container)
+{
+  for (unsigned i = 0; i < container.m_numRecords; ++i)
+  {
+
+    uint8_t colorModel = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, i, COLOR_MODEL_OFFSET, "Can't read color model.");
+    uint8_t red = 0;
+    uint8_t blue = 0;
+    uint8_t green = 0;
+
+    if (colorModel == RGB)
+    {
+      red = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, i, RED_OFFSET, "Can't read red.");
+      blue = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, i, BLUE_OFFSET, "Can't read red.");
+      green = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, i, GREEN_OFFSET, "Can't read red.");
+    }
+    else if (colorModel == CMYK)
+    {
+      uint16_t cyan = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, i, CYAN_OFFSET, "Can't read cyan percentage.");
+      uint16_t magenta = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, i, MAGENTA_OFFSET, "Can't read magenta percentage.");
+      uint16_t yellow = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, i, YELLOW_OFFSET, "Can't read yellow percentage.");
+      uint16_t black = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, i, BLACK_OFFSET, "Can't read black percentage.");
+
+      uint16_t max = (std::numeric_limits<uint16_t>::max)();
+
+      red = 255* round((1 - std::min(1.0, (double)cyan/max + (double)black/max)));
+      green = 255*round((1 - std::min(1.0, (double)magenta/max + (double)black/max)));
+      blue = 255*round((1 - std::min(1.0, (double)yellow/max + (double)black/max)));
+    }
+    else if (colorModel == HLS)
+    { }
+
+    m_collector->addColor(PMDColor(i, red, green, blue));
+  }
+}
+
 void PMDParser::parsePages(PMDRecordContainer container)
 {
   uint16_t pageWidth = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, 0, PAGE_WIDTH_OFFSET,
@@ -598,6 +636,18 @@ void PMDParser::parse()
   {
     throw RecordNotFoundException(GLOBAL_INFO);
   }
+
+  i = m_records.find(COLORS);
+  if (i != m_records.end()
+      && !(i->second.empty()))
+  {
+    parseColors(m_recordsInOrder[i->second[0]]);
+  }
+  else
+  {
+    throw RecordNotFoundException(COLORS);
+  }
+
   i = m_records.find(PAGE);
   if (i != m_records.end()
       && !(i->second.empty()))

@@ -18,6 +18,17 @@ const unsigned PAGE_HEIGHT_OFFSET = 0x3C; /* In the GLOBAL_INFO record. */
 const unsigned PAGE_WIDTH_OFFSET = 0x08;  /* in the first PAGE record. */
 const unsigned PAGE_SHAPE_SEQNUM_OFFSET = 0x02;  /* in the first PAGE record. */
 
+const unsigned COLOR_MODEL_OFFSET = 0x22;
+
+const unsigned RED_OFFSET = 0x26;
+const unsigned GREEN_OFFSET = 0x27;
+const unsigned BLUE_OFFSET = 0x28;
+
+const unsigned CYAN_OFFSET = 0x26;
+const unsigned MAGENTA_OFFSET = 0x28;
+const unsigned YELLOW_OFFSET = 0x2a;
+const unsigned BLACK_OFFSET = 0x2c;
+
 const unsigned LINE_MIRRORED_OFFSET = 0x26;
 const unsigned SHAPE_TOP_LEFT_OFFSET = 0x06;
 const unsigned SHAPE_BOT_RIGHT_OFFSET = 0x0A;

@@ -15,6 +15,7 @@
 /* PMD record types */
 const uint16_t PAGE = 0x0500;
 const uint16_t GLOBAL_INFO = 0x1800;
+const uint16_t COLORS = 0x1500;
 const uint16_t SHAPE = 0x1900;
 const uint16_t LINE_SET = 0x1100;
 const uint16_t XFORM = 0x2800;
@@ -22,6 +23,11 @@ const uint16_t TEXT_BLOCK = 0x1a00;
 const uint16_t CHARS = 0x1c00;
 const uint16_t PARA = 0x0b00;
 const uint16_t FONTS = 0x1300;
+
+/* Color record types */
+const uint8_t RGB = 0x18;
+const uint8_t CMYK = 0x08;
+const uint8_t HLS = 0x10;
 
 /* Shape record types */
 const uint8_t POLYGON_RECORD = 0x0C;
@@ -57,18 +63,6 @@ const uint8_t FILL_TILTED_BARS = 7;
 const uint8_t FILL_TIGHT_TILTED_BARS = 8;
 const uint8_t FILL_GRID_BARS = 9;
 const uint8_t FILL_TIGHT_GRID_BARS = 0x0A;
-
-/* Color Constants */
-const uint8_t NONE = 0;
-const uint8_t REGISTRATION = 1;
-const uint8_t PAPER = 2;
-const uint8_t BLACK = 3;
-const uint8_t RED = 4;
-const uint8_t GREEN = 5;
-const uint8_t BLUE = 6;
-const uint8_t CYAN = 7;
-const uint8_t MAGENTA = 8;
-const uint8_t YELLOW = 9;
 
 /* Stroke Constants */
 const uint8_t STROKE_NORMAL = 0;

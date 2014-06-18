@@ -13,7 +13,7 @@ namespace libpagemaker
 static const double EM2PT = 11.95516799999881;
 
 PMDCollector::PMDCollector() :
-  m_pageWidth(), m_pageHeight(), m_pages(),
+  m_pageWidth(), m_pageHeight(), m_pages(), m_color(),
   m_doubleSided(false)
 { }
 
@@ -37,6 +37,11 @@ unsigned PMDCollector::addPage()
 {
   m_pages.push_back((PMDPage()));
   return m_pages.size() - 1;
+}
+
+void PMDCollector::addColor(PMDColor color)
+{
+  m_color.push_back(color);
 }
 
 void PMDCollector::addShapeToPage(unsigned pageID, boost::shared_ptr<PMDLineSet> shape)
@@ -83,41 +88,19 @@ void PMDCollector::paintShape(const OutputShape &shape,
       points.insert("draw:fill", "none");
     }
 
-    switch (fillColor)
+    if (fillColor < m_color.size())
     {
-    case NONE:
-      points.insert("draw:fill-color", "#FFFFFF");
-      break;
-    case REGISTRATION:
-      points.insert("draw:fill-color", "#000000");
-      break;
-    case PAPER:
-      points.insert("draw:fill-color", "#FFFFFF");
-      break;
-    case BLACK:
-      points.insert("draw:fill-color", "#000000");
-      break;
-    case RED:
-      points.insert("draw:fill-color", "#FF0000");
-      break;
-    case GREEN:
-      points.insert("draw:fill-color", "#00FF00");
-      break;
-    case BLUE:
-      points.insert("draw:fill-color", "#0000FF");
-      break;
-    case CYAN:
-      points.insert("draw:fill-color", "#00FFFF");
-      break;
-    case MAGENTA:
-      points.insert("draw:fill-color", "#FF00FF");
-      break;
-    case YELLOW:
-      points.insert("draw:fill-color", "#FFFF00");
-      break;
+      PMDColor tempFillColor = m_color[fillColor];
+      librevenge::RVNGString tempFillColorString;
+      tempFillColorString.sprintf("#%.2x%.2x%.2x", tempFillColor.m_red,tempFillColor.m_green,tempFillColor.m_blue);
+      points.insert("draw:fill-color", tempFillColorString);
+    }
+    else
+    {
+      PMD_DEBUG_MSG(("Fill Color Not Available"));
     }
 
-    if (fillColor == NONE)
+    if (fillColor == 0)
       points.insert("draw:opacity", 0);
     else
       points.insert("draw:opacity", fillTint);
@@ -136,38 +119,16 @@ void PMDCollector::paintShape(const OutputShape &shape,
 
     points.insert("svg:stroke-width", strokeWidth);
 
-    switch (strokeColor)
+    if (strokeColor < m_color.size())
     {
-    case NONE:
-      points.insert("svg:stroke-color", "#FFFFFF");
-      break;
-    case REGISTRATION:
-      points.insert("svg:stroke-color", "#000000");
-      break;
-    case PAPER:
-      points.insert("svg:stroke-color", "#FFFFFF");
-      break;
-    case BLACK:
-      points.insert("svg:stroke-color", "#000000");
-      break;
-    case RED:
-      points.insert("svg:stroke-color", "#FF0000");
-      break;
-    case GREEN:
-      points.insert("svg:stroke-color", "#00FF00");
-      break;
-    case BLUE:
-      points.insert("svg:stroke-color", "#0000FF");
-      break;
-    case CYAN:
-      points.insert("svg:stroke-color", "#00FFFF");
-      break;
-    case MAGENTA:
-      points.insert("svg:stroke-color", "#FF00FF");
-      break;
-    case YELLOW:
-      points.insert("svg:stroke-color", "#FFFF00");
-      break;
+      PMDColor tempStrokeColor = m_color[strokeColor];
+      librevenge::RVNGString tempStrokeColorString;
+      tempStrokeColorString.sprintf("#%.2x%.2x%.2x", tempStrokeColor.m_red,tempStrokeColor.m_green,tempStrokeColor.m_blue);
+      points.insert("svg:stroke-color", tempStrokeColorString);
+    }
+    else
+    {
+      PMD_DEBUG_MSG(("Stroke Color Not Available"));
     }
 
     points.insert("svg:stroke-opacity", strokeTint);
@@ -263,7 +224,6 @@ void PMDCollector::paintShape(const OutputShape &shape,
       PMD_DEBUG_MSG(("\n\nPara Start is %d \n",paraStart));
       PMD_DEBUG_MSG(("Para End is %d \n\n",paraEnd));
 
-      //charProps.insert("fo:color", "#FF0000");
       //charProps.insert("style:font-name", "Ubuntu");
 
       std::string tempText = shape.getText();
@@ -279,7 +239,6 @@ void PMDCollector::paintShape(const OutputShape &shape,
 
       for (unsigned i = 0; i < charProperties.size(); ++i)
       {
-
         charLength = charProperties[i].m_length;
         uint16_t charEndTemp = charStart + charLength -1;
 
@@ -298,6 +257,19 @@ void PMDCollector::paintShape(const OutputShape &shape,
 
           librevenge::RVNGPropertyList charProps;
           charProps.insert("fo:font-size",(double)charProperties[i].m_fontSize/10,librevenge::RVNG_POINT);
+
+
+          if (charProperties[i].m_fontColor < m_color.size())
+          {
+            PMDColor tempColor = m_color[charProperties[i].m_fontColor];
+            librevenge::RVNGString tempColorString;
+            tempColorString.sprintf("#%.2x%.2x%.2x", tempColor.m_red,tempColor.m_green,tempColor.m_blue);
+            charProps.insert("fo:color", tempColorString);
+          }
+          else
+          {
+            PMD_DEBUG_MSG(("Color Not Available"));
+          }
 
           switch (charProperties[i].m_boldItalicUnderline)
           {
@@ -587,41 +559,19 @@ void PMDCollector::paintShape(const OutputShape &shape,
         propList.insert("draw:fill", "none");
       }
 
-      switch (fillColor)
+      if (fillColor < m_color.size())
       {
-      case NONE:
-        propList.insert("draw:fill-color", "#FFFFFF");
-        break;
-      case REGISTRATION:
-        propList.insert("draw:fill-color", "#000000");
-        break;
-      case PAPER:
-        propList.insert("draw:fill-color", "#FFFFFF");
-        break;
-      case BLACK:
-        propList.insert("draw:fill-color", "#000000");
-        break;
-      case RED:
-        propList.insert("draw:fill-color", "#FF0000");
-        break;
-      case GREEN:
-        propList.insert("draw:fill-color", "#00FF00");
-        break;
-      case BLUE:
-        propList.insert("draw:fill-color", "#0000FF");
-        break;
-      case CYAN:
-        propList.insert("draw:fill-color", "#00FFFF");
-        break;
-      case MAGENTA:
-        propList.insert("draw:fill-color", "#FF00FF");
-        break;
-      case YELLOW:
-        propList.insert("draw:fill-color", "#FFFF00");
-        break;
+        PMDColor tempFillColor = m_color[fillColor];
+        librevenge::RVNGString tempFillColorString;
+        tempFillColorString.sprintf("#%.2x%.2x%.2x", tempFillColor.m_red,tempFillColor.m_green,tempFillColor.m_blue);
+        propList.insert("draw:fill-color", tempFillColorString);
+      }
+      else
+      {
+        PMD_DEBUG_MSG(("Fill Color Not Available"));
       }
 
-      if (fillColor == NONE)
+      if (fillColor == 0)
         propList.insert("draw:opacity", 0);
       else
         propList.insert("draw:opacity", fillTint);
@@ -640,38 +590,16 @@ void PMDCollector::paintShape(const OutputShape &shape,
 
       propList.insert("svg:stroke-width", strokeWidth);
 
-      switch (strokeColor)
+      if (strokeColor < m_color.size())
       {
-      case NONE:
-        propList.insert("svg:stroke-color", "#FFFFFF");
-        break;
-      case REGISTRATION:
-        propList.insert("svg:stroke-color", "#000000");
-        break;
-      case PAPER:
-        propList.insert("svg:stroke-color", "#FFFFFF");
-        break;
-      case BLACK:
-        propList.insert("svg:stroke-color", "#000000");
-        break;
-      case RED:
-        propList.insert("svg:stroke-color", "#FF0000");
-        break;
-      case GREEN:
-        propList.insert("svg:stroke-color", "#00FF00");
-        break;
-      case BLUE:
-        propList.insert("svg:stroke-color", "#0000FF");
-        break;
-      case CYAN:
-        propList.insert("svg:stroke-color", "#00FFFF");
-        break;
-      case MAGENTA:
-        propList.insert("svg:stroke-color", "#FF00FF");
-        break;
-      case YELLOW:
-        propList.insert("svg:stroke-color", "#FFFF00");
-        break;
+        PMDColor tempStrokeColor = m_color[strokeColor];
+        librevenge::RVNGString tempStrokeColorString;
+        tempStrokeColorString.sprintf("#%.2x%.2x%.2x", tempStrokeColor.m_red,tempStrokeColor.m_green,tempStrokeColor.m_blue);
+        propList.insert("svg:stroke-color", tempStrokeColorString);
+      }
+      else
+      {
+        PMD_DEBUG_MSG(("Stroke Color Not Available"));
       }
 
       propList.insert("svg:stroke-opacity", strokeTint);
