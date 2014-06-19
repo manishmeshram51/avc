@@ -58,6 +58,22 @@ AC_CHECK_HEADERS(
     []
 )
 
+# =================================
+# Libtool/Version Makefile settings
+# =================================
+AC_SUBST(PMD_MAJOR_VERSION, [libpagemaker_version_major])
+AC_SUBST(PMD_MINOR_VERSION, [libpagemaker_version_minor])
+AC_SUBST(PMD_MICRO_VERSION, [libpagemaker_version_micro])
+AC_SUBST(PMD_VERSION, [libpagemaker_version])
+# AC_SUBST(LT_RELEASE, [libpagemaker_version_major.libpagemaker_version_minor])
+LT_CURRENT=`expr 100 '*' libpagemaker_version_major + libpagemaker_version_minor`
+# For 1.0.0 comment the first line and uncomment the second
+LT_AGE=0
+# LT_AGE=libpagemaker_version_minor
+AC_SUBST(LT_CURRENT)
+AC_SUBST(LT_REVISION, [libpagemaker_version_micro])
+AC_SUBST(LT_AGE)
+
 # ==========================
 # Platform check for windows
 # ==========================
