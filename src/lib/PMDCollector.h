@@ -68,7 +68,7 @@ public:
   void setPageWidth(PMDPageUnit);
   void setPageHeight(PMDPageUnit);
   void setDoubleSided(bool);
-  void addShapeToPage(unsigned pageID, boost::shared_ptr<PMDLineSet> shape);
+  void addShapeToPage(unsigned pageID, const boost::shared_ptr<PMDLineSet> &shape);
   void addColor(PMDColor color);
 
   unsigned addPage();

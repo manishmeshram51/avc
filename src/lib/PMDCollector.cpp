@@ -44,7 +44,7 @@ void PMDCollector::addColor(PMDColor color)
   m_color.push_back(color);
 }
 
-void PMDCollector::addShapeToPage(unsigned pageID, boost::shared_ptr<PMDLineSet> shape)
+void PMDCollector::addShapeToPage(unsigned pageID, const boost::shared_ptr<PMDLineSet> &shape)
 {
   m_pages.at(pageID).addShape(shape);
 }

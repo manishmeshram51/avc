@@ -26,7 +26,7 @@ public:
   PMDPage() : m_shapes()
   { }
 
-  void addShape(boost::shared_ptr<PMDLineSet> shape)
+  void addShape(const boost::shared_ptr<PMDLineSet> &shape)
   {
     m_shapes.push_back(shape);
   }
