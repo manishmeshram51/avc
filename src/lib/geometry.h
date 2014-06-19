@@ -16,9 +16,8 @@
 
 namespace libpagemaker
 {
-template <typename Unit> class Point
+template <typename Unit> struct Point
 {
-public:
   Unit m_x;
   Unit m_y;
 
@@ -29,9 +28,8 @@ public:
 typedef Point<PMDShapeUnit> PMDShapePoint;
 typedef Point<double> InchPoint;
 
-class PMDParaProperties
+struct PMDParaProperties
 {
-public:
   uint16_t m_length;
   uint8_t m_align;
   uint16_t m_leftIndent;
@@ -43,16 +41,10 @@ public:
   PMDParaProperties(const uint16_t length, const uint8_t align,const uint16_t leftIndent,const uint16_t firstIndent,const uint16_t rightIndent,const uint16_t beforeIndent,const uint16_t afterIndent)
     : m_length(length), m_align(align), m_leftIndent(leftIndent), m_firstIndent(firstIndent), m_rightIndent(rightIndent), m_beforeIndent(beforeIndent), m_afterIndent(afterIndent)
   { }
-
-  virtual ~PMDParaProperties()
-  {
-  }
-
 };
 
-class PMDCharProperties
+struct PMDCharProperties
 {
-public:
   uint16_t m_length;
   uint16_t m_fontFace;
   uint16_t m_fontSize;
@@ -67,11 +59,6 @@ public:
   PMDCharProperties(const uint16_t length, const uint16_t fontFace, const uint16_t fontSize, const uint8_t fontColor, const uint8_t boldItalicUnderline, const uint8_t superSubscript, const int16_t kerning, const uint16_t superSubSize, const uint16_t superPos, const uint16_t subPos)
     : m_length(length), m_fontFace(fontFace), m_fontSize(fontSize), m_fontColor(fontColor), m_boldItalicUnderline(boldItalicUnderline), m_superSubscript(superSubscript), m_kerning(kerning), m_superSubSize(superSubSize), m_superPos(superPos), m_subPos(subPos)
   { }
-
-  virtual ~PMDCharProperties()
-  {
-  }
-
 };
 
 class PMDLineSet
