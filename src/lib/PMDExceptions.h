@@ -19,7 +19,7 @@ namespace libpagemaker
 struct PMDParseException
 {
   std::string m_message;
-  PMDParseException(std::string message)
+  PMDParseException(const std::string &message)
     : m_message(message)
   { }
   virtual ~PMDParseException() { }
@@ -44,7 +44,7 @@ struct CorruptRecordException : public PMDParseException
 {
   uint16_t m_recordType;
 
-  CorruptRecordException(uint16_t recordType, std::string message)
+  CorruptRecordException(uint16_t recordType, const std::string &message)
     : PMDParseException((boost::format("Corrupt record: %d\nError message: %s\n") % recordType % message).str()),
       m_recordType(recordType)
   { }
