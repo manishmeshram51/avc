@@ -116,21 +116,23 @@ void PMDParser::parseTextBox(PMDRecordContainer container, unsigned recordIndex,
                              unsigned pageID)
 {
   PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                          recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read text box top-left point.");
+                                                 recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read text box top-left point.");
   PMDShapePoint botRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                           recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read text box bottom-right point.");
+                                                  recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read text box bottom-right point.");
   uint32_t textBoxRotationDegree = 0;
   uint32_t textBoxSkewDegree = 0;
   PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
   PMDShapePoint xformBotRight = PMDShapePoint(0,0);
   PMDShapePoint rotatingPoint = PMDShapePoint(0, 0);
 
+#if defined DEBUG
   uint16_t textBoxTextPropsOne = 0;
   uint16_t textBoxTextPropsTwo = 0;
+  uint16_t textBoxTextStyle = 0;
+#endif
   uint16_t textBoxText = 0;
   uint16_t textBoxChars = 0;
   uint16_t textBoxPara = 0;
-  uint16_t textBoxTextStyle = 0;
 
   uint32_t textBoxXformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_XFORM_ID_OFFSET, "Can't read text box xform id.");
 
@@ -142,7 +144,7 @@ void PMDParser::parseTextBox(PMDRecordContainer container, unsigned recordIndex,
     for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
     {
       uint32_t xformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i,
-                         XFORM_ID_OFFSET, "Can't find xform id.");
+                                                   XFORM_ID_OFFSET, "Can't find xform id.");
       if (xformId == textBoxXformId)
       {
         textBoxRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read text box rotation.");
@@ -167,16 +169,18 @@ void PMDParser::parseTextBox(PMDRecordContainer container, unsigned recordIndex,
   for (unsigned i = 0; i < textBlockContainer.m_numRecords; ++i)
   {
     uint32_t textBlockId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, textBlockContainer, i,
-                           TEXT_BLOCK_ID_OFFSET, "Can't find textBlock id.");
+                                                     TEXT_BLOCK_ID_OFFSET, "Can't find textBlock id.");
 
     if (textBlockId == textBoxTextBlockId)
     {
+#if defined DEBUG
       textBoxTextPropsOne = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_TEXT_PROPS_ONE_OFFSET, "Can't read text box props one.");
       textBoxTextPropsTwo = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_TEXT_PROPS_TWO_OFFSET, "Can't read text box props two.");
+      textBoxTextStyle = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_TEXT_STYLE_OFFSET, "Can't read text box style.");
+#endif
       textBoxText = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_TEXT_OFFSET, "Can't read text box text.");
       textBoxChars = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_CHARS_OFFSET, "Can't read text box chars.");
       textBoxPara = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_PARA_OFFSET, "Can't read text box para.");
-      textBoxTextStyle = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_TEXT_STYLE_OFFSET, "Can't read text box style.");
       PMD_DEBUG_MSG(("Text Box Props One is %x \n",textBoxTextPropsOne));
       PMD_DEBUG_MSG(("Text Box Props Two is %x \n",textBoxTextPropsTwo));
       PMD_DEBUG_MSG(("Text Box Style is %x \n",textBoxTextStyle));
