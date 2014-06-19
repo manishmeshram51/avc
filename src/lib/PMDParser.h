@@ -38,7 +38,7 @@ class PMDParser
   void parsePolygon(PMDRecordContainer, unsigned recordIndex, unsigned pageID);
   void parseEllipse(PMDRecordContainer, unsigned recordIndex, unsigned pageID);
   void parseHeader(uint32_t *tocOffset, uint16_t *tocLength);
-  unsigned readNextRecordFromTableOfContents(unsigned seqNum, bool seekToNext);
+  unsigned readNextRecordFromTableOfContents(unsigned seqNum);
   void parseTableOfContents(uint32_t offset, uint16_t length);
 
   /* Prevent copy and assignment */

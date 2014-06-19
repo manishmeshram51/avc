@@ -400,7 +400,7 @@ void PMDParser::parseHeader(uint32_t *tocOffset, uint16_t *tocLength)
   }
 }
 
-unsigned PMDParser::readNextRecordFromTableOfContents(unsigned seqNum, bool seekToNext)
+unsigned PMDParser::readNextRecordFromTableOfContents(unsigned seqNum)
 {
   long currentPosition = m_input->tell();
 
@@ -408,10 +408,7 @@ unsigned PMDParser::readNextRecordFromTableOfContents(unsigned seqNum, bool seek
   uint16_t numRecs = readU16(m_input, m_bigEndian);
   uint32_t offset = readU32(m_input, m_bigEndian);
 
-  if (seekToNext)
-  {
-    seek(m_input, currentPosition + 16);
-  }
+  seek(m_input, currentPosition + 16);
 
   m_recordsInOrder.push_back(PMDRecordContainer(recType, offset, seqNum, numRecs));
   m_records[recType].push_back((unsigned)(m_recordsInOrder.size() - 1));
@@ -425,7 +422,7 @@ void PMDParser::parseTableOfContents(uint32_t offset, uint16_t length) try
   PMD_DEBUG_MSG(("[TOC] entries to read: %d\n", length));
   for (unsigned i = 0; i < length; ++i)
   {
-    unsigned numRead = readNextRecordFromTableOfContents(i, i != length);
+    unsigned numRead = readNextRecordFromTableOfContents(i);
     (void)numRead;
     PMD_DEBUG_MSG(("[TOC] Learned about %d TMD records from ToC entry %d.\n",
                    numRead, i));
