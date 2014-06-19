@@ -7,10 +7,11 @@
 #include "constants.h"
 #include "libpagemaker_utils.h"
 
-#define emTopt 11.95516799999881
-
 namespace libpagemaker
 {
+
+static const double EM2PT = 11.95516799999881;
+
 PMDCollector::PMDCollector() :
   m_pageWidth(), m_pageHeight(), m_pages(),
   m_doubleSided(false)
@@ -439,7 +440,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
           if (charProperties[i].m_kerning != 0)
           {
             charProps.insert("style:letter-kerning","true");
-            charProps.insert("fo:letter-spacing",((double)charProperties[i].m_kerning/1000)*emTopt,librevenge::RVNG_POINT);
+            charProps.insert("fo:letter-spacing",((double)charProperties[i].m_kerning/1000)*EM2PT,librevenge::RVNG_POINT);
           }
 
 
