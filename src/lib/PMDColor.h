@@ -7,7 +7,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#pragma once
+#ifndef __PMDCOLOR_H__
+#define __PMDCOLOR_H__
+
 #include "Units.h"
 namespace libpagemaker
 {
@@ -30,5 +32,7 @@ public:
 
 };
 }
+
+#endif // __PMDCOLOR_H__
 
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */
