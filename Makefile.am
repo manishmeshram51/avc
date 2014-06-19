@@ -9,7 +9,9 @@ SUBDIRS = src inc build docs
 EXTRA_DIST = \
 	AUTHORS \
 	COPYING.MPL \
+	HACKING \
 	NEWS \
+	NOTES \
 	README \
 	autogen.sh \
 	libpagemaker.pc.in
