@@ -8,7 +8,7 @@ SUBDIRS = src inc build docs
 
 EXTRA_DIST = \
 	AUTHORS \
-	COPYING.MPL \
+	COPYING \
 	HACKING \
 	NEWS \
 	NOTES \
