@@ -226,8 +226,11 @@ void PMDCollector::paintShape(const OutputShape &shape,
       case 3:
         paraProps.insert("fo:text-align", "justify");
         break;
-      case 4:
-        paraProps.insert("fo:text-align-last", "justify"); // It has to be force-justify
+      case 4: // force-justify
+        // Strictly speaking, this is not equivalent to the real force-justify
+        // layout. But it is the best approximation ODF can do.
+        paraProps.insert("fo:text-align", "justify");
+        paraProps.insert("fo:text-align-last", "justify");
         break;
       case 0:
       default:
