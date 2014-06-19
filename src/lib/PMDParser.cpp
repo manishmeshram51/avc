@@ -36,7 +36,7 @@ PMDParser::PMDParser(librevenge::RVNGInputStream *input, PMDCollector *collector
 
 
 template <typename T> T tryReadRecordAt(librevenge::RVNGInputStream *input,
-                                        bool bigEndian, PMDRecordContainer container,
+                                        bool bigEndian, const PMDRecordContainer &container,
                                         unsigned recordIndex,
                                         uint32_t offsetWithinRecord, const std::string &errorMsg)
 {
@@ -74,7 +74,7 @@ template <typename T> T tryReadRecordAt(librevenge::RVNGInputStream *input,
 }
 
 PMDShapePoint tryReadPointFromRecord(librevenge::RVNGInputStream *input,
-                                     bool bigEndian, PMDRecordContainer container,
+                                     bool bigEndian, const PMDRecordContainer &container,
                                      unsigned recordIndex,
                                      uint32_t offsetWithinRecord, const std::string &errorMsg)
 {
@@ -85,7 +85,7 @@ PMDShapePoint tryReadPointFromRecord(librevenge::RVNGInputStream *input,
   return PMDShapePoint(x, y);
 }
 
-void PMDParser::parseGlobalInfo(PMDRecordContainer container)
+void PMDParser::parseGlobalInfo(const PMDRecordContainer &container)
 {
   uint16_t pageHeight = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, 0,
                                                   PAGE_HEIGHT_OFFSET, "Can't find page height in global attributes record.");
@@ -99,7 +99,7 @@ void PMDParser::parseGlobalInfo(PMDRecordContainer container)
   m_collector->setPageHeight(pageHeight);
 }
 
-void PMDParser::parseLine(PMDRecordContainer container, unsigned recordIndex,
+void PMDParser::parseLine(const PMDRecordContainer &container, unsigned recordIndex,
                           unsigned pageID)
 {
   PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
@@ -122,7 +122,7 @@ void PMDParser::parseLine(PMDRecordContainer container, unsigned recordIndex,
   m_collector->addShapeToPage(pageID, newShape);
 }
 
-void PMDParser::parseTextBox(PMDRecordContainer container, unsigned recordIndex,
+void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recordIndex,
                              unsigned pageID)
 {
   PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
@@ -267,7 +267,7 @@ void PMDParser::parseTextBox(PMDRecordContainer container, unsigned recordIndex,
 
 }
 
-void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordIndex,
+void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned recordIndex,
                                unsigned pageID)
 {
   PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
@@ -322,7 +322,7 @@ void PMDParser::parseRectangle(PMDRecordContainer container, unsigned recordInde
   m_collector->addShapeToPage(pageID, newShape);
 }
 
-void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
+void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recordIndex,
                              unsigned pageID)
 {
   PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
@@ -412,7 +412,7 @@ void PMDParser::parsePolygon(PMDRecordContainer container, unsigned recordIndex,
   m_collector->addShapeToPage(pageID, newShape);
 }
 
-void PMDParser::parseEllipse(PMDRecordContainer container, unsigned recordIndex, unsigned pageID)
+void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID)
 {
 
   PMDShapePoint bboxTopLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
@@ -503,7 +503,7 @@ void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
   }
 }
 
-void PMDParser::parseColors(PMDRecordContainer container)
+void PMDParser::parseColors(const PMDRecordContainer &container)
 {
   for (unsigned i = 0; i < container.m_numRecords; ++i)
   {
@@ -539,7 +539,7 @@ void PMDParser::parseColors(PMDRecordContainer container)
   }
 }
 
-void PMDParser::parsePages(PMDRecordContainer container)
+void PMDParser::parsePages(const PMDRecordContainer &container)
 {
   uint16_t pageWidth = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, 0, PAGE_WIDTH_OFFSET,
                                                  "Can't find page width in first page record.");

@@ -30,15 +30,15 @@ class PMDParser
   std::vector<PMDRecordContainer> m_recordsInOrder;
 
   /* Private functions. */
-  void parseGlobalInfo(PMDRecordContainer);
-  void parseColors(PMDRecordContainer);
-  void parsePages(PMDRecordContainer);
+  void parseGlobalInfo(const PMDRecordContainer &container);
+  void parseColors(const PMDRecordContainer &container);
+  void parsePages(const PMDRecordContainer &container);
   void parseShapes(uint16_t seqNum, unsigned pageID);
-  void parseLine(PMDRecordContainer, unsigned recordIndex, unsigned pageID);
-  void parseTextBox(PMDRecordContainer, unsigned recordIndex, unsigned pageID);
-  void parseRectangle(PMDRecordContainer, unsigned recordIndex, unsigned pageID);
-  void parsePolygon(PMDRecordContainer, unsigned recordIndex, unsigned pageID);
-  void parseEllipse(PMDRecordContainer, unsigned recordIndex, unsigned pageID);
+  void parseLine(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID);
+  void parseTextBox(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID);
+  void parseRectangle(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID);
+  void parsePolygon(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID);
+  void parseEllipse(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID);
   void parseHeader(uint32_t *tocOffset, uint16_t *tocLength);
   unsigned readNextRecordFromTableOfContents(unsigned seqNum);
   void parseTableOfContents(uint32_t offset, uint16_t length);
