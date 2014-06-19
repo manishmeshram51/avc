@@ -3,7 +3,7 @@
 #include <math.h>
 #include "libpagemaker_utils.h"
 boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
-  boost::shared_ptr<const PMDLineSet> ptrToLineSet, InchPoint translate)
+  const boost::shared_ptr<const PMDLineSet> &ptrToLineSet, const InchPoint &translate)
 {
   if (ptrToLineSet->shapeType() == SHAPE_TYPE_TEXTBOX)
   {

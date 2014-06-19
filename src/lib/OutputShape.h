@@ -174,7 +174,7 @@ public:
 
 
 boost::shared_ptr<OutputShape> newOutputShape(
-  boost::shared_ptr<const PMDLineSet> lineSet, InchPoint translate);
+  const boost::shared_ptr<const PMDLineSet> &lineSet, const InchPoint &translate);
 
 }
 
