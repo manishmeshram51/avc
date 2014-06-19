@@ -20,6 +20,7 @@ libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_SOURCES = \
 	OutputShape.h \
 	PMDCollector.cpp \
 	PMDCollector.h \
+	PMDColor.h \
 	PMDExceptions.h \
 	PMDPage.h \
 	PMDParser.cpp \
