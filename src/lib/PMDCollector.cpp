@@ -48,7 +48,7 @@ unsigned PMDCollector::addPage()
   return m_pages.size() - 1;
 }
 
-void PMDCollector::addColor(PMDColor color)
+void PMDCollector::addColor(const PMDColor &color)
 {
   m_color.push_back(color);
 }
