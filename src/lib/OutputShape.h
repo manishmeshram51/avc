@@ -60,7 +60,7 @@ public:
 
   InchPoint getPoint(unsigned i) const
   {
-    return m_points[i];
+    return (m_points.size() > i) ? m_points[i] : InchPoint(0, 0);
   }
 
   bool getIsClosed() const
