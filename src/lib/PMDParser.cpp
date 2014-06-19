@@ -402,13 +402,11 @@ void PMDParser::parseHeader(uint32_t *tocOffset, uint16_t *tocLength)
 
 unsigned PMDParser::readNextRecordFromTableOfContents(unsigned seqNum)
 {
-  long currentPosition = m_input->tell();
-
   uint16_t recType = readU16(m_input, true);
   uint16_t numRecs = readU16(m_input, m_bigEndian);
   uint32_t offset = readU32(m_input, m_bigEndian);
 
-  seek(m_input, currentPosition + 16);
+  m_input->seek(8, librevenge::RVNG_SEEK_CUR);
 
   m_recordsInOrder.push_back(PMDRecordContainer(recType, offset, seqNum, numRecs));
   m_records[recType].push_back((unsigned)(m_recordsInOrder.size() - 1));
