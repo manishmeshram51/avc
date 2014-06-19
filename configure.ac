@@ -49,40 +49,14 @@ AC_SUBST([REVENGE_LIBS])
 # Find boost
 # ==========
 AC_CHECK_HEADERS(
+        boost/format.hpp \
+        boost/optional.hpp \
+        boost/scoped_ptr.hpp \
         boost/shared_ptr.hpp,
     [],
-    [AC_MSG_ERROR([Required header boost/shared_ptr.hpp not found.])],
+    [AC_MSG_ERROR([Required boost headers not found.])],
     []
 )
-
-AC_CHECK_HEADERS(
-        boost/optional.hpp,
-    [],
-    [AC_MSG_ERROR([Required header boost/optional.hpp not found.])],
-    []
-)
-
-AC_CHECK_HEADERS(
-        boost/format.hpp,
-    [],
-    [AC_MSG_ERROR([Required header boost/format.hpp not found.])],
-    []
-)
-# =================================
-# Libtool/Version Makefile settings
-# =================================
-AC_SUBST(PMD_MAJOR_VERSION, [libpagemaker_version_major])
-AC_SUBST(PMD_MINOR_VERSION, [libpagemaker_version_minor])
-AC_SUBST(PMD_MICRO_VERSION, [libpagemaker_version_micro])
-AC_SUBST(PMD_VERSION, [libpagemaker_version])
-# AC_SUBST(LT_RELEASE, [libpagemaker_version_major.libpagemaker_version_minor])
-LT_CURRENT=`expr 100 '*' libpagemaker_version_major + libpagemaker_version_minor`
-# For 1.0.0 comment the first line and uncomment the second
-LT_AGE=0
-# LT_AGE=libpagemaker_version_minor
-AC_SUBST(LT_CURRENT)
-AC_SUBST(LT_REVISION, [libpagemaker_version_micro])
-AC_SUBST(LT_AGE)
 
 # ==========================
 # Platform check for windows
