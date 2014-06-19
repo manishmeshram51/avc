@@ -404,7 +404,7 @@ unsigned PMDParser::readNextRecordFromTableOfContents(unsigned seqNum, bool seek
 {
   long currentPosition = m_input->tell();
 
-  uint16_t recType = readU16(m_input, m_bigEndian);
+  uint16_t recType = readU16(m_input, true);
   uint16_t numRecs = readU16(m_input, m_bigEndian);
   uint32_t offset = readU32(m_input, m_bigEndian);
 
