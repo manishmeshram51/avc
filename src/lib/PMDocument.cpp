@@ -30,7 +30,7 @@ catch (...)
   return false;
 }
 
-bool PMDocument::parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter)
+bool PMDocument::parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter) try
 {
   PMDCollector collector;
   PMD_DEBUG_MSG(("About to start parsing...\n"));
@@ -40,6 +40,10 @@ bool PMDocument::parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawi
   PMD_DEBUG_MSG(("About to start drawing...\n"));
   collector.draw(painter);
   return true;
+}
+catch (...)
+{
+  return false;
 }
 
 }
