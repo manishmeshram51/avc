@@ -550,7 +550,7 @@ void PMDParser::parseHeader(uint32_t *tocOffset, uint16_t *tocLength)
 
 unsigned PMDParser::readNextRecordFromTableOfContents(unsigned seqNum)
 {
-  uint16_t recType = readU16(m_input, true);
+  uint16_t recType = readU16(m_input, m_bigEndian);
   uint16_t numRecs = readU16(m_input, m_bigEndian);
   uint32_t offset = readU32(m_input, m_bigEndian);
 
