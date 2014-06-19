@@ -16,23 +16,23 @@ libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_LIBADD  = $(REVENGE_LIBS
 libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_DEPENDENCIES = @LIBPMD_WIN32_RESOURCE@
 libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_LDFLAGS = $(version_info) -export-dynamic -no-undefines
 libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_SOURCES = \
-	PMDocument.cpp \
-	libpagemaker_utils.cpp \
-	libpagemaker_utils.h \
+	OutputShape.cpp \
 	OutputShape.h \
-	PMDPage.h \
-	PMDParser.cpp \
-	PMDParser.h \
 	PMDCollector.cpp \
 	PMDCollector.h \
 	PMDExceptions.h \
+	PMDPage.h \
+	PMDParser.cpp \
+	PMDParser.h \
 	PMDRecord.h \
-	offsets.h \
-	constants.h \
+	PMDocument.cpp \
 	Units.h \
+	constants.h \
 	geometry.cpp \
 	geometry.h \
-	OutputShape.cpp
+	libpagemaker_utils.cpp \
+	libpagemaker_utils.h \
+	offsets.h
 
 if OS_WIN32
 
