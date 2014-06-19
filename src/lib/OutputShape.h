@@ -78,42 +78,42 @@ public:
     return m_fillType;
   }
 
-  uint8_t virtual getFillColor() const
+  virtual uint8_t getFillColor() const
   {
     return m_fillColor;
   }
 
-  uint8_t virtual getFillOverprint() const
+  virtual uint8_t getFillOverprint() const
   {
     return m_fillOverprint;
   }
 
-  uint8_t virtual getFillTint() const
+  virtual uint8_t getFillTint() const
   {
     return m_fillTint;
   }
 
-  uint8_t virtual getStrokeType() const
+  virtual uint8_t getStrokeType() const
   {
     return m_strokeType;
   }
 
-  uint8_t virtual getStrokeWidth() const
+  virtual uint8_t getStrokeWidth() const
   {
     return m_strokeWidth;
   }
 
-  uint8_t virtual getStrokeColor() const
+  virtual uint8_t getStrokeColor() const
   {
     return m_strokeColor;
   }
 
-  uint8_t virtual getStrokeOverprint() const
+  virtual uint8_t getStrokeOverprint() const
   {
     return m_strokeOverprint;
   }
 
-  uint8_t virtual getStrokeTint() const
+  virtual uint8_t getStrokeTint() const
   {
     return m_strokeTint;
   }

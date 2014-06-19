@@ -65,24 +65,24 @@ class PMDLineSet
 {
 public:
   virtual std::vector<PMDShapePoint> getPoints() const = 0;
-  bool virtual getIsClosed() const = 0;
+  virtual bool getIsClosed() const = 0;
   virtual double getRotation() const = 0;
-  double virtual getSkew() const = 0;
-  PMDShapePoint virtual getRotatingPoint() const = 0;
-  PMDShapePoint virtual getXformTopLeft() const = 0;
-  PMDShapePoint virtual getXformBotRight() const = 0;
-  uint8_t virtual shapeType() const = 0;
-  PMDShapePoint virtual getTopLeft() const = 0;
-  PMDShapePoint virtual getBotRight() const = 0;
-  uint8_t virtual getFillType() const = 0;
-  uint8_t virtual getFillColor() const = 0;
-  uint8_t virtual getFillOverprint() const = 0;
-  uint8_t virtual getFillTint() const = 0;
-  uint8_t virtual getStrokeType() const = 0;
-  uint8_t virtual getStrokeWidth() const = 0;
-  uint8_t virtual getStrokeColor() const = 0;
-  uint8_t virtual getStrokeOverprint() const = 0;
-  uint8_t virtual getStrokeTint() const = 0;
+  virtual double getSkew() const = 0;
+  virtual PMDShapePoint getRotatingPoint() const = 0;
+  virtual PMDShapePoint getXformTopLeft() const = 0;
+  virtual PMDShapePoint getXformBotRight() const = 0;
+  virtual uint8_t shapeType() const = 0;
+  virtual PMDShapePoint getTopLeft() const = 0;
+  virtual PMDShapePoint getBotRight() const = 0;
+  virtual uint8_t getFillType() const = 0;
+  virtual uint8_t getFillColor() const = 0;
+  virtual uint8_t getFillOverprint() const = 0;
+  virtual uint8_t getFillTint() const = 0;
+  virtual uint8_t getStrokeType() const = 0;
+  virtual uint8_t getStrokeWidth() const = 0;
+  virtual uint8_t getStrokeColor() const = 0;
+  virtual uint8_t getStrokeOverprint() const = 0;
+  virtual uint8_t getStrokeTint() const = 0;
   virtual std::string getText() const = 0;
   virtual std::vector<PMDCharProperties> getCharProperties() const = 0;
   virtual std::vector<PMDParaProperties> getParaProperties() const = 0;
@@ -108,42 +108,42 @@ public:
     : m_topLeft(topLeft), m_botRight(botRight), m_mirrored(mirrored), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
   { }
 
-  double virtual getRotation() const
+  virtual double getRotation() const
   {
     return 0;
   }
 
-  double virtual getSkew() const
+  virtual double getSkew() const
   {
     return 0;
   }
 
-  PMDShapePoint virtual getXformTopLeft() const
+  virtual PMDShapePoint getXformTopLeft() const
   {
     return PMDShapePoint(0,0);
   }
 
-  PMDShapePoint virtual getXformBotRight() const
+  virtual PMDShapePoint getXformBotRight() const
   {
     return PMDShapePoint(0,0);
   }
 
-  PMDShapePoint virtual getRotatingPoint() const
+  virtual PMDShapePoint getRotatingPoint() const
   {
     return PMDShapePoint(0,0);
   }
 
-  bool virtual getIsClosed() const
+  virtual bool getIsClosed() const
   {
     return false;
   }
 
-  PMDShapePoint virtual getTopLeft() const
+  virtual PMDShapePoint getTopLeft() const
   {
     return m_topLeft;
   }
 
-  PMDShapePoint virtual getBotRight() const
+  virtual PMDShapePoint getBotRight() const
   {
     return m_botRight;
   }
@@ -165,52 +165,52 @@ public:
     return points;
   }
 
-  uint8_t virtual shapeType() const
+  virtual uint8_t shapeType() const
   {
     return SHAPE_TYPE_LINE;
   }
 
-  uint8_t virtual getFillType() const
+  virtual uint8_t getFillType() const
   {
     return FILL_SOLID;
   }
 
-  uint8_t virtual getFillColor() const
+  virtual uint8_t getFillColor() const
   {
     return 0;
   }
 
-  uint8_t virtual getFillOverprint() const
+  virtual uint8_t getFillOverprint() const
   {
     return 0;
   }
 
-  uint8_t virtual getFillTint() const
+  virtual uint8_t getFillTint() const
   {
     return 0;
   }
 
-  uint8_t virtual getStrokeType() const
+  virtual uint8_t getStrokeType() const
   {
     return m_strokeType;
   }
 
-  uint8_t virtual getStrokeWidth() const
+  virtual uint8_t getStrokeWidth() const
   {
     return m_strokeWidth;
   }
 
-  uint8_t virtual getStrokeColor() const
+  virtual uint8_t getStrokeColor() const
   {
     return m_strokeColor;
   }
 
-  uint8_t virtual getStrokeOverprint() const
+  virtual uint8_t getStrokeOverprint() const
   {
     return m_strokeOverprint;
   }
 
-  uint8_t virtual getStrokeTint() const
+  virtual uint8_t getStrokeTint() const
   {
     return m_strokeTint;
   }
@@ -265,42 +265,42 @@ public:
     : m_points(points), m_isClosed(isClosed), m_rotation(rotation), m_skew(skew), m_topLeft(topLeft), m_botRight(botRight), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
   { }
 
-  double virtual getRotation() const
+  virtual double getRotation() const
   {
     return m_rotation;
   }
 
-  double virtual getSkew() const
+  virtual double getSkew() const
   {
     return m_skew;
   }
 
-  PMDShapePoint virtual getXformTopLeft() const
+  virtual PMDShapePoint getXformTopLeft() const
   {
     return m_xformTopLeft;
   }
 
-  PMDShapePoint virtual getXformBotRight() const
+  virtual PMDShapePoint getXformBotRight() const
   {
     return m_xformBotRight;
   }
 
-  PMDShapePoint virtual getRotatingPoint() const
+  virtual PMDShapePoint getRotatingPoint() const
   {
     return PMDShapePoint(0,0);
   }
 
-  PMDShapePoint virtual getTopLeft() const
+  virtual PMDShapePoint getTopLeft() const
   {
     return m_topLeft;
   }
 
-  PMDShapePoint virtual getBotRight() const
+  virtual PMDShapePoint getBotRight() const
   {
     return m_botRight;
   }
 
-  bool virtual getIsClosed() const
+  virtual bool getIsClosed() const
   {
     return m_isClosed;
   }
@@ -310,52 +310,52 @@ public:
     return m_points;
   }
 
-  uint8_t virtual shapeType() const
+  virtual uint8_t shapeType() const
   {
     return SHAPE_TYPE_POLY;
   }
 
-  uint8_t virtual getFillType() const
+  virtual uint8_t getFillType() const
   {
     return m_fillType;
   }
 
-  uint8_t virtual getFillColor() const
+  virtual uint8_t getFillColor() const
   {
     return m_fillColor;
   }
 
-  uint8_t virtual getFillOverprint() const
+  virtual uint8_t getFillOverprint() const
   {
     return m_fillOverprint;
   }
 
-  uint8_t virtual getFillTint() const
+  virtual uint8_t getFillTint() const
   {
     return m_fillTint;
   }
 
-  uint8_t virtual getStrokeType() const
+  virtual uint8_t getStrokeType() const
   {
     return m_strokeType;
   }
 
-  uint8_t virtual getStrokeWidth() const
+  virtual uint8_t getStrokeWidth() const
   {
     return m_strokeWidth;
   }
 
-  uint8_t virtual getStrokeColor() const
+  virtual uint8_t getStrokeColor() const
   {
     return m_strokeColor;
   }
 
-  uint8_t virtual getStrokeOverprint() const
+  virtual uint8_t getStrokeOverprint() const
   {
     return m_strokeOverprint;
   }
 
-  uint8_t virtual getStrokeTint() const
+  virtual uint8_t getStrokeTint() const
   {
     return m_strokeTint;
   }
@@ -402,42 +402,42 @@ public:
     : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_text(text), m_charProps(charProps), m_paraProps(paraProps)
   { }
 
-  double virtual getRotation() const
+  virtual double getRotation() const
   {
     return m_rotation;
   }
 
-  double virtual getSkew() const
+  virtual double getSkew() const
   {
     return m_skew;
   }
 
-  PMDShapePoint virtual getXformTopLeft() const
+  virtual PMDShapePoint getXformTopLeft() const
   {
     return m_xformTopLeft;
   }
 
-  PMDShapePoint virtual getXformBotRight() const
+  virtual PMDShapePoint getXformBotRight() const
   {
     return m_xformBotRight;
   }
 
-  PMDShapePoint virtual getRotatingPoint() const
+  virtual PMDShapePoint getRotatingPoint() const
   {
     return m_rotatingPoint;
   }
 
-  PMDShapePoint virtual getTopLeft() const
+  virtual PMDShapePoint getTopLeft() const
   {
     return m_topLeft;
   }
 
-  PMDShapePoint virtual getBotRight() const
+  virtual PMDShapePoint getBotRight() const
   {
     return m_botRight;
   }
 
-  bool virtual getIsClosed() const
+  virtual bool getIsClosed() const
   {
     return true;
   }
@@ -451,52 +451,52 @@ public:
     return points;
   }
 
-  uint8_t virtual shapeType() const
+  virtual uint8_t shapeType() const
   {
     return SHAPE_TYPE_TEXTBOX;
   }
 
-  uint8_t virtual getFillType() const
+  virtual uint8_t getFillType() const
   {
     return 0;
   }
 
-  uint8_t virtual getFillColor() const
+  virtual uint8_t getFillColor() const
   {
     return 0;
   }
 
-  uint8_t virtual getFillOverprint() const
+  virtual uint8_t getFillOverprint() const
   {
     return 0;
   }
 
-  uint8_t virtual getFillTint() const
+  virtual uint8_t getFillTint() const
   {
     return 0;
   }
 
-  uint8_t virtual getStrokeType() const
+  virtual uint8_t getStrokeType() const
   {
     return 0;
   }
 
-  uint8_t virtual getStrokeWidth() const
+  virtual uint8_t getStrokeWidth() const
   {
     return 0;
   }
 
-  uint8_t virtual getStrokeColor() const
+  virtual uint8_t getStrokeColor() const
   {
     return 0;
   }
 
-  uint8_t virtual getStrokeOverprint() const
+  virtual uint8_t getStrokeOverprint() const
   {
     return 0;
   }
 
-  uint8_t virtual getStrokeTint() const
+  virtual uint8_t getStrokeTint() const
   {
     return 0;
   }
@@ -545,42 +545,42 @@ public:
     : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
   { }
 
-  double virtual getRotation() const
+  virtual double getRotation() const
   {
     return m_rotation;
   }
 
-  double virtual getSkew() const
+  virtual double getSkew() const
   {
     return m_skew;
   }
 
-  PMDShapePoint virtual getXformTopLeft() const
+  virtual PMDShapePoint getXformTopLeft() const
   {
     return m_xformTopLeft;
   }
 
-  PMDShapePoint virtual getXformBotRight() const
+  virtual PMDShapePoint getXformBotRight() const
   {
     return m_xformBotRight;
   }
 
-  PMDShapePoint virtual getRotatingPoint() const
+  virtual PMDShapePoint getRotatingPoint() const
   {
     return m_rotatingPoint;
   }
 
-  PMDShapePoint virtual getTopLeft() const
+  virtual PMDShapePoint getTopLeft() const
   {
     return m_topLeft;
   }
 
-  PMDShapePoint virtual getBotRight() const
+  virtual PMDShapePoint getBotRight() const
   {
     return m_botRight;
   }
 
-  bool virtual getIsClosed() const
+  virtual bool getIsClosed() const
   {
     return true;
   }
@@ -597,52 +597,52 @@ public:
     return points;
   }
 
-  uint8_t virtual shapeType() const
+  virtual uint8_t shapeType() const
   {
     return SHAPE_TYPE_RECT;
   }
 
-  uint8_t virtual getFillType() const
+  virtual uint8_t getFillType() const
   {
     return m_fillType;
   }
 
-  uint8_t virtual getFillColor() const
+  virtual uint8_t getFillColor() const
   {
     return m_fillColor;
   }
 
-  uint8_t virtual getFillOverprint() const
+  virtual uint8_t getFillOverprint() const
   {
     return m_fillOverprint;
   }
 
-  uint8_t virtual getFillTint() const
+  virtual uint8_t getFillTint() const
   {
     return m_fillTint;
   }
 
-  uint8_t virtual getStrokeType() const
+  virtual uint8_t getStrokeType() const
   {
     return m_strokeType;
   }
 
-  uint8_t virtual getStrokeWidth() const
+  virtual uint8_t getStrokeWidth() const
   {
     return m_strokeWidth;
   }
 
-  uint8_t virtual getStrokeColor() const
+  virtual uint8_t getStrokeColor() const
   {
     return m_strokeColor;
   }
 
-  uint8_t virtual getStrokeOverprint() const
+  virtual uint8_t getStrokeOverprint() const
   {
     return m_strokeOverprint;
   }
 
-  uint8_t virtual getStrokeTint() const
+  virtual uint8_t getStrokeTint() const
   {
     return m_strokeTint;
   }
@@ -694,31 +694,31 @@ public:
     : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
   { }
 
-  double virtual getRotation() const
+  virtual double getRotation() const
   {
     return m_rotation;
   }
 
-  double virtual getSkew() const
+  virtual double getSkew() const
   {
     return m_skew;
   }
 
-  PMDShapePoint virtual getXformTopLeft() const
+  virtual PMDShapePoint getXformTopLeft() const
   {
     return m_xformTopLeft;
   }
 
-  PMDShapePoint virtual getXformBotRight() const
+  virtual PMDShapePoint getXformBotRight() const
   {
     return m_xformBotRight;
   }
 
-  PMDShapePoint virtual getRotatingPoint() const
+  virtual PMDShapePoint getRotatingPoint() const
   {
     return PMDShapePoint(0,0);
   }
-  bool virtual getIsClosed() const
+  virtual bool getIsClosed() const
   {
     return true;
   }
@@ -733,62 +733,62 @@ public:
     return points;
   }
 
-  PMDShapePoint virtual getTopLeft() const
+  virtual PMDShapePoint getTopLeft() const
   {
     return m_bboxTopLeft;
   }
 
-  PMDShapePoint virtual getBotRight() const
+  virtual PMDShapePoint getBotRight() const
   {
     return m_bboxBotRight;
   }
 
-  uint8_t virtual shapeType() const
+  virtual uint8_t shapeType() const
   {
     return SHAPE_TYPE_ELLIPSE;
   }
 
-  uint8_t virtual getFillType() const
+  virtual uint8_t getFillType() const
   {
     return m_fillType;
   }
 
-  uint8_t virtual getFillColor() const
+  virtual uint8_t getFillColor() const
   {
     return m_fillColor;
   }
 
-  uint8_t virtual getFillOverprint() const
+  virtual uint8_t getFillOverprint() const
   {
     return m_fillOverprint;
   }
 
-  uint8_t virtual getFillTint() const
+  virtual uint8_t getFillTint() const
   {
     return m_fillTint;
   }
 
-  uint8_t virtual getStrokeType() const
+  virtual uint8_t getStrokeType() const
   {
     return m_strokeType;
   }
 
-  uint8_t virtual getStrokeWidth() const
+  virtual uint8_t getStrokeWidth() const
   {
     return m_strokeWidth;
   }
 
-  uint8_t virtual getStrokeColor() const
+  virtual uint8_t getStrokeColor() const
   {
     return m_strokeColor;
   }
 
-  uint8_t virtual getStrokeOverprint() const
+  virtual uint8_t getStrokeOverprint() const
   {
     return m_strokeOverprint;
   }
 
-  uint8_t virtual getStrokeTint() const
+  virtual uint8_t getStrokeTint() const
   {
     return m_strokeTint;
   }
