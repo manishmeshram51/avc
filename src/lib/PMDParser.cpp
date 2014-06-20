@@ -34,6 +34,20 @@ PMDParser::PMDParser(librevenge::RVNGInputStream *input, PMDCollector *collector
     m_recordsInOrder()
 { }
 
+void seekToRecord(librevenge::RVNGInputStream *const input, const PMDRecordContainer &container, const unsigned recordIndex)
+{
+  uint32_t recordOffset = container.m_offset;
+  if (recordIndex > 0)
+  {
+    boost::optional<unsigned> sizePerRecord = getRecordSize(container.m_recordType);
+    if (!sizePerRecord.is_initialized())
+    {
+      throw UnknownRecordSizeException(container.m_recordType);
+    }
+    recordOffset += sizePerRecord.get() * recordIndex;
+  }
+  seek(input, recordOffset);
+}
 
 template <typename T> T tryReadRecordAt(librevenge::RVNGInputStream *input,
                                         bool bigEndian, const PMDRecordContainer &container,
@@ -42,17 +56,9 @@ template <typename T> T tryReadRecordAt(librevenge::RVNGInputStream *input,
 {
   try
   {
-    uint32_t recordOffset = container.m_offset;
-    if (recordIndex > 0)
-    {
-      boost::optional<unsigned> sizePerRecord = getRecordSize(container.m_recordType);
-      if (!sizePerRecord.is_initialized())
-      {
-        throw UnknownRecordSizeException(container.m_recordType);
-      }
-      recordOffset += sizePerRecord.get() * recordIndex;
-    }
-    seek(input, recordOffset + offsetWithinRecord);
+    seekToRecord(input, container, recordIndex);
+    seekRelative(input, offsetWithinRecord);
+
     switch (sizeof(T))
     {
     case 1:
