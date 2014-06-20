@@ -96,11 +96,11 @@ PMDShapePoint tryReadPointFromRecord(librevenge::RVNGInputStream *input,
 
 void PMDParser::parseGlobalInfo(const PMDRecordContainer &container)
 {
-  uint16_t pageHeight = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, 0,
-                                                  PAGE_HEIGHT_OFFSET, "Can't find page height in global attributes record.");
+  seekToRecord(m_input, container, 0);
 
-  uint16_t leftPageRightBound = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, 0,
-                                                          LEFT_PAGE_RIGHT_BOUND_OFFSET, "Can't find the right boundary of the left page.");
+  skip(m_input, 0x3a);
+  uint16_t leftPageRightBound = readU16(m_input, m_bigEndian);
+  uint16_t pageHeight = readU16(m_input, m_bigEndian);
 
   bool doubleSided = (leftPageRightBound == 0);
   m_collector->setDoubleSided(doubleSided);
@@ -276,8 +276,8 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
     uint16_t leftIndent = readU16(m_input, m_bigEndian);
     uint16_t firstIndent = readU16(m_input, m_bigEndian);
     uint16_t rightIndent = readU16(m_input, m_bigEndian);
-    uint16_t beforeIndent = readU16(m_input, m_bigEndian);
-    uint16_t afterIndent = readU16(m_input, m_bigEndian);
+    uint16_t beforeIndent = readU16(m_input, m_bigEndian); // Above Para Spacing
+    uint16_t afterIndent = readU16(m_input, m_bigEndian); // Below Para Spacing
 
     paraProps.push_back(PMDParaProperties(length,align,leftIndent,firstIndent,rightIndent,beforeIndent,afterIndent));
   }
@@ -497,8 +497,9 @@ void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
   const PMDRecordContainer &container = *ptrToContainer;
   for (unsigned i = 0; i < container.m_numRecords; ++i)
   {
-    uint8_t shapeType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, i,
-                                                 SHAPE_TYPE_OFFSET, "Can't find shape type in shape.");
+    seekToRecord(m_input, container, i);
+
+    uint8_t shapeType = readU8(m_input);
     switch (shapeType)
     {
     case LINE_RECORD:
@@ -559,24 +560,27 @@ void PMDParser::parseColors(const PMDRecordContainer &container)
 {
   for (unsigned i = 0; i < container.m_numRecords; ++i)
   {
+    seekToRecord(m_input, container, i);
+    skip(m_input, 0x22);
 
-    uint8_t colorModel = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, i, COLOR_MODEL_OFFSET, "Can't read color model.");
+    uint8_t colorModel = readU8(m_input);
     uint8_t red = 0;
     uint8_t blue = 0;
     uint8_t green = 0;
 
+    skip(m_input, 3);
     if (colorModel == RGB)
     {
-      red = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, i, RED_OFFSET, "Can't read red.");
-      blue = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, i, BLUE_OFFSET, "Can't read red.");
-      green = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, i, GREEN_OFFSET, "Can't read red.");
+      red = readU8(m_input);
+      blue = readU8(m_input);
+      green = readU8(m_input);
     }
     else if (colorModel == CMYK)
     {
-      uint16_t cyan = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, i, CYAN_OFFSET, "Can't read cyan percentage.");
-      uint16_t magenta = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, i, MAGENTA_OFFSET, "Can't read magenta percentage.");
-      uint16_t yellow = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, i, YELLOW_OFFSET, "Can't read yellow percentage.");
-      uint16_t black = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, i, BLACK_OFFSET, "Can't read black percentage.");
+      uint16_t cyan = readU16(m_input, m_bigEndian);
+      uint16_t magenta = readU16(m_input, m_bigEndian);
+      uint16_t yellow = readU16(m_input, m_bigEndian);
+      uint16_t black = readU16(m_input, m_bigEndian);
 
       uint16_t max = (std::numeric_limits<uint16_t>::max)();
 
@@ -593,14 +597,17 @@ void PMDParser::parseColors(const PMDRecordContainer &container)
 
 void PMDParser::parsePages(const PMDRecordContainer &container)
 {
-  uint16_t pageWidth = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, 0, PAGE_WIDTH_OFFSET,
-                                                 "Can't find page width in first page record.");
+  seekToRecord(m_input, container, 0);
+
+  skip(m_input, 8);
+  uint16_t pageWidth = readU16(m_input, m_bigEndian);
   m_collector->setPageWidth(pageWidth);
   for (unsigned i = 0; i < container.m_numRecords; ++i)
   {
-    uint16_t shapesSeqNum = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, i,
-                                                      PAGE_SHAPE_SEQNUM_OFFSET,
-                                                      (boost::format("Can't find shape record sequence number in page record at index %d") % i).str());
+    seekToRecord(m_input, container, i);
+
+    skip(m_input, 2);
+    uint16_t shapesSeqNum = readU16(m_input, m_bigEndian);
     unsigned pageID = m_collector->addPage();
     parseShapes(shapesSeqNum, pageID);
   }
