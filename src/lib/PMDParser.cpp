@@ -15,7 +15,6 @@
 #include <math.h>
 #include <librevenge/librevenge.h>
 #include <boost/optional.hpp>
-#include <boost/format.hpp>
 #include <boost/shared_ptr.hpp>
 #include "PMDRecord.h"
 #include "PMDParser.h"
@@ -79,16 +78,8 @@ template <typename T> T tryReadRecordAt(librevenge::RVNGInputStream *input,
   throw CorruptRecordException(container.m_recordType, errorMsg);
 }
 
-PMDShapePoint tryReadPointFromRecord(librevenge::RVNGInputStream *input,
-                                     bool bigEndian, const PMDRecordContainer &container,
-                                     unsigned recordIndex,
-                                     uint32_t offsetWithinRecord, const std::string &errorMsg)
+PMDShapePoint readPoint(librevenge::RVNGInputStream *const input, const bool bigEndian)
 {
-  (void) errorMsg;
-
-  seekToRecord(input, container, recordIndex);
-  seekRelative(input, offsetWithinRecord);
-
   const PMDShapeUnit x(readU16(input, bigEndian));
   const PMDShapeUnit y(readU16(input, bigEndian));
   return PMDShapePoint(x, y);
@@ -111,21 +102,27 @@ void PMDParser::parseGlobalInfo(const PMDRecordContainer &container)
 void PMDParser::parseLine(const PMDRecordContainer &container, unsigned recordIndex,
                           unsigned pageID)
 {
-  PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                                                 recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read line first point.");
-  PMDShapePoint botRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                                                  recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read line second point.");
+  seekToRecord(m_input, container, recordIndex);
+  skip(m_input, 4);
+  uint8_t strokeColor = readU8(m_input);
+  skip(m_input, 1);
+  PMDShapePoint topLeft = readPoint(m_input, m_bigEndian);
+  PMDShapePoint botRight = readPoint(m_input, m_bigEndian);
   bool mirrored = false;
-  uint16_t temp = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, recordIndex , LINE_MIRRORED_OFFSET, "Can't read line mirror.");
+  skip(m_input, 0x18);
+  uint16_t temp = readU16(m_input, m_bigEndian);
 
   if (temp != 257 && temp != 0)
     mirrored = true;
 
-  uint8_t strokeColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_COLOR_OFFSET, "Can't read rectangle stroke color.");
-  uint8_t strokeType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TYPE_OFFSET, "Can't read rectangle stroke type.");
-  uint8_t strokeWidth = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_WIDTH_OFFSET, "Can't read rectangle stroke width.");
-  uint8_t strokeTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TINT_OFFSET, "Can't read rectangle stroke tint.");
-  uint8_t strokeOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_OVERPRINT_OFFSET, "Can't read rectangle stroke overprint.");
+  skip(m_input, 6);
+  uint8_t strokeType = readU8(m_input);
+  skip(m_input, 1);
+  uint8_t strokeWidth =readU8(m_input);
+  skip(m_input, 2);
+  uint8_t strokeTint = readU8(m_input);
+  skip(m_input, 6);
+  uint8_t strokeOverprint = readU8(m_input);
 
   boost::shared_ptr<PMDLineSet> newShape(new PMDLine(topLeft, botRight, mirrored, strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
   m_collector->addShapeToPage(pageID, newShape);
@@ -134,26 +131,28 @@ void PMDParser::parseLine(const PMDRecordContainer &container, unsigned recordIn
 void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recordIndex,
                              unsigned pageID)
 {
-  PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                                                 recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read text box top-left point.");
-  PMDShapePoint botRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                                                  recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read text box bottom-right point.");
+  seekToRecord(m_input, container, recordIndex);
+
+  skip(m_input, 6);
+  PMDShapePoint topLeft = readPoint(m_input, m_bigEndian);
+  PMDShapePoint botRight = readPoint(m_input, m_bigEndian);
   uint32_t textBoxRotationDegree = 0;
   uint32_t textBoxSkewDegree = 0;
   PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
   PMDShapePoint xformBotRight = PMDShapePoint(0,0);
   PMDShapePoint rotatingPoint = PMDShapePoint(0, 0);
 
-#if defined DEBUG
   uint16_t textBoxTextPropsOne = 0;
   uint16_t textBoxTextPropsTwo = 0;
   uint16_t textBoxTextStyle = 0;
-#endif
   uint16_t textBoxText = 0;
   uint16_t textBoxChars = 0;
   uint16_t textBoxPara = 0;
 
-  uint32_t textBoxXformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_XFORM_ID_OFFSET, "Can't read text box xform id.");
+  skip(m_input, 0xe);
+  uint32_t textBoxXformId = readU32(m_input, m_bigEndian);
+  skip(m_input, 6);
+  uint32_t textBoxTextBlockId = readU32(m_input, m_bigEndian);
 
   if (textBoxXformId != (std::numeric_limits<uint32_t>::max)())
   {
@@ -162,44 +161,53 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
 
     for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
     {
-      uint32_t xformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i,
-                                                   XFORM_ID_OFFSET, "Can't find xform id.");
+      seekToRecord(m_input, xformContainer, i);
+
+      skip(m_input, 0x16);
+      uint32_t xformId = readU32(m_input, m_bigEndian);
       if (xformId == textBoxXformId)
       {
-        textBoxRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read text box rotation.");
-        textBoxSkewDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_SKEW_OFFSET, "Can't read text box skew.");
-        rotatingPoint = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_ROTATING_POINT_OFFSET, "Can't read rotating point.");
-        xformTopLeft = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_TOP_LEFT_OFFSET, "Can't read xform top-left point.");
-        xformBotRight = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_BOT_RIGHT_OFFSET, "Can't read xform bot-right point.");
+        seekToRecord(m_input, xformContainer, i); // return to the beginning
+
+        textBoxRotationDegree = readU32(m_input, m_bigEndian);
+        textBoxSkewDegree = readU32(m_input, m_bigEndian);
+        skip(m_input, 4);
+        xformTopLeft = readPoint(m_input, m_bigEndian);
+        xformBotRight = readPoint(m_input, m_bigEndian);
+        rotatingPoint = readPoint(m_input, m_bigEndian);
         break;
       }
     }
   }
+
   int32_t temp = (int32_t)textBoxRotationDegree;
   double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
   temp = (int32_t)textBoxSkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
-
-  uint32_t textBoxTextBlockId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_TEXT_BLOCK_ID_OFFSET, "Can't read text box text block id.");
 
   const PMDRecordContainer *ptrToTextBlockContainer = &(m_recordsInOrder[TEXT_BLOCK_OFFSET]);
   const PMDRecordContainer &textBlockContainer = *ptrToTextBlockContainer;
 
   for (unsigned i = 0; i < textBlockContainer.m_numRecords; ++i)
   {
-    uint32_t textBlockId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, textBlockContainer, i,
-                                                     TEXT_BLOCK_ID_OFFSET, "Can't find textBlock id.");
+    seekToRecord(m_input, textBlockContainer, i);
+
+    skip(m_input, 2);
+    uint32_t textBlockId = readU32(m_input, m_bigEndian);
 
     if (textBlockId == textBoxTextBlockId)
     {
-#if defined DEBUG
-      textBoxTextPropsOne = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_TEXT_PROPS_ONE_OFFSET, "Can't read text box props one.");
-      textBoxTextPropsTwo = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_TEXT_PROPS_TWO_OFFSET, "Can't read text box props two.");
-      textBoxTextStyle = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_TEXT_STYLE_OFFSET, "Can't read text box style.");
-#endif
-      textBoxText = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_TEXT_OFFSET, "Can't read text box text.");
-      textBoxChars = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_CHARS_OFFSET, "Can't read text box chars.");
-      textBoxPara = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, textBlockContainer, i , TEXT_BLOCK_PARA_OFFSET, "Can't read text box para.");
+      seekToRecord(m_input, textBlockContainer, i); // return to the beginning of the record
+      textBoxTextPropsOne = readU16(m_input, m_bigEndian);
+      textBoxTextPropsTwo = readU16(m_input, m_bigEndian);
+      textBoxText = readU16(m_input, m_bigEndian);
+      textBoxChars = readU16(m_input, m_bigEndian);
+      textBoxPara = readU16(m_input, m_bigEndian);
+      textBoxTextStyle = readU16(m_input, m_bigEndian);
+
+      (void) textBoxTextPropsOne;
+      (void) textBoxTextPropsTwo;
+      (void) textBoxTextStyle;
       PMD_DEBUG_MSG(("Text Box Props One is %x \n",textBoxTextPropsOne));
       PMD_DEBUG_MSG(("Text Box Props Two is %x \n",textBoxTextPropsTwo));
       PMD_DEBUG_MSG(("Text Box Style is %x \n",textBoxTextStyle));
@@ -291,28 +299,38 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
 void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned recordIndex,
                                unsigned pageID)
 {
-  PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                                                 recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read rectangle top-left point.");
-  PMDShapePoint botRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                                                  recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read rectangle bottom-right point.");
+  seekToRecord(m_input, container, recordIndex);
+
+  skip(m_input, 2);
+  uint8_t fillOverprint = readU8(m_input);
+  skip(m_input, 1);
+  uint8_t fillColor = readU8(m_input);
+  skip(m_input, 1);
+  PMDShapePoint topLeft = readPoint(m_input, m_bigEndian);
+  PMDShapePoint botRight = readPoint(m_input, m_bigEndian);
   uint32_t rectRotationDegree = 0;
   uint32_t rectSkewDegree = 0;
   PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
   PMDShapePoint xformBotRight = PMDShapePoint(0,0);
   PMDShapePoint rotatingPoint = PMDShapePoint(0, 0);
-  uint32_t rectXformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_XFORM_ID_OFFSET, "Can't read rectangle xform id.");
+  skip(m_input, 14);
+  uint32_t rectXformId = readU32(m_input, m_bigEndian);
 
-  uint8_t fillColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_COLOR_OFFSET, "Can't read rectangle fill color.");
-  uint8_t fillType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TYPE_OFFSET, "Can't read rectangle fill type.");
-  uint8_t fillOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_OVERPRINT_OFFSET, "Can't read rectangle fill overprint.");
-  uint8_t fillTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TINT_OFFSET, "Can't read rectangle fill tint.");
+  skip(m_input, 6);
+  uint8_t strokeType = readU8(m_input);
+  skip(m_input, 2);
+  uint8_t strokeWidth = readU8(m_input);
+  skip(m_input, 2);
+  uint8_t fillType = readU8(m_input);
+  skip(m_input, 1);
+  uint8_t strokeColor = readU8(m_input);
+  skip(m_input, 1);
+  uint8_t strokeOverprint = readU8(m_input);
+  skip(m_input, 1);
+  uint8_t strokeTint = readU8(m_input);
 
-  uint8_t strokeColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_COLOR_OFFSET, "Can't read rectangle stroke color.");
-  uint8_t strokeType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TYPE_OFFSET, "Can't read rectangle stroke type.");
-  uint8_t strokeWidth = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_WIDTH_OFFSET, "Can't read rectangle stroke width.");
-  uint8_t strokeTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TINT_OFFSET, "Can't read rectangle stroke tint.");
-  uint8_t strokeOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_OVERPRINT_OFFSET, "Can't read rectangle stroke overprint.");
-
+  skip(m_input, 0xb3);
+  uint8_t fillTint = readU8(m_input);
 
   if (rectXformId != (std::numeric_limits<uint32_t>::max)())
   {
@@ -322,15 +340,20 @@ void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned rec
 
     for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
     {
-      uint32_t xformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i,
-                                                   XFORM_ID_OFFSET, "Can't find xform id.");
+      seekToRecord(m_input, xformContainer, i);
+
+      skip(m_input, 0x16);
+      uint32_t xformId = readU32(m_input, m_bigEndian);
       if (xformId == rectXformId)
       {
-        rectRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read rectangle rotation.");
-        rectSkewDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_SKEW_OFFSET, "Can't read rectangle skew.");
-        rotatingPoint = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_ROTATING_POINT_OFFSET, "Can't read rotating point.");
-        xformTopLeft = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_TOP_LEFT_OFFSET, "Can't read xform top-left point.");
-        xformBotRight = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_BOT_RIGHT_OFFSET, "Can't read xform bot-right point.");
+        seekToRecord(m_input, xformContainer, i); // return to the beginning
+
+        rectRotationDegree = readU32(m_input, m_bigEndian);
+        rectSkewDegree = readU32(m_input, m_bigEndian);
+        skip(m_input, 4);
+        xformTopLeft = readPoint(m_input, m_bigEndian);
+        xformBotRight = readPoint(m_input, m_bigEndian);
+        rotatingPoint = readPoint(m_input, m_bigEndian);
         break;
       }
     }
@@ -346,14 +369,38 @@ void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned rec
 void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recordIndex,
                              unsigned pageID)
 {
-  PMDShapePoint topLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                                                 recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read bbox top-left point.");
-  PMDShapePoint botRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                                                  recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read bbox bottom-right point.");
-  uint16_t lineSetSeqNum = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, container, recordIndex,
-                                                     POLYGON_LINE_SEQNUM_OFFSET, "Can't find seqNum of line set record in polygon record.");
-  uint8_t closedMarker = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex,
-                                                  POLYGON_CLOSED_MARKER_OFFSET, "Can't find the byte telling whether the polygon is open or closed.");
+  seekToRecord(m_input, container, recordIndex);
+
+  skip(m_input, 2);
+  uint8_t fillOverprint = readU8(m_input);
+  skip(m_input, 1);
+  uint8_t fillColor = readU8(m_input);
+
+  skip(m_input, 5);
+  PMDShapePoint topLeft = readPoint(m_input, m_bigEndian);
+  PMDShapePoint botRight = readPoint(m_input, m_bigEndian);
+
+  skip(m_input, 0xa);
+  uint32_t polyXformId = readU32(m_input, m_bigEndian);
+
+  uint8_t strokeType = readU8(m_input);
+  skip(m_input, 2);
+  uint8_t strokeWidth = readU8(m_input);
+  skip(m_input, 2);
+  uint8_t fillType = readU8(m_input);
+  skip(m_input, 1);
+  uint8_t strokeColor = readU8(m_input);
+  skip(m_input, 1);
+  uint8_t strokeOverprint = readU8(m_input);
+  skip(m_input, 1);
+  uint8_t strokeTint = readU8(m_input);
+
+  skip(m_input, 1);
+  uint16_t lineSetSeqNum = readU16(m_input, m_bigEndian);
+  skip(m_input, 8);
+  uint8_t closedMarker = readU8(m_input);
+  skip(m_input, 0xa7);
+  uint8_t fillTint = readU8(m_input);
 
   uint32_t polySkewDegree = 0;
   PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
@@ -387,23 +434,11 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
   std::vector<PMDShapePoint> points;
   for (unsigned i = 0; i < lineSetContainer.m_numRecords; ++i)
   {
-    points.push_back(tryReadPointFromRecord(m_input, m_bigEndian, lineSetContainer, i, 0,
-                                            (boost::format("Couldn't read point %d from line set container at seqnum %d.\n") % i % lineSetSeqNum).str()));
+    seekToRecord(m_input, lineSetContainer, i);
+    points.push_back(readPoint(m_input, m_bigEndian));
   }
 
   uint32_t polyRotationDegree = 0;
-  uint32_t polyXformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_XFORM_ID_OFFSET, "Can't read polygon xform id.");
-
-  uint8_t fillColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_COLOR_OFFSET, "Can't read polygon fill color.");
-  uint8_t fillType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TYPE_OFFSET, "Can't read polygon fill type.");
-  uint8_t fillOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_OVERPRINT_OFFSET, "Can't read polygon fill overprint.");
-  uint8_t fillTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TINT_OFFSET, "Can't read polygon fill tint.");
-
-  uint8_t strokeColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_COLOR_OFFSET, "Can't read polygon stroke color.");
-  uint8_t strokeType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TYPE_OFFSET, "Can't read polygon stroke type.");
-  uint8_t strokeWidth = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_WIDTH_OFFSET, "Can't read polygon stroke width.");
-  uint8_t strokeTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TINT_OFFSET, "Can't read polygon stroke tint.");
-  uint8_t strokeOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_OVERPRINT_OFFSET, "Can't read polygon stroke overprint.");
 
   if (polyXformId != (std::numeric_limits<uint32_t>::max)())
   {
@@ -412,14 +447,19 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
 
     for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
     {
-      uint32_t xformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i,
-                                                   XFORM_ID_OFFSET, "Can't find xform id.");
+      seekToRecord(m_input, xformContainer, i);
+
+      skip(m_input, 0x16);
+      uint32_t xformId = readU32(m_input, m_bigEndian);
       if (xformId == polyXformId)
       {
-        polyRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read polygon rotation.");
-        polySkewDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_SKEW_OFFSET, "Can't read polygon skew.");
-        xformTopLeft = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_TOP_LEFT_OFFSET, "Can't read xform top-left point.");
-        xformBotRight = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_BOT_RIGHT_OFFSET, "Can't read xform bot-right point.");
+        seekToRecord(m_input, xformContainer, i); // return to the beginning
+
+        polyRotationDegree = readU32(m_input, m_bigEndian);
+        polySkewDegree = readU32(m_input, m_bigEndian);
+        skip(m_input, 4);
+        xformTopLeft = readPoint(m_input, m_bigEndian);
+        xformBotRight = readPoint(m_input, m_bigEndian);
         break;
       }
     }
@@ -435,28 +475,39 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
 
 void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID)
 {
+  seekToRecord(m_input, container, recordIndex);
 
-  PMDShapePoint bboxTopLeft = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                                                     recordIndex, SHAPE_TOP_LEFT_OFFSET, "Can't read bbox top-left point.");
-  PMDShapePoint bboxBotRight = tryReadPointFromRecord(m_input, m_bigEndian, container,
-                                                      recordIndex, SHAPE_BOT_RIGHT_OFFSET, "Can't read bbox bottom-right point.");
+  skip(m_input, 2);
+  uint8_t fillOverprint = readU8(m_input);
+  skip(m_input, 1);
+  uint8_t fillColor = readU8(m_input);
+
+  skip(m_input, 5);
+  PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
+  PMDShapePoint bboxBotRight = readPoint(m_input, m_bigEndian);
 
   uint32_t ellipseRotationDegree = 0;
   uint32_t ellipseSkewDegree = 0;
   PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
   PMDShapePoint xformBotRight = PMDShapePoint(0,0);
-  uint32_t ellipseXformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_XFORM_ID_OFFSET, "Can't read ellipse xform id.");
 
-  uint8_t fillColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_COLOR_OFFSET, "Can't read rectangle fill color.");
-  uint8_t fillType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TYPE_OFFSET, "Can't read rectangle fill type.");
-  uint8_t fillOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_OVERPRINT_OFFSET, "Can't read rectangle fill overprint.");
-  uint8_t fillTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_FILL_TINT_OFFSET, "Can't read rectangle fill tint.");
+  skip(m_input, 10);
+  uint32_t ellipseXformId = readU32(m_input, m_bigEndian);
 
-  uint8_t strokeColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_COLOR_OFFSET, "Can't read rectangle stroke color.");
-  uint8_t strokeType = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TYPE_OFFSET, "Can't read rectangle stroke type.");
-  uint8_t strokeWidth = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_WIDTH_OFFSET, "Can't read rectangle stroke width.");
-  uint8_t strokeTint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_TINT_OFFSET, "Can't read rectangle stroke tint.");
-  uint8_t strokeOverprint = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, container, recordIndex, SHAPE_STROKE_OVERPRINT_OFFSET, "Can't read rectangle stroke overprint.");
+  uint8_t strokeType = readU8(m_input);
+  skip(m_input, 2);
+  uint8_t strokeWidth = readU8(m_input);
+  skip(m_input, 2);
+  uint8_t fillType = readU8(m_input);
+  skip(m_input, 1);
+  uint8_t strokeColor = readU8(m_input);
+  skip(m_input, 1);
+  uint8_t strokeOverprint = readU8(m_input);
+  skip(m_input, 1);
+  uint8_t strokeTint = readU8(m_input);
+
+  skip(m_input, 0xb3);
+  uint8_t fillTint = readU8(m_input);
 
   if (ellipseXformId != (std::numeric_limits<uint32_t>::max)())
   {
@@ -465,14 +516,19 @@ void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recor
 
     for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
     {
-      uint32_t xformId = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i,
-                                                   XFORM_ID_OFFSET, "Can't find xform id.");
+      seekToRecord(m_input, xformContainer, i);
+
+      skip(m_input, 0x16);
+      uint32_t xformId = readU32(m_input, m_bigEndian);
       if (xformId == ellipseXformId)
       {
-        ellipseRotationDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_RECT_ROTATION_OFFSET, "Can't read ellipse rotation.");
-        ellipseSkewDegree = tryReadRecordAt<uint32_t>(m_input, m_bigEndian, xformContainer, i , XFORM_SKEW_OFFSET, "Can't read ellipse skew.");
-        xformTopLeft = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_TOP_LEFT_OFFSET, "Can't read xform top-left point.");
-        xformBotRight = tryReadPointFromRecord(m_input, m_bigEndian, xformContainer, i, XFORM_BOT_RIGHT_OFFSET, "Can't read xform bot-right point.");
+        seekToRecord(m_input, xformContainer, i); // return to the beginning
+
+        ellipseRotationDegree = readU32(m_input, m_bigEndian);
+        ellipseSkewDegree = readU32(m_input, m_bigEndian);
+        skip(m_input, 4);
+        xformTopLeft = readPoint(m_input, m_bigEndian);
+        xformBotRight = readPoint(m_input, m_bigEndian);
         break;
       }
     }
