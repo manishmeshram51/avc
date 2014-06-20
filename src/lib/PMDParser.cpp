@@ -84,10 +84,13 @@ PMDShapePoint tryReadPointFromRecord(librevenge::RVNGInputStream *input,
                                      unsigned recordIndex,
                                      uint32_t offsetWithinRecord, const std::string &errorMsg)
 {
-  PMDShapeUnit x(tryReadRecordAt<int16_t>(input, bigEndian, container, recordIndex, offsetWithinRecord,
-                                          errorMsg));
-  PMDShapeUnit y(tryReadRecordAt<int16_t>(input, bigEndian, container, recordIndex, offsetWithinRecord + 2,
-                                          errorMsg));
+  (void) errorMsg;
+
+  seekToRecord(input, container, recordIndex);
+  seekRelative(input, offsetWithinRecord);
+
+  const PMDShapeUnit x(readU16(input, bigEndian));
+  const PMDShapeUnit y(readU16(input, bigEndian));
   return PMDShapePoint(x, y);
 }
 
@@ -213,9 +216,11 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
   }
   std::string text = "";
   const PMDRecordContainer &textContainer = *(ptrToTextContainer);
+
+  seekToRecord(m_input, textContainer, 0);
   for (unsigned i = 0; i < textContainer.m_numRecords; ++i)
   {
-    text.push_back(tryReadRecordAt<uint8_t>(m_input, m_bigEndian, textContainer, 0, i,"Can't read text box text."));
+    text.push_back(readU8(m_input));
   }
 
   const PMDRecordContainer *ptrToCharsContainer =
@@ -230,16 +235,22 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
   const PMDRecordContainer &charsContainer = *(ptrToCharsContainer);
   for (unsigned i = 0; i < charsContainer.m_numRecords; ++i)
   {
-    uint16_t length = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x00,"Can't read text box text length.");
-    uint16_t fontFace = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x02,"Can't read text box text font face.");
-    uint16_t fontSize = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x04,"Can't read text box text font size.");
-    uint8_t fontColor = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, charsContainer, i, 0x08,"Can't read text box text font color.");
-    uint8_t boldItalicUnderline = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, charsContainer, i, 0x0a,"Can't read text box text bold-italic-undeline.");
-    uint8_t superSubscript = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, charsContainer, i, 0x0b,"Can't read text box text subsuperscript.");
-    int16_t kerning = tryReadRecordAt<int16_t>(m_input, m_bigEndian, charsContainer, i, 0x10,"Can't read text box text kerning.");
-    uint16_t superSubSize = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x14,"Can't read text box text subsuperscript size.");
-    uint16_t superPos = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x18,"Can't read text box text superscript position.");
-    uint16_t subPos = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, charsContainer, i, 0x16,"Can't read text box text subscript position.");
+    seekToRecord(m_input, charsContainer, i);
+
+    uint16_t length = readU16(m_input, m_bigEndian);
+    uint16_t fontFace = readU16(m_input, m_bigEndian);
+    uint16_t fontSize = readU16(m_input, m_bigEndian);
+    skip(m_input, 2);
+    uint8_t fontColor = readU8(m_input);
+    skip(m_input, 1);
+    uint8_t boldItalicUnderline = readU8(m_input);
+    uint8_t superSubscript = readU8(m_input);
+    skip(m_input, 4);
+    int16_t kerning = readU16(m_input, m_bigEndian);
+    skip(m_input, 2);
+    uint16_t superSubSize = readU16(m_input, m_bigEndian);
+    uint16_t subPos = readU16(m_input, m_bigEndian);
+    uint16_t superPos = readU16(m_input, m_bigEndian);
 
     charProps.push_back(PMDCharProperties(length,fontFace,fontSize,fontColor,boldItalicUnderline,superSubscript,kerning,superSubSize,superPos,subPos));
   }
@@ -256,13 +267,17 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
   const PMDRecordContainer &paraContainer = *(ptrToParaContainer);
   for (unsigned i = 0; i < paraContainer.m_numRecords; ++i)
   {
-    uint16_t length = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, paraContainer, i, 0x00,"Can't read text box para length.");
-    uint8_t align = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, paraContainer, i, 0x03,"Can't read text box para align.");
-    uint16_t leftIndent = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, paraContainer, i, 0x0a,"Can't read text box para align.");
-    uint16_t firstIndent = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, paraContainer, i, 0x0c,"Can't read text box para align.");
-    uint16_t rightIndent = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, paraContainer, i, 0x0e,"Can't read text box para align.");
-    uint16_t beforeIndent = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, paraContainer, i, 0x10,"Can't read text box para align."); // Above Para Spacing
-    uint16_t afterIndent = tryReadRecordAt<uint16_t>(m_input, m_bigEndian, paraContainer, i, 0x12,"Can't read text box para align.");  // Below Para Spacing
+    seekToRecord(m_input, paraContainer, i);
+
+    uint16_t length = readU16(m_input, m_bigEndian);
+    skip(m_input, 1);
+    uint8_t align = readU8(m_input);
+    skip(m_input, 6);
+    uint16_t leftIndent = readU16(m_input, m_bigEndian);
+    uint16_t firstIndent = readU16(m_input, m_bigEndian);
+    uint16_t rightIndent = readU16(m_input, m_bigEndian);
+    uint16_t beforeIndent = readU16(m_input, m_bigEndian);
+    uint16_t afterIndent = readU16(m_input, m_bigEndian);
 
     paraProps.push_back(PMDParaProperties(length,align,leftIndent,firstIndent,rightIndent,beforeIndent,afterIndent));
   }
@@ -514,16 +529,20 @@ void PMDParser::parseFonts(const PMDRecordContainer &container)
 
   for (unsigned i = 0; i < container.m_numRecords; ++i)
   {
-    uint16_t recType = tryReadRecordAt<uint16_t>(m_input, m_bigEndian , container, i, 00, "Can't read fonts recType.");
-    uint16_t numRecs =  tryReadRecordAt<uint16_t>(m_input, m_bigEndian , container, i, 02, "Can't read fonts numRecs.");
-    uint16_t offset = tryReadRecordAt<uint16_t>(m_input, m_bigEndian , container, i, 04, "Can't read fonts offset.");
+    seekToRecord(m_input, container, i);
+
+    uint16_t recType = readU16(m_input, m_bigEndian);
+    uint16_t numRecs = readU16(m_input, m_bigEndian);
+    uint16_t offset = readU16(m_input, m_bigEndian);
 
     PMDRecordContainer subContainer(recType, offset, 0, numRecs);
 
     for (unsigned k = 0; k < subContainer.m_numRecords; ++k)
     {
       std::string fontName;
-      uint8_t temp = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, subContainer, k, 0, "Can't read font name.");
+
+      seekToRecord(m_input, subContainer, k);
+      uint8_t temp = readU8(m_input);
 
       while (temp)
       {
