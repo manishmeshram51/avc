@@ -7,6 +7,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include <cassert>
+
 #include "libpagemaker_utils.h"
 
 namespace libpagemaker
@@ -125,8 +127,12 @@ unsigned long getLength(const RVNGInputStreamPtr &input)
 {
   checkStream(input);
 
-  const unsigned long begin = input->tell();
-  unsigned long end = begin;
+  const long begin = input->tell();
+
+  if (0 > begin)
+    throw SeekFailedException();
+
+  long end = begin;
 
   if (0 == input->seek(0, librevenge::RVNG_SEEK_END))
     end = input->tell();
@@ -142,7 +148,9 @@ unsigned long getLength(const RVNGInputStreamPtr &input)
 
   seek(input, begin);
 
-  return end - begin;
+  assert(begin <= end);
+
+  return static_cast<unsigned long>(end - begin);
 }
 
 EndOfStreamException::EndOfStreamException()
