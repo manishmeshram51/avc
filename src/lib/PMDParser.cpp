@@ -48,36 +48,6 @@ void seekToRecord(librevenge::RVNGInputStream *const input, const PMDRecordConta
   seek(input, recordOffset);
 }
 
-template <typename T> T tryReadRecordAt(librevenge::RVNGInputStream *input,
-                                        bool bigEndian, const PMDRecordContainer &container,
-                                        unsigned recordIndex,
-                                        uint32_t offsetWithinRecord, const std::string &errorMsg)
-{
-  try
-  {
-    seekToRecord(input, container, recordIndex);
-    seekRelative(input, offsetWithinRecord);
-
-    switch (sizeof(T))
-    {
-    case 1:
-      return T(readU8(input, bigEndian));
-    case 2:
-      return T(readU16(input, bigEndian));
-    case 4:
-      return T(readU32(input, bigEndian));
-    case 8:
-      return T(readU64(input, bigEndian));
-    default:
-      assert(0);
-    }
-  }
-  catch (PMDStreamException)
-  {
-  }
-  throw CorruptRecordException(container.m_recordType, errorMsg);
-}
-
 PMDShapePoint readPoint(librevenge::RVNGInputStream *const input, const bool bigEndian)
 {
   const PMDShapeUnit x(readU16(input, bigEndian));
