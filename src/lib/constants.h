@@ -23,6 +23,7 @@ const uint16_t TEXT_BLOCK = 0x1a00;
 const uint16_t CHARS = 0x1c00;
 const uint16_t PARA = 0x0b00;
 const uint16_t FONTS = 0x1300;
+const uint16_t FONTS_PARENT = 0x0100;
 
 /* Color record types */
 const uint8_t RGB = 0x18;

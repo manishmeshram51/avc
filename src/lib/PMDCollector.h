@@ -25,7 +25,7 @@
 #include "PMDExceptions.h"
 #include "Units.h"
 #include "OutputShape.h"
-#include "PMDColor.h"
+#include "PMDTypes.h"
 
 namespace libpagemaker
 {
@@ -49,6 +49,7 @@ class PMDCollector
 
   std::vector<PMDPage> m_pages;
   std::vector<PMDColor> m_color;
+  std::vector<PMDFont> m_font;
   bool m_doubleSided;
 
   void writePage(const PMDPage &,
@@ -70,6 +71,7 @@ public:
   void setDoubleSided(bool);
   void addShapeToPage(unsigned pageID, const boost::shared_ptr<PMDLineSet> &shape);
   void addColor(const PMDColor &color);
+  void addFont(const PMDFont &font);
 
   unsigned addPage();
 

@@ -55,6 +55,8 @@ inline boost::optional<unsigned> getRecordSize(uint16_t recType)
     return 80;
   case FONTS:
     return 94;
+  case FONTS_PARENT:
+    return 10;
   case COLORS:
     return 210;
   default:

@@ -7,8 +7,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __PMDCOLOR_H__
-#define __PMDCOLOR_H__
+#ifndef __PMDTYPES_H__
+#define __PMDTYPES_H__
 
 #include "Units.h"
 namespace libpagemaker
@@ -25,8 +25,20 @@ struct PMDColor
     : m_i(i), m_red(red), m_green(green), m_blue(blue)
   { }
 };
+
+struct PMDFont
+{
+public:
+  unsigned m_i;
+  std::string m_fontName;
+
+  PMDFont(const unsigned i,const std::string &fontName)
+    : m_i(i), m_fontName(fontName)
+  { }
+};
+
 }
 
-#endif // __PMDCOLOR_H__
+#endif // __PMDTYPES_H__
 
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

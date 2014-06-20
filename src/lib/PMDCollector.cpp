@@ -22,7 +22,7 @@ namespace libpagemaker
 static const double EM2PT = 11.95516799999881;
 
 PMDCollector::PMDCollector() :
-  m_pageWidth(), m_pageHeight(), m_pages(), m_color(),
+  m_pageWidth(), m_pageHeight(), m_pages(), m_color(),m_font(),
   m_doubleSided(false)
 { }
 
@@ -51,6 +51,11 @@ unsigned PMDCollector::addPage()
 void PMDCollector::addColor(const PMDColor &color)
 {
   m_color.push_back(color);
+}
+
+void PMDCollector::addFont(const PMDFont &font)
+{
+  m_font.push_back(font);
 }
 
 void PMDCollector::addShapeToPage(unsigned pageID, const boost::shared_ptr<PMDLineSet> &shape)
@@ -267,6 +272,16 @@ void PMDCollector::paintShape(const OutputShape &shape,
           librevenge::RVNGPropertyList charProps;
           charProps.insert("fo:font-size",(double)charProperties[i].m_fontSize/10,librevenge::RVNG_POINT);
 
+          if (charProperties[i].m_fontFace < m_font.size())
+          {
+            PMDFont tempFont = m_font[charProperties[i].m_fontFace];
+            std::string tempFontString = tempFont.m_fontName;
+            charProps.insert("style:font-name", tempFontString.c_str());
+          }
+          else
+          {
+            PMD_DEBUG_MSG(("Font Not Available"));
+          }
 
           if (charProperties[i].m_fontColor < m_color.size())
           {

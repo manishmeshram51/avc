@@ -25,7 +25,7 @@
 #include "offsets.h"
 #include "libpagemaker_utils.h"
 #include "geometry.h"
-#include "PMDColor.h"
+#include "PMDTypes.h"
 
 namespace libpagemaker
 {
@@ -494,11 +494,38 @@ void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
       break;
     case TEXT_RECORD:
       parseTextBox(container, i, pageID);
-      //parseRectangle(container, i, pageID);
       break;
     default:
       PMD_ERR_MSG("Encountered shape of unknown type.\n");
       continue;
+    }
+  }
+}
+
+void PMDParser::parseFonts(const PMDRecordContainer &container)
+{
+  uint16_t fontIndex = 0;
+
+  for (unsigned i = 0; i < container.m_numRecords; ++i)
+  {
+    uint16_t recType = tryReadRecordAt<uint16_t>(m_input, m_bigEndian , container, i, 00, "Can't read fonts recType.");
+    uint16_t numRecs =  tryReadRecordAt<uint16_t>(m_input, m_bigEndian , container, i, 02, "Can't read fonts numRecs.");
+    uint16_t offset = tryReadRecordAt<uint16_t>(m_input, m_bigEndian , container, i, 04, "Can't read fonts offset.");
+
+    PMDRecordContainer subContainer(recType, offset, 0, numRecs);
+
+    for (unsigned k = 0; k < subContainer.m_numRecords; ++k)
+    {
+      std::string fontName;
+      uint8_t temp = tryReadRecordAt<uint8_t>(m_input, m_bigEndian, subContainer, k, 0, "Can't read font name.");
+
+      while (temp)
+      {
+        fontName.push_back(temp);
+        temp = readU8(m_input);
+      }
+      m_collector->addFont(PMDFont(fontIndex, fontName));
+      fontIndex++;
     }
   }
 }
@@ -655,6 +682,17 @@ void PMDParser::parse()
   else
   {
     throw RecordNotFoundException(COLORS);
+  }
+
+  i = m_records.find(FONTS_PARENT);
+  if (i != m_records.end()
+      && !(i->second.empty()))
+  {
+    parseFonts(m_recordsInOrder[i->second[0]]);
+  }
+  else
+  {
+    throw RecordNotFoundException(FONTS_PARENT);
   }
 
   i = m_records.find(PAGE);
