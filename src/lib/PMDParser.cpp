@@ -285,7 +285,6 @@ void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned rec
   skip(m_input, 14);
   uint32_t rectXformId = readU32(m_input, m_bigEndian);
 
-  skip(m_input, 6);
   uint8_t strokeType = readU8(m_input);
   skip(m_input, 2);
   uint8_t strokeWidth = readU8(m_input);
