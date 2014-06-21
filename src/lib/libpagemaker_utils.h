@@ -88,9 +88,13 @@ struct PMDDummyDeleter
 };
 
 uint8_t readU8(const RVNGInputStreamPtr &input, bool = false);
+int8_t readS8(const RVNGInputStreamPtr &input, bool = false);
 uint16_t readU16(const RVNGInputStreamPtr &input, bool bigEndian=false);
+int16_t readS16(const RVNGInputStreamPtr &input, bool bigEndian=false);
 uint32_t readU32(const RVNGInputStreamPtr &input, bool bigEndian=false);
+int32_t readS32(const RVNGInputStreamPtr &input, bool bigEndian=false);
 uint64_t readU64(const RVNGInputStreamPtr &input, bool bigEndian=false);
+int64_t readS64(const RVNGInputStreamPtr &input, bool bigEndian=false);
 
 const unsigned char *readNBytes(const RVNGInputStreamPtr &input, unsigned long numBytes);
 

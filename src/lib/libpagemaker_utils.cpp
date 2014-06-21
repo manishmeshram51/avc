@@ -39,6 +39,11 @@ uint8_t readU8(const RVNGInputStreamPtr &input, bool /* bigEndian */)
   throw EndOfStreamException();
 }
 
+int8_t readS8(const RVNGInputStreamPtr &input, bool /* bigEndian */)
+{
+  return static_cast<int8_t>(readU8(input));
+}
+
 uint16_t readU16(const RVNGInputStreamPtr &input, bool bigEndian)
 {
   checkStream(input);
@@ -53,6 +58,11 @@ uint16_t readU16(const RVNGInputStreamPtr &input, bool bigEndian)
     return static_cast<uint16_t>((uint16_t)p[0]|((uint16_t)p[1]<<8));
   }
   throw EndOfStreamException();
+}
+
+int16_t readS16(const RVNGInputStreamPtr &input, const bool bigEndian)
+{
+  return static_cast<int16_t>(readU16(input, bigEndian));
 }
 
 uint32_t readU32(const RVNGInputStreamPtr &input, bool bigEndian)
@@ -71,6 +81,11 @@ uint32_t readU32(const RVNGInputStreamPtr &input, bool bigEndian)
   throw EndOfStreamException();
 }
 
+int32_t readS32(const RVNGInputStreamPtr &input, const bool bigEndian)
+{
+  return static_cast<int32_t>(readU32(input, bigEndian));
+}
+
 uint64_t readU64(const RVNGInputStreamPtr &input, bool bigEndian)
 {
   checkStream(input);
@@ -85,6 +100,11 @@ uint64_t readU64(const RVNGInputStreamPtr &input, bool bigEndian)
     return (uint64_t)p[0]|((uint64_t)p[1]<<8)|((uint64_t)p[2]<<16)|((uint64_t)p[3]<<24)|((uint64_t)p[4]<<32)|((uint64_t)p[5]<<40)|((uint64_t)p[6]<<48)|((uint64_t)p[7]<<56);
   }
   throw EndOfStreamException();
+}
+
+int64_t readS64(const RVNGInputStreamPtr &input, const bool bigEndian)
+{
+  return static_cast<int64_t>(readU64(input, bigEndian));
 }
 
 const unsigned char *readNBytes(const RVNGInputStreamPtr &input, const unsigned long numBytes)
