@@ -50,8 +50,8 @@ void seekToRecord(librevenge::RVNGInputStream *const input, const PMDRecordConta
 
 PMDShapePoint readPoint(librevenge::RVNGInputStream *const input, const bool bigEndian)
 {
-  const PMDShapeUnit x(readU16(input, bigEndian));
-  const PMDShapeUnit y(readU16(input, bigEndian));
+  const PMDShapeUnit x(readS16(input, bigEndian));
+  const PMDShapeUnit y(readS16(input, bigEndian));
   return PMDShapePoint(x, y);
 }
 
