@@ -121,7 +121,6 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
 
   skip(m_input, 0xe);
   uint32_t textBoxXformId = readU32(m_input, m_bigEndian);
-  skip(m_input, 6);
   uint32_t textBoxTextBlockId = readU32(m_input, m_bigEndian);
 
   if (textBoxXformId != (std::numeric_limits<uint32_t>::max)())
@@ -162,7 +161,7 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
   {
     seekToRecord(m_input, textBlockContainer, i);
 
-    skip(m_input, 2);
+    skip(m_input, 0x20);
     uint32_t textBlockId = readU32(m_input, m_bigEndian);
 
     if (textBlockId == textBoxTextBlockId)
