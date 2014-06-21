@@ -348,7 +348,7 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
   PMDShapePoint topLeft = readPoint(m_input, m_bigEndian);
   PMDShapePoint botRight = readPoint(m_input, m_bigEndian);
 
-  skip(m_input, 0xa);
+  skip(m_input, 14);
   uint32_t polyXformId = readU32(m_input, m_bigEndian);
 
   uint8_t strokeType = readU8(m_input);
