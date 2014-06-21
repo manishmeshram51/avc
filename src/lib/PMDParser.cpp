@@ -597,8 +597,8 @@ void PMDParser::parseColors(const PMDRecordContainer &container)
     if (colorModel == RGB)
     {
       red = readU8(m_input);
-      blue = readU8(m_input);
       green = readU8(m_input);
+      blue = readU8(m_input);
     }
     else if (colorModel == CMYK)
     {
