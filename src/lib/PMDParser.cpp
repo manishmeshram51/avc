@@ -450,7 +450,7 @@ void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recor
   skip(m_input, 1);
   uint8_t fillColor = readU8(m_input);
 
-  skip(m_input, 5);
+  skip(m_input, 1);
   PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
   PMDShapePoint bboxBotRight = readPoint(m_input, m_bigEndian);
 
@@ -459,7 +459,7 @@ void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recor
   PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
   PMDShapePoint xformBotRight = PMDShapePoint(0,0);
 
-  skip(m_input, 10);
+  skip(m_input, 14);
   uint32_t ellipseXformId = readU32(m_input, m_bigEndian);
 
   uint8_t strokeType = readU8(m_input);
