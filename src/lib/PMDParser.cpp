@@ -224,7 +224,7 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
     uint8_t boldItalicUnderline = readU8(m_input);
     uint8_t superSubscript = readU8(m_input);
     skip(m_input, 4);
-    int16_t kerning = readU16(m_input, m_bigEndian);
+    int16_t kerning = readS16(m_input, m_bigEndian);
     skip(m_input, 2);
     uint16_t superSubSize = readU16(m_input, m_bigEndian);
     uint16_t subPos = readU16(m_input, m_bigEndian);
