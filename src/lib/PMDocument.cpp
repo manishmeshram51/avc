@@ -20,10 +20,9 @@
 namespace libpagemaker
 {
 
-bool PMDocument::isSupported(librevenge::RVNGInputStream * /*input*/) try
+bool PMDocument::isSupported(librevenge::RVNGInputStream *input) try
 {
-  // TODO: Fix this.
-  return true;
+  return input && input->isStructured() && input->existsSubStream("PageMaker");
 }
 catch (...)
 {
