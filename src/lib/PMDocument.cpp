@@ -31,6 +31,9 @@ catch (...)
 
 bool PMDocument::parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter) try
 {
+  if (!isSupported(input))
+    return false;
+
   PMDCollector collector;
   PMD_DEBUG_MSG(("About to start parsing...\n"));
   boost::scoped_ptr<librevenge::RVNGInputStream>
