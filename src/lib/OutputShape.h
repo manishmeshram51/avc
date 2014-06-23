@@ -52,7 +52,6 @@ public:
       m_text(text), m_charProps(charProps), m_paraProps(paraProps)
   { }
 
-
   unsigned numPoints() const
   {
     return m_points.size();
@@ -78,42 +77,42 @@ public:
     return m_fillType;
   }
 
-  virtual uint8_t getFillColor() const
+  uint8_t getFillColor() const
   {
     return m_fillColor;
   }
 
-  virtual uint8_t getFillOverprint() const
+  uint8_t getFillOverprint() const
   {
     return m_fillOverprint;
   }
 
-  virtual uint8_t getFillTint() const
+  uint8_t getFillTint() const
   {
     return m_fillTint;
   }
 
-  virtual uint8_t getStrokeType() const
+  uint8_t getStrokeType() const
   {
     return m_strokeType;
   }
 
-  virtual uint8_t getStrokeWidth() const
+  uint8_t getStrokeWidth() const
   {
     return m_strokeWidth;
   }
 
-  virtual uint8_t getStrokeColor() const
+  uint8_t getStrokeColor() const
   {
     return m_strokeColor;
   }
 
-  virtual uint8_t getStrokeOverprint() const
+  uint8_t getStrokeOverprint() const
   {
     return m_strokeOverprint;
   }
 
-  virtual uint8_t getStrokeTint() const
+  uint8_t getStrokeTint() const
   {
     return m_strokeTint;
   }
