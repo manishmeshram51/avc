@@ -318,7 +318,7 @@ void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned rec
 
         rectRotationDegree = readU32(m_input, m_bigEndian);
         rectSkewDegree = readU32(m_input, m_bigEndian);
-        skip(m_input, 4);
+        skip(m_input, 2);
         xformTopLeft = readPoint(m_input, m_bigEndian);
         xformBotRight = readPoint(m_input, m_bigEndian);
         rotatingPoint = readPoint(m_input, m_bigEndian);
@@ -425,7 +425,7 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
 
         polyRotationDegree = readU32(m_input, m_bigEndian);
         polySkewDegree = readU32(m_input, m_bigEndian);
-        skip(m_input, 4);
+        skip(m_input, 2);
         xformTopLeft = readPoint(m_input, m_bigEndian);
         xformBotRight = readPoint(m_input, m_bigEndian);
         break;
@@ -494,7 +494,7 @@ void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recor
 
         ellipseRotationDegree = readU32(m_input, m_bigEndian);
         ellipseSkewDegree = readU32(m_input, m_bigEndian);
-        skip(m_input, 4);
+        skip(m_input, 2);
         xformTopLeft = readPoint(m_input, m_bigEndian);
         xformBotRight = readPoint(m_input, m_bigEndian);
         break;
