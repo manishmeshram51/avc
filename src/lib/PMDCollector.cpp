@@ -666,41 +666,27 @@ const
   double centerToEdge_y = m_pageHeight.get().toInches() / 2;
   InchPoint translateForLeftPage(centerToEdge_x * 2, centerToEdge_y);
   InchPoint translateForRightPage(0, centerToEdge_y);
-  /* Iterate over the right-sided pages. */
-  for (unsigned i = 0; i < m_pages.size(); i += 2)
+
+  for (unsigned i = 0, pageNum = 0; i < m_pages.size(); ++i, pageNum += 2)
   {
+    const bool leftPageExists = (pageNum > 0);
+
     const PMDPage &page = m_pages[i];
     for (unsigned j = 0; j < page.numShapes(); ++j)
     {
-      bool leftPageExists = (i > 0);
-
       boost::shared_ptr<const OutputShape> right = newOutputShape(page.getShape(j), translateForRightPage);
       if (right->getBoundingBox().second.m_x >= 0)
       {
-        toReturn[i].push_back(right);
+        toReturn[pageNum].push_back(right);
       }
       if (leftPageExists)
       {
         boost::shared_ptr<const OutputShape> left = newOutputShape(page.getShape(j), translateForLeftPage);
         if (left->getBoundingBox().first.m_x <= centerToEdge_x * 2)
         {
-          toReturn[i - 1].push_back(left);
+          toReturn[pageNum - 1].push_back(left);
         }
       }
-    }
-  }
-
-  // FIXME: I have NO idea how the pages in double-sided doc are supposed to be composed. But
-  // this at least produces the right result for my testing document.
-
-  /* Iterate over the left-sided pages. */
-  for (unsigned i = 1; i < m_pages.size(); i += 2)
-  {
-    const PMDPage &page = m_pages[i];
-    for (unsigned j = 0; j < page.numShapes(); ++j)
-    {
-      boost::shared_ptr<const OutputShape> left = newOutputShape(page.getShape(j), translateForLeftPage);
-      toReturn[i].push_back(left);
     }
   }
 
