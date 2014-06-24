@@ -12,7 +12,6 @@
 
 #include <stdint.h>
 
-#include <map>
 #include <vector>
 #include <string>
 
@@ -40,6 +39,9 @@ namespace libpagemaker
  */
 class PMDCollector
 {
+  typedef std::vector<boost::shared_ptr<const OutputShape> > PageShapes_t;
+  typedef std::vector<PageShapes_t> PageShapesList_t;
+
   /*
    * Height and width in PMD page units.
    * One PMD page unit is 1/20 of a point (1/720 inch)
@@ -59,9 +61,9 @@ class PMDCollector
   void paintShape(const OutputShape &shape,
                   librevenge::RVNGDrawingInterface *) const;
 
-  std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > getOutputShapesByPage_OneSided() const;
-  std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > getOutputShapesByPage_TwoSided() const;
-  std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > getOutputShapesByPage() const;
+  const PageShapesList_t getOutputShapesByPage_OneSided() const;
+  const PageShapesList_t getOutputShapesByPage_TwoSided() const;
+  const PageShapesList_t getOutputShapesByPage() const;
 public:
   PMDCollector();
 

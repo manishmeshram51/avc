@@ -658,10 +658,9 @@ void PMDCollector::writePage(const PMDPage & /*page*/,
   painter->endPage();
 }
 
-std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > PMDCollector::getOutputShapesByPage_TwoSided()
-const
+const PMDCollector::PageShapesList_t PMDCollector::getOutputShapesByPage_TwoSided() const
 {
-  std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > toReturn;
+  PageShapesList_t toReturn(m_pages.size() * 2 - 1); // the first "page" only has right side
   double centerToEdge_x = m_pageWidth.get().toInches() / 2;
   double centerToEdge_y = m_pageHeight.get().toInches() / 2;
   InchPoint translateForLeftPage(centerToEdge_x * 2, centerToEdge_y);
@@ -690,13 +689,15 @@ const
     }
   }
 
+  if (toReturn.back().empty()) // the last "page" only has left side
+    toReturn.pop_back();
+
   return toReturn;
 }
 
-std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > PMDCollector::getOutputShapesByPage_OneSided()
-const
+const PMDCollector::PageShapesList_t PMDCollector::getOutputShapesByPage_OneSided() const
 {
-  std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > toReturn;
+  PageShapesList_t toReturn;
   for (unsigned i = 0; i < m_pages.size(); ++i)
   {
     const PMDPage &page = m_pages[i];
@@ -708,12 +709,9 @@ const
   return toReturn;
 }
 
-std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > PMDCollector::getOutputShapesByPage()
-const
+const PMDCollector::PageShapesList_t PMDCollector::getOutputShapesByPage() const
 {
-  return m_doubleSided ?
-         getOutputShapesByPage_TwoSided()
-         : getOutputShapesByPage_OneSided();
+  return m_doubleSided ? getOutputShapesByPage_TwoSided() : getOutputShapesByPage_OneSided();
 }
 
 /* Output functions */
@@ -721,11 +719,10 @@ void PMDCollector::draw(librevenge::RVNGDrawingInterface *painter) const
 {
   painter->startDocument(librevenge::RVNGPropertyList());
 
-  std::map<unsigned, std::vector<boost::shared_ptr<const OutputShape> > > shapesByPage
-    = getOutputShapesByPage();
+  PageShapesList_t shapesByPage = getOutputShapesByPage();
   for (unsigned i = 0; i < m_pages.size(); ++i)
   {
-    std::vector<boost::shared_ptr<const OutputShape> > shapes = shapesByPage[i];
+    const PageShapes_t &shapes = shapesByPage[i];
     writePage(m_pages[i], painter, shapes);
   }
   painter->endDocument();
