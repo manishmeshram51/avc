@@ -658,9 +658,10 @@ void PMDCollector::writePage(const PMDPage & /*page*/,
   painter->endPage();
 }
 
-const PMDCollector::PageShapesList_t PMDCollector::getOutputShapesByPage_TwoSided() const
+void PMDCollector::fillOutputShapesByPage_TwoSided(PageShapesList_t &pageShapes) const
 {
-  PageShapesList_t toReturn(m_pages.size() * 2 - 1); // the first "page" only has right side
+  pageShapes.assign(m_pages.size() * 2 - 1, PageShapes_t()); // the first "page" only has right side
+
   double centerToEdge_x = m_pageWidth.get().toInches() / 2;
   double centerToEdge_y = m_pageHeight.get().toInches() / 2;
   InchPoint translateForLeftPage(centerToEdge_x * 2, centerToEdge_y);
@@ -676,42 +677,43 @@ const PMDCollector::PageShapesList_t PMDCollector::getOutputShapesByPage_TwoSide
       boost::shared_ptr<const OutputShape> right = newOutputShape(page.getShape(j), translateForRightPage);
       if (right->getBoundingBox().second.m_x >= 0)
       {
-        toReturn[pageNum].push_back(right);
+        pageShapes[pageNum].push_back(right);
       }
       if (leftPageExists)
       {
         boost::shared_ptr<const OutputShape> left = newOutputShape(page.getShape(j), translateForLeftPage);
         if (left->getBoundingBox().first.m_x <= centerToEdge_x * 2)
         {
-          toReturn[pageNum - 1].push_back(left);
+          pageShapes[pageNum - 1].push_back(left);
         }
       }
     }
   }
 
-  if (toReturn.back().empty()) // the last "page" only has left side
-    toReturn.pop_back();
-
-  return toReturn;
+  if (pageShapes.back().empty()) // the last "page" only has left side
+    pageShapes.pop_back();
 }
 
-const PMDCollector::PageShapesList_t PMDCollector::getOutputShapesByPage_OneSided() const
+void PMDCollector::fillOutputShapesByPage_OneSided(PageShapesList_t &pageShapes) const
 {
-  PageShapesList_t toReturn;
+  pageShapes.reserve(m_pages.size());
+
   for (unsigned i = 0; i < m_pages.size(); ++i)
   {
     const PMDPage &page = m_pages[i];
     for (unsigned j = 0; j < page.numShapes(); ++j)
     {
-      toReturn[i].push_back(newOutputShape(page.getShape(j), InchPoint(0, 0)));
+      pageShapes[i].push_back(newOutputShape(page.getShape(j), InchPoint(0, 0)));
     }
   }
-  return toReturn;
 }
 
-const PMDCollector::PageShapesList_t PMDCollector::getOutputShapesByPage() const
+void PMDCollector::fillOutputShapesByPage(PageShapesList_t &pageShapes) const
 {
-  return m_doubleSided ? getOutputShapesByPage_TwoSided() : getOutputShapesByPage_OneSided();
+  if (m_doubleSided)
+    fillOutputShapesByPage_TwoSided(pageShapes);
+  else
+    fillOutputShapesByPage_OneSided(pageShapes);
 }
 
 /* Output functions */
@@ -719,10 +721,11 @@ void PMDCollector::draw(librevenge::RVNGDrawingInterface *painter) const
 {
   painter->startDocument(librevenge::RVNGPropertyList());
 
-  PageShapesList_t shapesByPage = getOutputShapesByPage();
+  PageShapesList_t shapesByPage;
+  fillOutputShapesByPage(shapesByPage);
   for (unsigned i = 0; i < m_pages.size(); ++i)
   {
-    const PageShapes_t &shapes = shapesByPage[i];
+    PageShapes_t shapes = shapesByPage[i];
     writePage(m_pages[i], painter, shapes);
   }
   painter->endDocument();

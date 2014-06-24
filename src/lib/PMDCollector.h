@@ -61,9 +61,9 @@ class PMDCollector
   void paintShape(const OutputShape &shape,
                   librevenge::RVNGDrawingInterface *) const;
 
-  const PageShapesList_t getOutputShapesByPage_OneSided() const;
-  const PageShapesList_t getOutputShapesByPage_TwoSided() const;
-  const PageShapesList_t getOutputShapesByPage() const;
+  void fillOutputShapesByPage_OneSided(PageShapesList_t &pageShapes) const;
+  void fillOutputShapesByPage_TwoSided(PageShapesList_t &pageShapes) const;
+  void fillOutputShapesByPage(PageShapesList_t &pageShapes) const;
 public:
   PMDCollector();
 
