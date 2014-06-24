@@ -689,6 +689,21 @@ const
       }
     }
   }
+
+  // FIXME: I have NO idea how the pages in double-sided doc are supposed to be composed. But
+  // this at least produces the right result for my testing document.
+
+  /* Iterate over the left-sided pages. */
+  for (unsigned i = 1; i < m_pages.size(); i += 2)
+  {
+    const PMDPage &page = m_pages[i];
+    for (unsigned j = 0; j < page.numShapes(); ++j)
+    {
+      boost::shared_ptr<const OutputShape> left = newOutputShape(page.getShape(j), translateForLeftPage);
+      toReturn[i].push_back(left);
+    }
+  }
+
   return toReturn;
 }
 
