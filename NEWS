@@ -1,1 +1,6 @@
+libpagemaker-0.0.0
 
+- First release.
+- Implement parsing of basic shapes: rectangle, ellipse, path, text
+  block; also parse some properties.
+- Handle multi-page documents, both single- and double-sided (untested).
