@@ -12,7 +12,6 @@
 #include <cassert>
 #include <vector>
 #include <limits>
-#include <math.h>
 #include <librevenge/librevenge.h>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
@@ -608,9 +607,9 @@ void PMDParser::parseColors(const PMDRecordContainer &container)
 
       uint16_t max = (std::numeric_limits<uint16_t>::max)();
 
-      red = 255* round((1 - std::min(1.0, (double)cyan/max + (double)black/max)));
-      green = 255*round((1 - std::min(1.0, (double)magenta/max + (double)black/max)));
-      blue = 255*round((1 - std::min(1.0, (double)yellow/max + (double)black/max)));
+      red = 255* std::floor((1 - std::min(1.0, (double)cyan/max + (double)black/max) + 0.5));
+      green = 255*std::floor((1 - std::min(1.0, (double)magenta/max + (double)black/max) + 0.5));
+      blue = 255*std::floor((1 - std::min(1.0, (double)yellow/max + (double)black/max) + 0.5));
     }
     else if (colorModel == HLS)
     { }
