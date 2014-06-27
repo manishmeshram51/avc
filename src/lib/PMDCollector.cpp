@@ -486,6 +486,19 @@ void PMDCollector::paintShape(const OutputShape &shape,
     }
     painter->endTextObject();
   }
+  else if (shape.shapeType() == SHAPE_TYPE_BITMAP)
+  {
+
+
+  librevenge::RVNGPropertyList props;
+  props.insert("svg:x", shape.getPoint(0).m_x);
+  props.insert("svg:y", shape.getPoint(0).m_y);
+  props.insert("svg:width", fabs(shape.getPoint(2).m_x - shape.getPoint(0).m_x));
+  props.insert("svg:height", fabs(shape.getPoint(2).m_y - shape.getPoint(0).m_y));
+  props.insert("librevenge:mime-type", "image/tiff");
+  props.insert("office:binary-data", shape.getBitmap());
+  painter->drawGraphicObject(props);
+}
   else
   {
     double cx = shape.getPoint(0).m_x;

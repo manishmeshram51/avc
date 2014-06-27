@@ -47,6 +47,13 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
     return ptrToOutputShape;
 
   }
+  else if (ptrToLineSet->shapeType() == SHAPE_TYPE_BITMAP)
+  {
+    boost::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(
+      new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeType(), ptrToLineSet->getRotation(), ptrToLineSet->getSkew(), ptrToLineSet->getBitmap()));
+
+    return ptrToOutputShape;
+  }
   else
   {
     boost::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(

@@ -13,6 +13,7 @@
 #include <vector>
 #include "Units.h"
 #include "constants.h"
+#include <librevenge/librevenge.h>
 
 namespace libpagemaker
 {
@@ -86,6 +87,8 @@ public:
   virtual std::string getText() const = 0;
   virtual std::vector<PMDCharProperties> getCharProperties() const = 0;
   virtual std::vector<PMDParaProperties> getParaProperties() const = 0;
+  virtual librevenge::RVNGBinaryData getBitmap() const = 0;
+
 
   virtual ~PMDLineSet()
   {
@@ -234,6 +237,12 @@ public:
     return temp;
   }
 
+  virtual librevenge::RVNGBinaryData getBitmap() const
+  {
+    librevenge::RVNGBinaryData temp;
+    return temp;
+  }
+
   virtual ~PMDLine()
   {
   }
@@ -379,6 +388,12 @@ public:
     return temp;
   }
 
+  virtual librevenge::RVNGBinaryData getBitmap() const
+  {
+    librevenge::RVNGBinaryData temp;
+    return temp;
+  }
+
   virtual ~PMDPolygon()
   {
   }
@@ -514,6 +529,12 @@ public:
   virtual std::vector<PMDParaProperties> getParaProperties() const
   {
     return m_paraProps;
+  }
+
+  virtual librevenge::RVNGBinaryData getBitmap() const
+  {
+    librevenge::RVNGBinaryData temp;
+    return temp;
   }
 
   virtual ~PMDTextBox()
@@ -666,6 +687,12 @@ public:
     return temp;
   }
 
+  virtual librevenge::RVNGBinaryData getBitmap() const
+  {
+    librevenge::RVNGBinaryData temp;
+    return temp;
+  }
+
   virtual ~PMDRectangle()
   {
   }
@@ -812,7 +839,160 @@ public:
     return temp;
   }
 
+  virtual librevenge::RVNGBinaryData getBitmap() const
+  {
+    librevenge::RVNGBinaryData temp;
+    return temp;
+  }
+
   virtual ~PMDEllipse()
+  {
+  }
+};
+
+class PMDBitmap : public PMDLineSet
+{
+  PMDShapePoint m_topLeft;
+  PMDShapePoint m_botRight;
+  double m_rotation;
+  double m_skew;
+  PMDShapePoint m_rotatingPoint;
+  PMDShapePoint m_xformTopLeft;
+  PMDShapePoint m_xformBotRight;
+  librevenge::RVNGBinaryData m_bitmap;
+
+public:
+  PMDBitmap(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const librevenge::RVNGBinaryData &bitmap)
+    : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight),m_bitmap(bitmap)
+  { }
+
+  virtual double getRotation() const
+  {
+    return m_rotation;
+  }
+
+  virtual double getSkew() const
+  {
+    return m_skew;
+  }
+
+  virtual PMDShapePoint getXformTopLeft() const
+  {
+    return m_xformTopLeft;
+  }
+
+  virtual PMDShapePoint getXformBotRight() const
+  {
+    return m_xformBotRight;
+  }
+
+  virtual PMDShapePoint getRotatingPoint() const
+  {
+    return m_rotatingPoint;
+  }
+
+  virtual PMDShapePoint getTopLeft() const
+  {
+    return m_topLeft;
+  }
+
+  virtual PMDShapePoint getBotRight() const
+  {
+    return m_botRight;
+  }
+
+  virtual bool getIsClosed() const
+  {
+    return true;
+  }
+
+  virtual std::vector<PMDShapePoint> getPoints() const
+  {
+    std::vector<PMDShapePoint> points;
+
+    points.push_back(m_topLeft);
+    points.push_back(PMDShapePoint(m_botRight.m_x, m_topLeft.m_y));
+    points.push_back(m_botRight);
+    points.push_back(PMDShapePoint(m_topLeft.m_x, m_botRight.m_y));
+
+    return points;
+  }
+
+  virtual uint8_t shapeType() const
+  {
+    return SHAPE_TYPE_BITMAP;
+  }
+
+  virtual uint8_t getFillType() const
+  {
+    return 0;
+  }
+
+  virtual uint8_t getFillColor() const
+  {
+    return 0;
+  }
+
+  virtual uint8_t getFillOverprint() const
+  {
+    return 0;
+  }
+
+  virtual uint8_t getFillTint() const
+  {
+    return 0;
+  }
+
+  virtual uint8_t getStrokeType() const
+  {
+    return 0;
+  }
+
+  virtual uint8_t getStrokeWidth() const
+  {
+    return 0;
+  }
+
+  virtual uint8_t getStrokeColor() const
+  {
+    return 0;
+  }
+
+  virtual uint8_t getStrokeOverprint() const
+  {
+    return 0;
+  }
+
+  virtual uint8_t getStrokeTint() const
+  {
+    return 0;
+  }
+
+  virtual std::string getText() const
+  {
+    return "";
+  }
+
+  virtual std::vector<PMDCharProperties> getCharProperties() const
+  {
+    std::vector<PMDCharProperties> temp;
+    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0));
+    return temp;
+  }
+
+  virtual std::vector<PMDParaProperties> getParaProperties() const
+  {
+    std::vector<PMDParaProperties> temp;
+    temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
+    return temp;
+  }
+
+  virtual librevenge::RVNGBinaryData getBitmap() const
+  {
+    return m_bitmap;
+  }
+
+  virtual ~PMDBitmap()
   {
   }
 };

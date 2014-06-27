@@ -24,6 +24,7 @@ const uint16_t CHARS = 0x1c00;
 const uint16_t PARA = 0x0b00;
 const uint16_t FONTS = 0x1300;
 const uint16_t FONTS_PARENT = 0x0100;
+const uint16_t TIFF = 0x0e00;
 
 /* Color record types */
 const uint8_t RGB = 0x18;
@@ -36,6 +37,7 @@ const uint8_t LINE_RECORD = 0x03;
 const uint8_t RECTANGLE_RECORD = 0x04;
 const uint8_t ELLIPSE_RECORD = 0x05;
 const uint8_t TEXT_RECORD = 0x01;
+const uint8_t BITMAP_RECORD = 0x06;
 
 /* Polygon flags */
 const uint8_t REGULAR_POLYGON = 0x00;
@@ -51,6 +53,7 @@ const uint8_t SHAPE_TYPE_POLY = 2;
 const uint8_t SHAPE_TYPE_RECT = 3;
 const uint8_t SHAPE_TYPE_ELLIPSE = 4;
 const uint8_t SHAPE_TYPE_TEXTBOX = 5;
+const uint8_t SHAPE_TYPE_BITMAP = 6;
 
 /* Fill Constants */
 const uint8_t FILL_NONE = 0;

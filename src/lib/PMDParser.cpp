@@ -509,6 +509,97 @@ void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recor
   m_collector->addShapeToPage(pageID, newShape);
 }
 
+void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID)
+{
+  librevenge::RVNGBinaryData bitmap;
+  seekToRecord(m_input, container, recordIndex);
+
+  skip(m_input, 6);
+  PMDShapePoint topLeft = readPoint(m_input, m_bigEndian);
+  PMDShapePoint botRight = readPoint(m_input, m_bigEndian);
+  uint32_t bboxRotationDegree = 0;
+  uint32_t bboxSkewDegree = 0;
+  PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
+  PMDShapePoint xformBotRight = PMDShapePoint(0,0);
+  PMDShapePoint rotatingPoint = PMDShapePoint(0, 0);
+  skip(m_input, 14);
+  uint32_t bboxXformId = readU32(m_input, m_bigEndian);
+
+  skip(m_input, 16);
+  uint16_t bitmapRecordSeqNum = readU16(m_input);
+
+  if (bboxXformId != (std::numeric_limits<uint32_t>::max)())
+  {
+    const PMDRecordContainer *ptrToXformContainer = &(m_recordsInOrder[0x0c]);
+    const PMDRecordContainer &xformContainer = *ptrToXformContainer;
+
+    for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
+    {
+      seekToRecord(m_input, xformContainer, i);
+
+      skip(m_input, 0x16);
+      uint32_t xformId = readU32(m_input, m_bigEndian);
+      if (xformId == bboxXformId)
+      {
+        seekToRecord(m_input, xformContainer, i); // return to the beginning
+
+        bboxRotationDegree = readU32(m_input, m_bigEndian);
+        bboxSkewDegree = readU32(m_input, m_bigEndian);
+        skip(m_input, 2);
+        xformTopLeft = readPoint(m_input, m_bigEndian);
+        xformBotRight = readPoint(m_input, m_bigEndian);
+        rotatingPoint = readPoint(m_input, m_bigEndian);
+        break;
+      }
+    }
+  }
+  int32_t temp = (int32_t)bboxRotationDegree;
+  double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
+  temp = (int32_t)bboxSkewDegree;
+  double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
+
+  const PMDRecordContainer *ptrToTiffContainer =
+    (bitmapRecordSeqNum < m_recordsInOrder.size()) ? &(m_recordsInOrder[bitmapRecordSeqNum]) : NULL;
+  if (!ptrToTiffContainer)
+  {
+    throw RecordNotFoundException(TIFF, bitmapRecordSeqNum);
+  }
+  const PMDRecordContainer &tiffContainer = *ptrToTiffContainer;
+
+  seekToRecord(m_input, tiffContainer, 0);
+  const unsigned char *tempBytes = readNBytes(m_input,tiffContainer.m_numRecords);
+  bitmap.append(tempBytes,tiffContainer.m_numRecords);
+
+  const PMDRecordContainer *ptrToTiffSecondContainer =
+    (bitmapRecordSeqNum < m_recordsInOrder.size()) ? &(m_recordsInOrder[bitmapRecordSeqNum + 1]) : NULL;
+  if (!ptrToTiffSecondContainer)
+  {
+    throw RecordNotFoundException(TIFF, bitmapRecordSeqNum + 1);
+  }
+  const PMDRecordContainer &tiffSecondContainer = *ptrToTiffSecondContainer;
+
+  for (unsigned i = 0; i < tiffSecondContainer.m_numRecords; ++i)
+  {
+    seekToRecord(m_input, tiffSecondContainer, i);
+
+    uint16_t recType = readU16(m_input, m_bigEndian);
+    uint16_t numRecs = readU16(m_input, m_bigEndian);
+    uint32_t offset = readU32(m_input, m_bigEndian);
+
+    if (numRecs > 0)
+    {
+      PMDRecordContainer subContainer(recType, offset, 0, numRecs);
+      seekToRecord(m_input, subContainer, 0);
+      tempBytes = readNBytes(m_input,numRecs);
+      bitmap.append(tempBytes,numRecs);
+    }
+  }
+
+  boost::shared_ptr<PMDLineSet> newShape(new PMDBitmap(topLeft, botRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, bitmap));
+  m_collector->addShapeToPage(pageID, newShape);
+
+}
+
 void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
 {
   const PMDRecordContainer *ptrToContainer =
@@ -539,6 +630,9 @@ void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
       break;
     case TEXT_RECORD:
       parseTextBox(container, i, pageID);
+      break;
+    case BITMAP_RECORD:
+      parseBitmap(container, i, pageID);
       break;
     default:
       PMD_ERR_MSG("Encountered shape of unknown type.\n");

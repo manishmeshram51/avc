@@ -40,6 +40,7 @@ class PMDParser
   void parseRectangle(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID);
   void parsePolygon(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID);
   void parseEllipse(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID);
+  void parseBitmap(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID);
   void parseHeader(uint32_t *tocOffset, uint16_t *tocLength);
   unsigned readNextRecordFromTableOfContents(unsigned seqNum);
   void parseTableOfContents(uint32_t offset, uint16_t length);
