@@ -52,6 +52,47 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
     boost::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(
       new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeType(), ptrToLineSet->getRotation(), ptrToLineSet->getSkew(), ptrToLineSet->getBitmap()));
 
+    std::vector<PMDShapePoint> pmdPoints = ptrToLineSet->getPoints();
+    double pmdRotation = ptrToLineSet->getRotation();
+    double pmdSkew = ptrToLineSet->getSkew();
+    if (pmdRotation == 0 && pmdSkew == 0)
+    {
+      for (unsigned i = 0; i < pmdPoints.size(); ++i)
+      {
+        double x = pmdPoints[i].m_x.toInches() + translate.m_x;
+        double y = pmdPoints[i].m_y.toInches() + translate.m_y;
+        ptrToOutputShape->addPoint(InchPoint(x, y));
+      }
+    }
+    else
+    {
+      PMDShapePoint pmdXformTopLeft = ptrToLineSet->getXformTopLeft();
+      PMDShapePoint pmdXformBotRight = ptrToLineSet->getXformBotRight();
+
+      double length = fabs(pmdXformBotRight.m_x.toInches() - pmdXformTopLeft.m_x.toInches());
+      double breadth = fabs(pmdXformBotRight.m_y.toInches() - pmdXformTopLeft.m_y.toInches());
+
+      PMDShapePoint pmdRotatingPoint = ptrToLineSet->getRotatingPoint();
+
+      double x1 = pmdRotatingPoint.m_x.toInches() + translate.m_x;
+      double y1 = pmdRotatingPoint.m_y.toInches() + translate.m_y;
+
+      double x2 = x1 + length;
+      double y2 = y1;
+
+      double x4 = x1 ;
+      double y4 = y1 + breadth;
+
+      double x3 = x1 + length;
+      double y3 = y1 + breadth;
+
+
+      ptrToOutputShape->addPoint(InchPoint(x1, y1));
+      ptrToOutputShape->addPoint(InchPoint(x2, y2));
+      ptrToOutputShape->addPoint(InchPoint(x3, y3));
+      ptrToOutputShape->addPoint(InchPoint(x4, y4));
+    }
+
     return ptrToOutputShape;
   }
   else
