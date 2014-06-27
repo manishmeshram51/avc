@@ -10,6 +10,7 @@
 #ifndef __LIBPAGEMAKER_UTILS_H__
 #define __LIBPAGEMAKER_UTILS_H__
 
+#include <cmath>
 #include <cstdio>
 
 #include <string>
@@ -18,6 +19,10 @@
 
 #include <librevenge-stream/librevenge-stream.h>
 #include <librevenge/librevenge.h>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 #ifdef _MSC_VER
 
