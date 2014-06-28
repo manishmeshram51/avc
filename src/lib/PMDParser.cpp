@@ -557,7 +557,6 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
   double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
   temp = (int32_t)bboxSkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
-  const unsigned char *tempBytes;
   const PMDRecordContainer *ptrToTiffContainer =
     (bitmapRecordSeqNum < m_recordsInOrder.size()) ? &(m_recordsInOrder[bitmapRecordSeqNum]) : NULL;
   if (!ptrToTiffContainer)
@@ -581,7 +580,7 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
       {
         PMDRecordContainer tempSubContainer(recType, offset, 0, numRecs);
         seekToRecord(m_input, tempSubContainer, 0);
-        tempBytes = readNBytes(m_input,numRecs);
+        const unsigned char *const tempBytes = readNBytes(m_input,numRecs);
         bitmap.append(tempBytes,numRecs);
       }
     }
@@ -589,7 +588,7 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
   else
   {
     seekToRecord(m_input, tiffContainer, 0);
-    tempBytes = readNBytes(m_input,tiffContainer.m_numRecords);
+    const unsigned char *const tempBytes = readNBytes(m_input,tiffContainer.m_numRecords);
     bitmap.append(tempBytes,tiffContainer.m_numRecords);
   }
 
@@ -615,7 +614,7 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
       {
         PMDRecordContainer subContainer(recType, offset, 0, numRecs);
         seekToRecord(m_input, subContainer, 0);
-        tempBytes = readNBytes(m_input,numRecs);
+        const unsigned char *const tempBytes = readNBytes(m_input,numRecs);
         bitmap.append(tempBytes,numRecs);
       }
     }
@@ -623,7 +622,7 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
   else
   {
     seekToRecord(m_input, tiffSecondContainer, 0);
-    tempBytes = readNBytes(m_input,tiffSecondContainer.m_numRecords);
+    const unsigned char *const tempBytes = readNBytes(m_input,tiffSecondContainer.m_numRecords);
     bitmap.append(tempBytes,tiffSecondContainer.m_numRecords);
   }
   boost::shared_ptr<PMDLineSet> newShape(new PMDBitmap(topLeft, botRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, bitmap));
