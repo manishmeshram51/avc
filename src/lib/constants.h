@@ -38,6 +38,7 @@ const uint8_t RECTANGLE_RECORD = 0x04;
 const uint8_t ELLIPSE_RECORD = 0x05;
 const uint8_t TEXT_RECORD = 0x01;
 const uint8_t BITMAP_RECORD = 0x06;
+const uint8_t METAFILE_RECORD = 0x0a;
 
 /* Polygon flags */
 const uint8_t REGULAR_POLYGON = 0x00;

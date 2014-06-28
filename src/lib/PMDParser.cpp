@@ -557,7 +557,7 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
   double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
   temp = (int32_t)bboxSkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
-
+  const unsigned char *tempBytes;
   const PMDRecordContainer *ptrToTiffContainer =
     (bitmapRecordSeqNum < m_recordsInOrder.size()) ? &(m_recordsInOrder[bitmapRecordSeqNum]) : NULL;
   if (!ptrToTiffContainer)
@@ -565,10 +565,33 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
     throw RecordNotFoundException(TIFF, bitmapRecordSeqNum);
   }
   const PMDRecordContainer &tiffContainer = *ptrToTiffContainer;
+  PMD_DEBUG_MSG(("HIIII %d",tiffContainer.m_numRecords));
+  if (tiffContainer.m_numRecords <= 100)
+  {
 
-  seekToRecord(m_input, tiffContainer, 0);
-  const unsigned char *tempBytes = readNBytes(m_input,tiffContainer.m_numRecords);
-  bitmap.append(tempBytes,tiffContainer.m_numRecords);
+    for (unsigned i = 0; i < tiffContainer.m_numRecords; ++i)
+    {
+      seekToRecord(m_input, tiffContainer, i);
+
+      uint16_t recType = readU16(m_input, m_bigEndian);
+      uint16_t numRecs = readU16(m_input, m_bigEndian);
+      uint32_t offset = readU32(m_input, m_bigEndian);
+
+      if (numRecs > 0)
+      {
+        PMDRecordContainer tempSubContainer(recType, offset, 0, numRecs);
+        seekToRecord(m_input, tempSubContainer, 0);
+        tempBytes = readNBytes(m_input,numRecs);
+        bitmap.append(tempBytes,numRecs);
+      }
+    }
+  }
+  else
+  {
+    seekToRecord(m_input, tiffContainer, 0);
+    tempBytes = readNBytes(m_input,tiffContainer.m_numRecords);
+    bitmap.append(tempBytes,tiffContainer.m_numRecords);
+  }
 
   const PMDRecordContainer *ptrToTiffSecondContainer =
     (bitmapRecordSeqNum < m_recordsInOrder.size()) ? &(m_recordsInOrder[bitmapRecordSeqNum + 1]) : NULL;
@@ -578,23 +601,31 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
   }
   const PMDRecordContainer &tiffSecondContainer = *ptrToTiffSecondContainer;
 
-  for (unsigned i = 0; i < tiffSecondContainer.m_numRecords; ++i)
+  if (tiffSecondContainer.m_numRecords <= 100)
   {
-    seekToRecord(m_input, tiffSecondContainer, i);
-
-    uint16_t recType = readU16(m_input, m_bigEndian);
-    uint16_t numRecs = readU16(m_input, m_bigEndian);
-    uint32_t offset = readU32(m_input, m_bigEndian);
-
-    if (numRecs > 0)
+    for (unsigned i = 0; i < tiffSecondContainer.m_numRecords; ++i)
     {
-      PMDRecordContainer subContainer(recType, offset, 0, numRecs);
-      seekToRecord(m_input, subContainer, 0);
-      tempBytes = readNBytes(m_input,numRecs);
-      bitmap.append(tempBytes,numRecs);
+      seekToRecord(m_input, tiffSecondContainer, i);
+
+      uint16_t recType = readU16(m_input, m_bigEndian);
+      uint16_t numRecs = readU16(m_input, m_bigEndian);
+      uint32_t offset = readU32(m_input, m_bigEndian);
+
+      if (numRecs > 0)
+      {
+        PMDRecordContainer subContainer(recType, offset, 0, numRecs);
+        seekToRecord(m_input, subContainer, 0);
+        tempBytes = readNBytes(m_input,numRecs);
+        bitmap.append(tempBytes,numRecs);
+      }
     }
   }
-
+  else
+  {
+    seekToRecord(m_input, tiffSecondContainer, 0);
+    tempBytes = readNBytes(m_input,tiffSecondContainer.m_numRecords);
+    bitmap.append(tempBytes,tiffSecondContainer.m_numRecords);
+  }
   boost::shared_ptr<PMDLineSet> newShape(new PMDBitmap(topLeft, botRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, bitmap));
   m_collector->addShapeToPage(pageID, newShape);
 
@@ -632,6 +663,7 @@ void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
       parseTextBox(container, i, pageID);
       break;
     case BITMAP_RECORD:
+    case METAFILE_RECORD:
       parseBitmap(container, i, pageID);
       break;
     default:
