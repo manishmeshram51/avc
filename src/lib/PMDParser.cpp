@@ -692,7 +692,7 @@ void PMDParser::parseColors(const PMDRecordContainer &container)
       green = readU8(m_input);
       blue = readU8(m_input);
     }
-    else if (colorModel == CMYK)
+    else if (colorModel == CMYK || colorModel == HLS) // HLS is also stroed in CMYK format
     {
       uint16_t cyan = readU16(m_input, m_bigEndian);
       uint16_t magenta = readU16(m_input, m_bigEndian);
@@ -701,12 +701,10 @@ void PMDParser::parseColors(const PMDRecordContainer &container)
 
       uint16_t max = (std::numeric_limits<uint16_t>::max)();
 
-      red = 255* std::floor((1 - std::min(1.0, (double)cyan/max + (double)black/max) + 0.5));
-      green = 255*std::floor((1 - std::min(1.0, (double)magenta/max + (double)black/max) + 0.5));
-      blue = 255*std::floor((1 - std::min(1.0, (double)yellow/max + (double)black/max) + 0.5));
+      red = 255*(1 - std::min(1.0, (double)cyan/max + (double)black/max));
+      green = 255*(1 - std::min(1.0, (double)magenta/max + (double)black/max));
+      blue = 255*(1 - std::min(1.0, (double)yellow/max + (double)black/max));
     }
-    else if (colorModel == HLS)
-    { }
 
     m_collector->addColor(PMDColor(i, red, green, blue));
   }
