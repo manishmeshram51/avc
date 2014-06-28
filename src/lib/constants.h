@@ -13,37 +13,37 @@
 #include <stdint.h>
 
 /* PMD record types */
+const uint16_t FONTS_PARENT = 0x0100;
 const uint16_t PAGE = 0x0500;
-const uint16_t GLOBAL_INFO = 0x1800;
-const uint16_t COLORS = 0x1500;
-const uint16_t SHAPE = 0x1900;
+const uint16_t PARA = 0x0b00;
+const uint16_t TIFF = 0x0e00;
 const uint16_t LINE_SET = 0x1100;
-const uint16_t XFORM = 0x2800;
+const uint16_t FONTS = 0x1300;
+const uint16_t COLORS = 0x1500;
+const uint16_t GLOBAL_INFO = 0x1800;
+const uint16_t SHAPE = 0x1900;
 const uint16_t TEXT_BLOCK = 0x1a00;
 const uint16_t CHARS = 0x1c00;
-const uint16_t PARA = 0x0b00;
-const uint16_t FONTS = 0x1300;
-const uint16_t FONTS_PARENT = 0x0100;
-const uint16_t TIFF = 0x0e00;
+const uint16_t XFORM = 0x2800;
 
 /* Color record types */
-const uint8_t RGB = 0x18;
 const uint8_t CMYK = 0x08;
 const uint8_t HLS = 0x10;
+const uint8_t RGB = 0x18;
 
 /* Shape record types */
-const uint8_t POLYGON_RECORD = 0x0C;
+const uint8_t TEXT_RECORD = 0x01;
 const uint8_t LINE_RECORD = 0x03;
 const uint8_t RECTANGLE_RECORD = 0x04;
 const uint8_t ELLIPSE_RECORD = 0x05;
-const uint8_t TEXT_RECORD = 0x01;
 const uint8_t BITMAP_RECORD = 0x06;
 const uint8_t METAFILE_RECORD = 0x0a;
+const uint8_t POLYGON_RECORD = 0x0c;
 
 /* Polygon flags */
 const uint8_t REGULAR_POLYGON = 0x00;
-const uint8_t POLYGON_CLOSED = 0x03;
 const uint8_t POLYGON_OPEN = 0x01;
+const uint8_t POLYGON_CLOSED = 0x03;
 
 /* Various constants */
 const uint16_t ENDIANNESS_MARKER = 0x99FF;
