@@ -77,6 +77,12 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
       double x1 = pmdRotatingPoint.m_x.toInches() + translate.m_x;
       double y1 = pmdRotatingPoint.m_y.toInches() + translate.m_y;
 
+      if (pmdRotation != 0)
+      {
+        x1 += (length*cos(pmdRotation)-breadth*sin(pmdRotation)-length)/2.0;
+        y1 += (length*sin(pmdRotation)+breadth*cos(pmdRotation)-breadth)/2.0;
+      }
+
       double x2 = x1 + length;
       double y2 = y1;
 
