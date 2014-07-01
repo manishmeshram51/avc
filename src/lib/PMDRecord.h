@@ -26,10 +26,11 @@ struct PMDRecordContainer
   uint32_t m_offset;
   unsigned m_seqNum;
   uint16_t m_numRecords;
+  bool m_containsSubRecord;
 
-  PMDRecordContainer(uint16_t recordType, uint32_t offset, unsigned seqNum, uint16_t numRecords)
+  PMDRecordContainer(uint16_t recordType, uint32_t offset, unsigned seqNum, uint16_t numRecords, bool containsSubRecord = false)
     : m_recordType(recordType), m_offset(offset), m_seqNum(seqNum),
-      m_numRecords(numRecords)
+      m_numRecords(numRecords), m_containsSubRecord(containsSubRecord)
   { }
 };
 

@@ -564,8 +564,7 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
     throw RecordNotFoundException(TIFF, bitmapRecordSeqNum);
   }
   const PMDRecordContainer &tiffContainer = *ptrToTiffContainer;
-  PMD_DEBUG_MSG(("HIIII %d",tiffContainer.m_numRecords));
-  if (tiffContainer.m_numRecords <= 100)
+  if (tiffContainer.m_containsSubRecord)
   {
 
     for (unsigned i = 0; i < tiffContainer.m_numRecords; ++i)
@@ -600,7 +599,7 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
   }
   const PMDRecordContainer &tiffSecondContainer = *ptrToTiffSecondContainer;
 
-  if (tiffSecondContainer.m_numRecords <= 100)
+  if (tiffSecondContainer.m_containsSubRecord)
   {
     for (unsigned i = 0; i < tiffSecondContainer.m_numRecords; ++i)
     {
@@ -684,22 +683,25 @@ void PMDParser::parseFonts(const PMDRecordContainer &container)
     uint16_t numRecs = readU16(m_input, m_bigEndian);
     uint16_t offset = readU16(m_input, m_bigEndian);
 
-    PMDRecordContainer subContainer(recType, offset, 0, numRecs);
-
-    for (unsigned k = 0; k < subContainer.m_numRecords; ++k)
+    if (recType == FONTS)
     {
-      std::string fontName;
+      PMDRecordContainer subContainer(recType, offset, 0, numRecs);
 
-      seekToRecord(m_input, subContainer, k);
-      uint8_t temp = readU8(m_input);
-
-      while (temp)
+      for (unsigned k = 0; k < subContainer.m_numRecords; ++k)
       {
-        fontName.push_back(temp);
-        temp = readU8(m_input);
+        std::string fontName;
+
+        seekToRecord(m_input, subContainer, k);
+        uint8_t temp = readU8(m_input);
+
+        while (temp)
+        {
+          fontName.push_back(temp);
+          temp = readU8(m_input);
+        }
+        m_collector->addFont(PMDFont(fontIndex, fontName));
+        fontIndex++;
       }
-      m_collector->addFont(PMDFont(fontIndex, fontName));
-      fontIndex++;
     }
   }
 }
@@ -806,9 +808,12 @@ unsigned PMDParser::readNextRecordFromTableOfContents(unsigned seqNum)
   uint16_t numRecs = readU16(m_input, m_bigEndian);
   uint32_t offset = readU32(m_input, m_bigEndian);
 
-  m_input->seek(8, librevenge::RVNG_SEEK_CUR);
+  skip(m_input, 2);
+  const bool containsSubRecord = readU8(m_input) == 0x01;
 
-  m_recordsInOrder.push_back(PMDRecordContainer(recType, offset, seqNum, numRecs));
+  skip(m_input, 5);
+
+  m_recordsInOrder.push_back(PMDRecordContainer(recType, offset, seqNum, numRecs,containsSubRecord));
   m_records[recType].push_back((unsigned)(m_recordsInOrder.size() - 1));
   return numRecs;
 }
