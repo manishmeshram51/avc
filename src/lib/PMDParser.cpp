@@ -65,6 +65,9 @@ void PMDParser::parseGlobalInfo(const PMDRecordContainer &container)
   bool doubleSided = (leftPageRightBound == 0);
   m_collector->setDoubleSided(doubleSided);
 
+  if (!doubleSided)
+    m_collector->setPageWidth(leftPageRightBound);
+
   m_collector->setPageHeight(pageHeight);
 }
 
@@ -749,7 +752,10 @@ void PMDParser::parsePages(const PMDRecordContainer &container)
 
   skip(m_input, 8);
   uint16_t pageWidth = readU16(m_input, m_bigEndian);
-  m_collector->setPageWidth(pageWidth);
+
+  if (pageWidth)
+    m_collector->setPageWidth(pageWidth);
+
   for (unsigned i = 0; i < container.m_numRecords; ++i)
   {
     seekToRecord(m_input, container, i);

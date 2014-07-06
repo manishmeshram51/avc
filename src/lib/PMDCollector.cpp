@@ -712,13 +712,18 @@ void PMDCollector::fillOutputShapesByPage_TwoSided(PageShapesList_t &pageShapes)
 void PMDCollector::fillOutputShapesByPage_OneSided(PageShapesList_t &pageShapes) const
 {
   pageShapes.reserve(m_pages.size());
+  pageShapes.assign(m_pages.size(), PageShapes_t());
+
+  double centerToEdge_x = m_pageWidth.get().toInches() / 2;
+  double centerToEdge_y = m_pageHeight.get().toInches() / 2;
+  InchPoint translateShapes(centerToEdge_x, centerToEdge_y);
 
   for (unsigned i = 0; i < m_pages.size(); ++i)
   {
     const PMDPage &page = m_pages[i];
     for (unsigned j = 0; j < page.numShapes(); ++j)
     {
-      pageShapes[i].push_back(newOutputShape(page.getShape(j), InchPoint(0, 0)));
+      pageShapes[i].push_back(newOutputShape(page.getShape(j), translateShapes));
     }
   }
 }
