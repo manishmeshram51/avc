@@ -682,9 +682,9 @@ void PMDCollector::fillOutputShapesByPage_TwoSided(PageShapesList_t &pageShapes)
   InchPoint translateForLeftPage(centerToEdge_x * 2, centerToEdge_y);
   InchPoint translateForRightPage(0, centerToEdge_y);
 
-  for (unsigned i = 0, pageNum = 0; i < m_pages.size(); ++i, pageNum += 2)
+  for (unsigned i = 0; i < m_pages.size(); ++i)
   {
-    const bool leftPageExists = (pageNum > 0);
+    const bool leftPageExists = (i > 0);
 
     const PMDPage &page = m_pages[i];
     for (unsigned j = 0; j < page.numShapes(); ++j)
@@ -692,14 +692,15 @@ void PMDCollector::fillOutputShapesByPage_TwoSided(PageShapesList_t &pageShapes)
       boost::shared_ptr<const OutputShape> right = newOutputShape(page.getShape(j), translateForRightPage);
       if (right->getBoundingBox().second.m_x >= 0)
       {
-        pageShapes[pageNum].push_back(right);
+        pageShapes[i].push_back(right);
+        continue;
       }
       if (leftPageExists)
       {
         boost::shared_ptr<const OutputShape> left = newOutputShape(page.getShape(j), translateForLeftPage);
         if (left->getBoundingBox().first.m_x <= centerToEdge_x * 2)
         {
-          pageShapes[pageNum - 1].push_back(left);
+          pageShapes[i - 1].push_back(left);
         }
       }
     }
