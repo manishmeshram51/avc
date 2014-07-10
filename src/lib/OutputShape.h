@@ -39,11 +39,12 @@ class OutputShape
   std::vector<PMDCharProperties> m_charProps;
   std::vector<PMDParaProperties> m_paraProps;
   librevenge::RVNGBinaryData m_bitmap;
+  double m_width,m_height;
 
 public:
   OutputShape(bool isClosed, int shape, double rotation, double skew, uint8_t fillType, uint8_t fillColor, uint8_t fillOverprint, uint8_t fillTint, uint8_t strokeType, uint8_t strokeWidth, uint8_t strokeColor, uint8_t strokeOverprint, uint8_t strokeTint)
     : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
-      m_left(), m_top(), m_right(), m_bot(), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint), m_text(), m_charProps(),  m_paraProps(), m_bitmap()
+      m_left(), m_top(), m_right(), m_bot(), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint), m_text(), m_charProps(),  m_paraProps(), m_bitmap(), m_width(), m_height()
   { }
 
   OutputShape(bool isClosed, int shape, double rotation, double skew, std::string text, std::vector<PMDCharProperties> charProps, std::vector<PMDParaProperties> paraProps)
@@ -51,7 +52,7 @@ public:
       m_left(), m_top(), m_right(), m_bot(),
       m_fillType(0), m_fillColor(0), m_fillOverprint(0), m_fillTint(0),
       m_strokeType(0), m_strokeWidth(0), m_strokeColor(0), m_strokeOverprint(0), m_strokeTint(0),
-      m_text(text), m_charProps(charProps), m_paraProps(paraProps), m_bitmap()
+      m_text(text), m_charProps(charProps), m_paraProps(paraProps), m_bitmap(), m_width(), m_height()
   { }
 
   OutputShape(bool isClosed, int shape, double rotation, double skew, librevenge::RVNGBinaryData bitmap)
@@ -59,7 +60,7 @@ public:
       m_left(), m_top(), m_right(), m_bot(),
       m_fillType(0), m_fillColor(0), m_fillOverprint(0), m_fillTint(0),
       m_strokeType(0), m_strokeWidth(0), m_strokeColor(0), m_strokeOverprint(0), m_strokeTint(0),
-      m_text(), m_charProps(), m_paraProps(), m_bitmap(bitmap)
+      m_text(), m_charProps(), m_paraProps(), m_bitmap(bitmap), m_width(), m_height()
   { }
 
   unsigned numPoints() const
@@ -183,6 +184,22 @@ public:
       if (y > m_bot) m_bot = y;
     }
     m_points.push_back(InchPoint(x, y));
+  }
+
+  void setDimensions(double width, double height)
+  {
+    m_width = width,
+    m_height = height;
+  }
+
+  double getWidth() const
+  {
+    return m_width;
+  }
+
+  double getHeight() const
+  {
+    return m_height;
   }
 };
 

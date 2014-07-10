@@ -162,8 +162,8 @@ void PMDCollector::paintShape(const OutputShape &shape,
 
     textbox.insert("svg:x",shape.getPoint(0).m_x, librevenge::RVNG_INCH);
     textbox.insert("svg:y",shape.getPoint(0).m_y, librevenge::RVNG_INCH);
-    textbox.insert("svg:width",shape.getPoint(1).m_x, librevenge::RVNG_INCH);
-    textbox.insert("svg:height",shape.getPoint(1).m_y, librevenge::RVNG_INCH);
+    textbox.insert("svg:width",shape.getWidth(), librevenge::RVNG_INCH);
+    textbox.insert("svg:height",shape.getHeight(), librevenge::RVNG_INCH);
     //textbox.insert("text:anchor-type", "page");
     //textbox.insert("text:anchor-page-number", 1);
     //textbox.insert("style:vertical-rel", "page");
