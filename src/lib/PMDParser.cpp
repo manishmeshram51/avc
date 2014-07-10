@@ -815,7 +815,7 @@ unsigned PMDParser::readNextRecordFromTableOfContents(unsigned seqNum)
   uint32_t offset = readU32(m_input, m_bigEndian);
 
   skip(m_input, 2);
-  const bool containsSubRecord = readU8(m_input) == 0x01;
+  const bool containsSubRecord = readU8(m_input) != 0x01;
 
   skip(m_input, 5);
 
