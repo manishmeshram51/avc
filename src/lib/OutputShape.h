@@ -25,7 +25,7 @@ class OutputShape
   std::vector<InchPoint> m_points;
   double m_rotation;
   double m_skew;
-  double m_left, m_top, m_right, m_bot;
+  double m_bboxLeft, m_bboxTop, m_bboxRight, m_bboxBot;
   uint8_t m_fillType;
   uint8_t m_fillColor;
   uint8_t m_fillOverprint;
@@ -44,12 +44,12 @@ class OutputShape
 public:
   OutputShape(bool isClosed, int shape, double rotation, double skew, uint8_t fillType, uint8_t fillColor, uint8_t fillOverprint, uint8_t fillTint, uint8_t strokeType, uint8_t strokeWidth, uint8_t strokeColor, uint8_t strokeOverprint, uint8_t strokeTint)
     : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
-      m_left(), m_top(), m_right(), m_bot(), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint), m_text(), m_charProps(),  m_paraProps(), m_bitmap(), m_width(), m_height()
+      m_bboxLeft(), m_bboxTop(), m_bboxRight(), m_bboxBot(), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint), m_text(), m_charProps(),  m_paraProps(), m_bitmap(), m_width(), m_height()
   { }
 
   OutputShape(bool isClosed, int shape, double rotation, double skew, std::string text, std::vector<PMDCharProperties> charProps, std::vector<PMDParaProperties> paraProps)
     : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
-      m_left(), m_top(), m_right(), m_bot(),
+      m_bboxLeft(), m_bboxTop(), m_bboxRight(), m_bboxBot(),
       m_fillType(0), m_fillColor(0), m_fillOverprint(0), m_fillTint(0),
       m_strokeType(0), m_strokeWidth(0), m_strokeColor(0), m_strokeOverprint(0), m_strokeTint(0),
       m_text(text), m_charProps(charProps), m_paraProps(paraProps), m_bitmap(), m_width(), m_height()
@@ -57,7 +57,7 @@ public:
 
   OutputShape(bool isClosed, int shape, double rotation, double skew, librevenge::RVNGBinaryData bitmap)
     : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
-      m_left(), m_top(), m_right(), m_bot(),
+      m_bboxLeft(), m_bboxTop(), m_bboxRight(), m_bboxBot(),
       m_fillType(0), m_fillColor(0), m_fillOverprint(0), m_fillTint(0),
       m_strokeType(0), m_strokeWidth(0), m_strokeColor(0), m_strokeOverprint(0), m_strokeTint(0),
       m_text(), m_charProps(), m_paraProps(), m_bitmap(bitmap), m_width(), m_height()
@@ -164,7 +164,7 @@ public:
     {
       throw EmptyLineSetException();
     }
-    return std::make_pair(InchPoint(m_left, m_top), InchPoint(m_right, m_bot));
+    return std::make_pair(InchPoint(m_bboxLeft, m_bboxTop), InchPoint(m_bboxRight, m_bboxBot));
   }
 
   void addPoint(InchPoint point)
@@ -173,15 +173,15 @@ public:
            y = point.m_y;
     if (m_points.empty())
     {
-      m_left = m_right = x;
-      m_top = m_bot = y;
+      m_bboxLeft = m_bboxRight = x;
+      m_bboxTop = m_bboxBot = y;
     }
     else
     {
-      if (x < m_left) m_left = x;
-      if (y < m_top) m_top = y;
-      if (x > m_right) m_right = x;
-      if (y > m_bot) m_bot = y;
+      if (x < m_bboxLeft) m_bboxLeft = x;
+      if (y < m_bboxTop) m_bboxTop = y;
+      if (x > m_bboxRight) m_bboxRight = x;
+      if (y > m_bboxBot) m_bboxBot = y;
     }
     m_points.push_back(InchPoint(x, y));
   }

@@ -73,8 +73,8 @@ public:
   virtual PMDShapePoint getXformTopLeft() const = 0;
   virtual PMDShapePoint getXformBotRight() const = 0;
   virtual uint8_t shapeType() const = 0;
-  virtual PMDShapePoint getTopLeft() const = 0;
-  virtual PMDShapePoint getBotRight() const = 0;
+  virtual PMDShapePoint getBboxTopLeft() const = 0;
+  virtual PMDShapePoint getBboxBotRight() const = 0;
   virtual uint8_t getFillType() const = 0;
   virtual uint8_t getFillColor() const = 0;
   virtual uint8_t getFillOverprint() const = 0;
@@ -97,8 +97,8 @@ public:
 
 class PMDLine : public PMDLineSet
 {
-  PMDShapePoint m_topLeft;
-  PMDShapePoint m_botRight;
+  PMDShapePoint m_bboxTopLeft;
+  PMDShapePoint m_bboxBotRight;
   bool m_mirrored;
   uint8_t m_strokeType;
   uint8_t m_strokeWidth;
@@ -107,8 +107,8 @@ class PMDLine : public PMDLineSet
   uint8_t m_strokeTint;
 
 public:
-  PMDLine(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const bool mirrored, const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
-    : m_topLeft(topLeft), m_botRight(botRight), m_mirrored(mirrored), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
+  PMDLine(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const bool mirrored, const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_mirrored(mirrored), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
   { }
 
   virtual double getRotation() const
@@ -141,14 +141,14 @@ public:
     return false;
   }
 
-  virtual PMDShapePoint getTopLeft() const
+  virtual PMDShapePoint getBboxTopLeft() const
   {
-    return m_topLeft;
+    return m_bboxTopLeft;
   }
 
-  virtual PMDShapePoint getBotRight() const
+  virtual PMDShapePoint getBboxBotRight() const
   {
-    return m_botRight;
+    return m_bboxBotRight;
   }
 
   virtual std::vector<PMDShapePoint> getPoints() const
@@ -157,13 +157,13 @@ public:
 
     if (m_mirrored)
     {
-      points.push_back(PMDShapePoint(m_botRight.m_x,m_topLeft.m_y));
-      points.push_back(PMDShapePoint(m_topLeft.m_x,m_botRight.m_y));
+      points.push_back(PMDShapePoint(m_bboxBotRight.m_x,m_bboxTopLeft.m_y));
+      points.push_back(PMDShapePoint(m_bboxTopLeft.m_x,m_bboxBotRight.m_y));
     }
     else
     {
-      points.push_back(m_topLeft);
-      points.push_back(m_botRight);
+      points.push_back(m_bboxTopLeft);
+      points.push_back(m_bboxBotRight);
     }
     return points;
   }
@@ -255,8 +255,8 @@ class PMDPolygon : public PMDLineSet
   bool m_isClosed;
   double m_rotation;
   double m_skew;
-  PMDShapePoint m_topLeft;
-  PMDShapePoint m_botRight;
+  PMDShapePoint m_bboxTopLeft;
+  PMDShapePoint m_bboxBotRight;
   PMDShapePoint m_xformTopLeft;
   PMDShapePoint m_xformBotRight;
   uint8_t m_fillType;
@@ -270,8 +270,8 @@ class PMDPolygon : public PMDLineSet
   uint8_t m_strokeTint;
 
 public:
-  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const double rotation, const double skew, const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const uint8_t fillType, const uint8_t fillColor, const uint8_t fillOverprint, const uint8_t fillTint, const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
-    : m_points(points), m_isClosed(isClosed), m_rotation(rotation), m_skew(skew), m_topLeft(topLeft), m_botRight(botRight), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
+  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const double rotation, const double skew, const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const uint8_t fillType, const uint8_t fillColor, const uint8_t fillOverprint, const uint8_t fillTint, const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
+    : m_points(points), m_isClosed(isClosed), m_rotation(rotation), m_skew(skew), m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
   { }
 
   virtual double getRotation() const
@@ -299,14 +299,14 @@ public:
     return PMDShapePoint(0,0);
   }
 
-  virtual PMDShapePoint getTopLeft() const
+  virtual PMDShapePoint getBboxTopLeft() const
   {
-    return m_topLeft;
+    return m_bboxTopLeft;
   }
 
-  virtual PMDShapePoint getBotRight() const
+  virtual PMDShapePoint getBboxBotRight() const
   {
-    return m_botRight;
+    return m_bboxBotRight;
   }
 
   virtual bool getIsClosed() const
@@ -401,8 +401,8 @@ public:
 
 class PMDTextBox : public PMDLineSet
 {
-  PMDShapePoint m_topLeft;
-  PMDShapePoint m_botRight;
+  PMDShapePoint m_bboxTopLeft;
+  PMDShapePoint m_bboxBotRight;
   double m_rotation;
   double m_skew;
   PMDShapePoint m_rotatingPoint;
@@ -413,8 +413,8 @@ class PMDTextBox : public PMDLineSet
   std::vector<PMDParaProperties> m_paraProps;
 
 public:
-  PMDTextBox(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const std::string text, const std::vector<PMDCharProperties> charProps, const std::vector<PMDParaProperties> paraProps)
-    : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_text(text), m_charProps(charProps), m_paraProps(paraProps)
+  PMDTextBox(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const std::string text, const std::vector<PMDCharProperties> charProps, const std::vector<PMDParaProperties> paraProps)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_text(text), m_charProps(charProps), m_paraProps(paraProps)
   { }
 
   virtual double getRotation() const
@@ -442,14 +442,14 @@ public:
     return m_rotatingPoint;
   }
 
-  virtual PMDShapePoint getTopLeft() const
+  virtual PMDShapePoint getBboxTopLeft() const
   {
-    return m_topLeft;
+    return m_bboxTopLeft;
   }
 
-  virtual PMDShapePoint getBotRight() const
+  virtual PMDShapePoint getBboxBotRight() const
   {
-    return m_botRight;
+    return m_bboxBotRight;
   }
 
   virtual bool getIsClosed() const
@@ -461,7 +461,7 @@ public:
   {
     std::vector<PMDShapePoint> points;
 
-    points.push_back(m_topLeft);
+    points.push_back(m_bboxTopLeft);
 
     return points;
   }
@@ -544,8 +544,8 @@ public:
 
 class PMDRectangle : public PMDLineSet
 {
-  PMDShapePoint m_topLeft;
-  PMDShapePoint m_botRight;
+  PMDShapePoint m_bboxTopLeft;
+  PMDShapePoint m_bboxBotRight;
   double m_rotation;
   double m_skew;
   PMDShapePoint m_rotatingPoint;
@@ -562,8 +562,8 @@ class PMDRectangle : public PMDLineSet
   uint8_t m_strokeTint;
 
 public:
-  PMDRectangle(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const uint8_t fillType, const uint8_t fillColor, const uint8_t fillOverprint, const uint8_t fillTint,  const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
-    : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
+  PMDRectangle(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const uint8_t fillType, const uint8_t fillColor, const uint8_t fillOverprint, const uint8_t fillTint,  const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
   { }
 
   virtual double getRotation() const
@@ -591,14 +591,14 @@ public:
     return m_rotatingPoint;
   }
 
-  virtual PMDShapePoint getTopLeft() const
+  virtual PMDShapePoint getBboxTopLeft() const
   {
-    return m_topLeft;
+    return m_bboxTopLeft;
   }
 
-  virtual PMDShapePoint getBotRight() const
+  virtual PMDShapePoint getBboxBotRight() const
   {
-    return m_botRight;
+    return m_bboxBotRight;
   }
 
   virtual bool getIsClosed() const
@@ -610,10 +610,10 @@ public:
   {
     std::vector<PMDShapePoint> points;
 
-    points.push_back(m_topLeft);
-    points.push_back(PMDShapePoint(m_botRight.m_x, m_topLeft.m_y));
-    points.push_back(m_botRight);
-    points.push_back(PMDShapePoint(m_topLeft.m_x, m_botRight.m_y));
+    points.push_back(m_bboxTopLeft);
+    points.push_back(PMDShapePoint(m_bboxBotRight.m_x, m_bboxTopLeft.m_y));
+    points.push_back(m_bboxBotRight);
+    points.push_back(PMDShapePoint(m_bboxTopLeft.m_x, m_bboxBotRight.m_y));
 
     return points;
   }
@@ -760,12 +760,12 @@ public:
     return points;
   }
 
-  virtual PMDShapePoint getTopLeft() const
+  virtual PMDShapePoint getBboxTopLeft() const
   {
     return m_bboxTopLeft;
   }
 
-  virtual PMDShapePoint getBotRight() const
+  virtual PMDShapePoint getBboxBotRight() const
   {
     return m_bboxBotRight;
   }
@@ -852,8 +852,8 @@ public:
 
 class PMDBitmap : public PMDLineSet
 {
-  PMDShapePoint m_topLeft;
-  PMDShapePoint m_botRight;
+  PMDShapePoint m_bboxTopLeft;
+  PMDShapePoint m_bboxBotRight;
   double m_rotation;
   double m_skew;
   PMDShapePoint m_rotatingPoint;
@@ -862,8 +862,8 @@ class PMDBitmap : public PMDLineSet
   librevenge::RVNGBinaryData m_bitmap;
 
 public:
-  PMDBitmap(const PMDShapePoint &topLeft, const PMDShapePoint &botRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const librevenge::RVNGBinaryData &bitmap)
-    : m_topLeft(topLeft), m_botRight(botRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight),m_bitmap(bitmap)
+  PMDBitmap(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const librevenge::RVNGBinaryData &bitmap)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight),m_bitmap(bitmap)
   { }
 
   virtual double getRotation() const
@@ -891,14 +891,14 @@ public:
     return m_rotatingPoint;
   }
 
-  virtual PMDShapePoint getTopLeft() const
+  virtual PMDShapePoint getBboxTopLeft() const
   {
-    return m_topLeft;
+    return m_bboxTopLeft;
   }
 
-  virtual PMDShapePoint getBotRight() const
+  virtual PMDShapePoint getBboxBotRight() const
   {
-    return m_botRight;
+    return m_bboxBotRight;
   }
 
   virtual bool getIsClosed() const
@@ -910,10 +910,10 @@ public:
   {
     std::vector<PMDShapePoint> points;
 
-    points.push_back(m_topLeft);
-    points.push_back(PMDShapePoint(m_botRight.m_x, m_topLeft.m_y));
-    points.push_back(m_botRight);
-    points.push_back(PMDShapePoint(m_topLeft.m_x, m_botRight.m_y));
+    points.push_back(m_bboxTopLeft);
+    points.push_back(PMDShapePoint(m_bboxBotRight.m_x, m_bboxTopLeft.m_y));
+    points.push_back(m_bboxBotRight);
+    points.push_back(PMDShapePoint(m_bboxTopLeft.m_x, m_bboxBotRight.m_y));
 
     return points;
   }
@@ -1002,8 +1002,8 @@ class TransformationMatrix
   double m_tl, m_tr, m_bl, m_br;
 
 public:
-  TransformationMatrix(double topLeft, double topRight, double bottomLeft, double bottomRight)
-    : m_tl(topLeft), m_tr(topRight), m_bl(bottomLeft), m_br(bottomRight)
+  TransformationMatrix(double bboxTopLeft, double topRight, double bottomLeft, double bottomRight)
+    : m_tl(bboxTopLeft), m_tr(topRight), m_bl(bottomLeft), m_br(bottomRight)
   { }
 
   template <typename Unit> InchPoint transform(const Point<Unit> &point) const

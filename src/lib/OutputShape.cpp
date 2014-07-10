@@ -20,14 +20,14 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
     boost::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(
       new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeType(), ptrToLineSet->getRotation(), ptrToLineSet->getSkew(), ptrToLineSet->getText(), ptrToLineSet->getCharProperties(), ptrToLineSet->getParaProperties()));
 
-    PMDShapePoint topLeft = ptrToLineSet->getTopLeft();
-    double x = topLeft.m_x.toInches() + translate.m_x;
-    double y = topLeft.m_y.toInches() + translate.m_y;
+    PMDShapePoint bboxTopLeft = ptrToLineSet->getBboxTopLeft();
+    double x = bboxTopLeft.m_x.toInches() + translate.m_x;
+    double y = bboxTopLeft.m_y.toInches() + translate.m_y;
     ptrToOutputShape->addPoint(InchPoint(x, y));
 
-    PMDShapePoint botRight = ptrToLineSet->getBotRight();
-    x = botRight.m_x.toInches() + translate.m_x;
-    y = botRight.m_y.toInches() + translate.m_y;
+    PMDShapePoint bboxBotRight = ptrToLineSet->getBboxBotRight();
+    x = bboxBotRight.m_x.toInches() + translate.m_x;
+    y = bboxBotRight.m_y.toInches() + translate.m_y;
     ptrToOutputShape->addPoint(InchPoint(x, y));
 
     double pmdRotation = ptrToLineSet->getRotation();
@@ -35,8 +35,8 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
 
     if (pmdRotation == 0 && pmdSkew == 0)
     {
-      double width = fabs(botRight.m_x.toInches() - topLeft.m_x.toInches());
-      double height = fabs(botRight.m_y.toInches() - topLeft.m_y.toInches());
+      double width = fabs(bboxBotRight.m_x.toInches() - bboxTopLeft.m_x.toInches());
+      double height = fabs(bboxBotRight.m_y.toInches() - bboxTopLeft.m_y.toInches());
       ptrToOutputShape->setDimensions(width, height);
     }
     else
@@ -160,11 +160,11 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
         }
         else
         {
-          PMDShapePoint topLeft = ptrToLineSet->getTopLeft();
-          PMDShapePoint botRight = ptrToLineSet->getBotRight();
+          PMDShapePoint bboxTopLeft = ptrToLineSet->getBboxTopLeft();
+          PMDShapePoint bboxBotRight = ptrToLineSet->getBboxBotRight();
 
-          double tx = (botRight.m_x.toInches() + topLeft.m_x.toInches())/2 + translate.m_x;
-          double ty = (botRight.m_y.toInches() + topLeft.m_y.toInches())/2 + translate.m_y;
+          double tx = (bboxBotRight.m_x.toInches() + bboxTopLeft.m_x.toInches())/2 + translate.m_x;
+          double ty = (bboxBotRight.m_y.toInches() + bboxTopLeft.m_y.toInches())/2 + translate.m_y;
 
           for (unsigned i = 0; i < pmdPoints.size(); ++i)
           {

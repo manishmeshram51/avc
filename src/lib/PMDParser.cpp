@@ -78,8 +78,8 @@ void PMDParser::parseLine(const PMDRecordContainer &container, unsigned recordIn
   skip(m_input, 4);
   uint8_t strokeColor = readU8(m_input);
   skip(m_input, 1);
-  PMDShapePoint topLeft = readPoint(m_input, m_bigEndian);
-  PMDShapePoint botRight = readPoint(m_input, m_bigEndian);
+  PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
+  PMDShapePoint bboxBotRight = readPoint(m_input, m_bigEndian);
   bool mirrored = false;
   skip(m_input, 0x18);
   uint16_t temp = readU16(m_input, m_bigEndian);
@@ -96,7 +96,7 @@ void PMDParser::parseLine(const PMDRecordContainer &container, unsigned recordIn
   skip(m_input, 6);
   uint8_t strokeOverprint = readU8(m_input);
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDLine(topLeft, botRight, mirrored, strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDLine(bboxTopLeft, bboxBotRight, mirrored, strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -106,8 +106,8 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
   seekToRecord(m_input, container, recordIndex);
 
   skip(m_input, 6);
-  PMDShapePoint topLeft = readPoint(m_input, m_bigEndian);
-  PMDShapePoint botRight = readPoint(m_input, m_bigEndian);
+  PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
+  PMDShapePoint bboxBotRight = readPoint(m_input, m_bigEndian);
   uint32_t textBoxRotationDegree = 0;
   uint32_t textBoxSkewDegree = 0;
   PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
@@ -262,7 +262,7 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
   }
 
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDTextBox(topLeft, botRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, text, charProps, paraProps));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDTextBox(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, text, charProps, paraProps));
   m_collector->addShapeToPage(pageID, newShape);
 
 }
@@ -277,8 +277,8 @@ void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned rec
   skip(m_input, 1);
   uint8_t fillColor = readU8(m_input);
   skip(m_input, 1);
-  PMDShapePoint topLeft = readPoint(m_input, m_bigEndian);
-  PMDShapePoint botRight = readPoint(m_input, m_bigEndian);
+  PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
+  PMDShapePoint bboxBotRight = readPoint(m_input, m_bigEndian);
   uint32_t rectRotationDegree = 0;
   uint32_t rectSkewDegree = 0;
   PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
@@ -332,7 +332,7 @@ void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned rec
   double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
   temp = (int32_t)rectSkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
-  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(topLeft, botRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, fillType, fillColor, fillOverprint, fillTint,  strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, fillType, fillColor, fillOverprint, fillTint,  strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -347,8 +347,8 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
   uint8_t fillColor = readU8(m_input);
 
   skip(m_input, 5);
-  PMDShapePoint topLeft = readPoint(m_input, m_bigEndian);
-  PMDShapePoint botRight = readPoint(m_input, m_bigEndian);
+  PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
+  PMDShapePoint bboxBotRight = readPoint(m_input, m_bigEndian);
 
   skip(m_input, 14);
   uint32_t polyXformId = readU32(m_input, m_bigEndian);
@@ -439,7 +439,7 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
   temp = (int32_t)polySkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, rotationRadian, skewRadian, topLeft, botRight, xformTopLeft, xformBotRight, fillType, fillColor, fillOverprint, fillTint, strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, rotationRadian, skewRadian, bboxTopLeft, bboxBotRight, xformTopLeft, xformBotRight, fillType, fillColor, fillOverprint, fillTint, strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -518,8 +518,8 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
   seekToRecord(m_input, container, recordIndex);
 
   skip(m_input, 6);
-  PMDShapePoint topLeft = readPoint(m_input, m_bigEndian);
-  PMDShapePoint botRight = readPoint(m_input, m_bigEndian);
+  PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
+  PMDShapePoint bboxBotRight = readPoint(m_input, m_bigEndian);
   uint32_t bboxRotationDegree = 0;
   uint32_t bboxSkewDegree = 0;
   PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
@@ -627,7 +627,7 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
     const unsigned char *const tempBytes = readNBytes(m_input,tiffSecondContainer.m_numRecords);
     bitmap.append(tempBytes,tiffSecondContainer.m_numRecords);
   }
-  boost::shared_ptr<PMDLineSet> newShape(new PMDBitmap(topLeft, botRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, bitmap));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDBitmap(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, bitmap));
   m_collector->addShapeToPage(pageID, newShape);
 
 }
