@@ -346,7 +346,7 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
   skip(m_input, 1);
   uint8_t fillColor = readU8(m_input);
 
-  skip(m_input, 5);
+  skip(m_input, 1);
   PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
   PMDShapePoint bboxBotRight = readPoint(m_input, m_bigEndian);
 
