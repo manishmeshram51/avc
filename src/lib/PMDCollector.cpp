@@ -78,10 +78,8 @@ void PMDCollector::paintShape(const OutputShape &shape,
     }
     librevenge::RVNGPropertyList points;
     points.insert("svg:points", vertices);
-    uint8_t fillType = shape.getFillType();
-    uint8_t fillColor = shape.getFillColor();
-    //uint8_t fillOverprint = shape.getFillOverprint();
-    uint8_t fillTint = shape.getFillTint();
+
+    PMDFillProperties fillProps = shape.getFillProperties();
 
     uint8_t strokeType = shape.getStrokeType();
     double strokeWidth = shape.getStrokeWidth();
@@ -90,7 +88,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
     //uint8_t strokeOverprint = shape.getStrokeOverprint();
     uint8_t strokeTint = shape.getStrokeTint();
 
-    switch (fillType)
+    switch (fillProps.m_fillType)
     {
     case FILL_SOLID:
       points.insert("draw:fill", "solid");
@@ -102,9 +100,9 @@ void PMDCollector::paintShape(const OutputShape &shape,
       points.insert("draw:fill", "none");
     }
 
-    if (fillColor < m_color.size())
+    if (fillProps.m_fillColor < m_color.size())
     {
-      PMDColor tempFillColor = m_color[fillColor];
+      PMDColor tempFillColor = m_color[fillProps.m_fillColor];
       librevenge::RVNGString tempFillColorString;
       tempFillColorString.sprintf("#%.2x%.2x%.2x", tempFillColor.m_red,tempFillColor.m_green,tempFillColor.m_blue);
       points.insert("draw:fill-color", tempFillColorString);
@@ -114,10 +112,10 @@ void PMDCollector::paintShape(const OutputShape &shape,
       PMD_DEBUG_MSG(("Fill Color Not Available"));
     }
 
-    if (fillColor == 0)
+    if (fillProps.m_fillColor == 0)
       points.insert("draw:opacity", 0);
     else
-      points.insert("draw:opacity", fillTint);
+      points.insert("draw:opacity", fillProps.m_fillTint);
 
     switch (strokeType)
     {
@@ -574,10 +572,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
 
       propList.insert("svg:d",vec);
 
-      uint8_t fillType = shape.getFillType();
-      uint8_t fillColor = shape.getFillColor();
-      //uint8_t fillOverprint = shape.getFillOverprint();
-      uint8_t fillTint = shape.getFillTint();
+      PMDFillProperties fillProps = shape.getFillProperties();
 
       uint8_t strokeType = shape.getStrokeType();
       double strokeWidth = shape.getStrokeWidth();
@@ -586,7 +581,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
       //uint8_t strokeOverprint = shape.getStrokeOverprint();
       uint8_t strokeTint = shape.getStrokeTint();
 
-      switch (fillType)
+      switch (fillProps.m_fillType)
       {
       case FILL_SOLID:
         propList.insert("draw:fill", "solid");
@@ -598,9 +593,9 @@ void PMDCollector::paintShape(const OutputShape &shape,
         propList.insert("draw:fill", "none");
       }
 
-      if (fillColor < m_color.size())
+      if (fillProps.m_fillColor < m_color.size())
       {
-        PMDColor tempFillColor = m_color[fillColor];
+        PMDColor tempFillColor = m_color[fillProps.m_fillColor];
         librevenge::RVNGString tempFillColorString;
         tempFillColorString.sprintf("#%.2x%.2x%.2x", tempFillColor.m_red,tempFillColor.m_green,tempFillColor.m_blue);
         propList.insert("draw:fill-color", tempFillColorString);
@@ -610,10 +605,10 @@ void PMDCollector::paintShape(const OutputShape &shape,
         PMD_DEBUG_MSG(("Fill Color Not Available"));
       }
 
-      if (fillColor == 0)
+      if (fillProps.m_fillColor == 0)
         propList.insert("draw:opacity", 0);
       else
-        propList.insert("draw:opacity", fillTint);
+        propList.insert("draw:opacity", fillProps.m_fillTint);
 
       switch (strokeType)
       {

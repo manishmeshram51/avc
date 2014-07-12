@@ -26,10 +26,7 @@ class OutputShape
   double m_rotation;
   double m_skew;
   double m_bboxLeft, m_bboxTop, m_bboxRight, m_bboxBot;
-  uint8_t m_fillType;
-  uint8_t m_fillColor;
-  uint8_t m_fillOverprint;
-  uint8_t m_fillTint;
+  PMDFillProperties m_fillProps;
   uint8_t m_strokeType;
   uint8_t m_strokeWidth;
   uint8_t m_strokeColor;
@@ -42,15 +39,15 @@ class OutputShape
   double m_width,m_height;
 
 public:
-  OutputShape(bool isClosed, int shape, double rotation, double skew, uint8_t fillType, uint8_t fillColor, uint8_t fillOverprint, uint8_t fillTint, uint8_t strokeType, uint8_t strokeWidth, uint8_t strokeColor, uint8_t strokeOverprint, uint8_t strokeTint)
+  OutputShape(bool isClosed, int shape, double rotation, double skew, const PMDFillProperties &fillProps, uint8_t strokeType, uint8_t strokeWidth, uint8_t strokeColor, uint8_t strokeOverprint, uint8_t strokeTint)
     : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
-      m_bboxLeft(), m_bboxTop(), m_bboxRight(), m_bboxBot(), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint), m_text(), m_charProps(),  m_paraProps(), m_bitmap(), m_width(), m_height()
+      m_bboxLeft(), m_bboxTop(), m_bboxRight(), m_bboxBot(), m_fillProps(fillProps), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint), m_text(), m_charProps(),  m_paraProps(), m_bitmap(), m_width(), m_height()
   { }
 
   OutputShape(bool isClosed, int shape, double rotation, double skew, std::string text, std::vector<PMDCharProperties> charProps, std::vector<PMDParaProperties> paraProps)
     : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
       m_bboxLeft(), m_bboxTop(), m_bboxRight(), m_bboxBot(),
-      m_fillType(0), m_fillColor(0), m_fillOverprint(0), m_fillTint(0),
+      m_fillProps(PMDFillProperties(0,0,0,0)),
       m_strokeType(0), m_strokeWidth(0), m_strokeColor(0), m_strokeOverprint(0), m_strokeTint(0),
       m_text(text), m_charProps(charProps), m_paraProps(paraProps), m_bitmap(), m_width(), m_height()
   { }
@@ -58,7 +55,7 @@ public:
   OutputShape(bool isClosed, int shape, double rotation, double skew, librevenge::RVNGBinaryData bitmap)
     : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
       m_bboxLeft(), m_bboxTop(), m_bboxRight(), m_bboxBot(),
-      m_fillType(0), m_fillColor(0), m_fillOverprint(0), m_fillTint(0),
+      m_fillProps(PMDFillProperties(0,0,0,0)),
       m_strokeType(0), m_strokeWidth(0), m_strokeColor(0), m_strokeOverprint(0), m_strokeTint(0),
       m_text(), m_charProps(), m_paraProps(), m_bitmap(bitmap), m_width(), m_height()
   { }
@@ -83,24 +80,9 @@ public:
     return m_shapeType;
   }
 
-  uint8_t getFillType() const
+  const PMDFillProperties &getFillProperties() const
   {
-    return m_fillType;
-  }
-
-  uint8_t getFillColor() const
-  {
-    return m_fillColor;
-  }
-
-  uint8_t getFillOverprint() const
-  {
-    return m_fillOverprint;
-  }
-
-  uint8_t getFillTint() const
-  {
-    return m_fillTint;
+    return m_fillProps;
   }
 
   uint8_t getStrokeType() const

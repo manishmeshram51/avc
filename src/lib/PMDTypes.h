@@ -37,6 +37,18 @@ public:
   { }
 };
 
+struct PMDFillProperties
+{
+  uint8_t m_fillType;
+  uint8_t m_fillColor;
+  uint8_t m_fillOverprint;
+  uint8_t m_fillTint;
+
+  PMDFillProperties(const uint8_t fillType,const uint8_t fillColor,const uint8_t fillOverprint,const uint8_t fillTint)
+    : m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint)
+  { }
+};
+
 }
 
 #endif // __PMDTYPES_H__

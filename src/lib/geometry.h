@@ -14,6 +14,7 @@
 #include "Units.h"
 #include "constants.h"
 #include <librevenge/librevenge.h>
+#include <PMDTypes.h>
 
 namespace libpagemaker
 {
@@ -75,10 +76,7 @@ public:
   virtual uint8_t shapeType() const = 0;
   virtual PMDShapePoint getBboxTopLeft() const = 0;
   virtual PMDShapePoint getBboxBotRight() const = 0;
-  virtual uint8_t getFillType() const = 0;
-  virtual uint8_t getFillColor() const = 0;
-  virtual uint8_t getFillOverprint() const = 0;
-  virtual uint8_t getFillTint() const = 0;
+  virtual PMDFillProperties getFillProperties() const = 0;
   virtual uint8_t getStrokeType() const = 0;
   virtual uint8_t getStrokeWidth() const = 0;
   virtual uint8_t getStrokeColor() const = 0;
@@ -173,24 +171,9 @@ public:
     return SHAPE_TYPE_LINE;
   }
 
-  virtual uint8_t getFillType() const
+  virtual PMDFillProperties getFillProperties() const
   {
-    return FILL_SOLID;
-  }
-
-  virtual uint8_t getFillColor() const
-  {
-    return 0;
-  }
-
-  virtual uint8_t getFillOverprint() const
-  {
-    return 0;
-  }
-
-  virtual uint8_t getFillTint() const
-  {
-    return 0;
+    return PMDFillProperties(FILL_SOLID,0,0,0);
   }
 
   virtual uint8_t getStrokeType() const
@@ -259,10 +242,7 @@ class PMDPolygon : public PMDLineSet
   PMDShapePoint m_bboxBotRight;
   PMDShapePoint m_xformTopLeft;
   PMDShapePoint m_xformBotRight;
-  uint8_t m_fillType;
-  uint8_t m_fillColor;
-  uint8_t m_fillOverprint;
-  uint8_t m_fillTint;
+  PMDFillProperties m_fillProps;
   uint8_t m_strokeType;
   uint8_t m_strokeWidth;
   uint8_t m_strokeColor;
@@ -270,8 +250,8 @@ class PMDPolygon : public PMDLineSet
   uint8_t m_strokeTint;
 
 public:
-  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const double rotation, const double skew, const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const uint8_t fillType, const uint8_t fillColor, const uint8_t fillOverprint, const uint8_t fillTint, const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
-    : m_points(points), m_isClosed(isClosed), m_rotation(rotation), m_skew(skew), m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
+  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const double rotation, const double skew, const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const PMDFillProperties fillProps, const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
+    : m_points(points), m_isClosed(isClosed), m_rotation(rotation), m_skew(skew), m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillProps(fillProps), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
   { }
 
   virtual double getRotation() const
@@ -324,24 +304,9 @@ public:
     return SHAPE_TYPE_POLY;
   }
 
-  virtual uint8_t getFillType() const
+  virtual PMDFillProperties getFillProperties() const
   {
-    return m_fillType;
-  }
-
-  virtual uint8_t getFillColor() const
-  {
-    return m_fillColor;
-  }
-
-  virtual uint8_t getFillOverprint() const
-  {
-    return m_fillOverprint;
-  }
-
-  virtual uint8_t getFillTint() const
-  {
-    return m_fillTint;
+    return m_fillProps;
   }
 
   virtual uint8_t getStrokeType() const
@@ -471,24 +436,9 @@ public:
     return SHAPE_TYPE_TEXTBOX;
   }
 
-  virtual uint8_t getFillType() const
+  virtual PMDFillProperties getFillProperties() const
   {
-    return 0;
-  }
-
-  virtual uint8_t getFillColor() const
-  {
-    return 0;
-  }
-
-  virtual uint8_t getFillOverprint() const
-  {
-    return 0;
-  }
-
-  virtual uint8_t getFillTint() const
-  {
-    return 0;
+    return PMDFillProperties(0,0,0,0);
   }
 
   virtual uint8_t getStrokeType() const
@@ -551,10 +501,7 @@ class PMDRectangle : public PMDLineSet
   PMDShapePoint m_rotatingPoint;
   PMDShapePoint m_xformTopLeft;
   PMDShapePoint m_xformBotRight;
-  uint8_t m_fillType;
-  uint8_t m_fillColor;
-  uint8_t m_fillOverprint;
-  uint8_t m_fillTint;
+  PMDFillProperties m_fillProps;
   uint8_t m_strokeType;
   uint8_t m_strokeWidth;
   uint8_t m_strokeColor;
@@ -562,8 +509,8 @@ class PMDRectangle : public PMDLineSet
   uint8_t m_strokeTint;
 
 public:
-  PMDRectangle(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const uint8_t fillType, const uint8_t fillColor, const uint8_t fillOverprint, const uint8_t fillTint,  const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
-    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
+  PMDRectangle(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const PMDFillProperties fillProps, const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillProps(fillProps), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
   { }
 
   virtual double getRotation() const
@@ -623,24 +570,9 @@ public:
     return SHAPE_TYPE_RECT;
   }
 
-  virtual uint8_t getFillType() const
+  virtual PMDFillProperties getFillProperties() const
   {
-    return m_fillType;
-  }
-
-  virtual uint8_t getFillColor() const
-  {
-    return m_fillColor;
-  }
-
-  virtual uint8_t getFillOverprint() const
-  {
-    return m_fillOverprint;
-  }
-
-  virtual uint8_t getFillTint() const
-  {
-    return m_fillTint;
+    return m_fillProps;
   }
 
   virtual uint8_t getStrokeType() const
@@ -706,10 +638,7 @@ class PMDEllipse : public PMDLineSet
   double m_skew;
   PMDShapePoint m_xformTopLeft;
   PMDShapePoint m_xformBotRight;
-  uint8_t m_fillType;
-  uint8_t m_fillColor;
-  uint8_t m_fillOverprint;
-  uint8_t m_fillTint;
+  PMDFillProperties m_fillProps;
   uint8_t m_strokeType;
   uint8_t m_strokeWidth;
   uint8_t m_strokeColor;
@@ -717,8 +646,8 @@ class PMDEllipse : public PMDLineSet
   uint8_t m_strokeTint;
 
 public:
-  PMDEllipse(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const uint8_t fillType, const uint8_t fillColor, const uint8_t fillOverprint, const uint8_t fillTint,  const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
-    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillType(fillType), m_fillColor(fillColor), m_fillOverprint(fillOverprint), m_fillTint(fillTint), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
+  PMDEllipse(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const PMDFillProperties fillProps, const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillProps(fillProps), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
   { }
 
   virtual double getRotation() const
@@ -775,24 +704,9 @@ public:
     return SHAPE_TYPE_ELLIPSE;
   }
 
-  virtual uint8_t getFillType() const
+  virtual PMDFillProperties getFillProperties() const
   {
-    return m_fillType;
-  }
-
-  virtual uint8_t getFillColor() const
-  {
-    return m_fillColor;
-  }
-
-  virtual uint8_t getFillOverprint() const
-  {
-    return m_fillOverprint;
-  }
-
-  virtual uint8_t getFillTint() const
-  {
-    return m_fillTint;
+    return m_fillProps;
   }
 
   virtual uint8_t getStrokeType() const
@@ -923,24 +837,9 @@ public:
     return SHAPE_TYPE_BITMAP;
   }
 
-  virtual uint8_t getFillType() const
+  virtual PMDFillProperties getFillProperties() const
   {
-    return 0;
-  }
-
-  virtual uint8_t getFillColor() const
-  {
-    return 0;
-  }
-
-  virtual uint8_t getFillOverprint() const
-  {
-    return 0;
-  }
-
-  virtual uint8_t getFillTint() const
-  {
-    return 0;
+    return PMDFillProperties(0,0,0,0);
   }
 
   virtual uint8_t getStrokeType() const
