@@ -123,7 +123,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
       points.insert("draw:stroke", "solid");
     }
 
-    points.insert("svg:stroke-width", strokeProps.m_strokeWidth);
+    points.insert("svg:stroke-width", (double)strokeProps.m_strokeWidth/5.0,librevenge::RVNG_POINT);
 
     if (strokeProps.m_strokeColor < m_color.size())
     {
@@ -137,7 +137,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
       PMD_DEBUG_MSG(("Stroke Color Not Available"));
     }
 
-    points.insert("svg:stroke-opacity", strokeProps.m_strokeTint);
+    points.insert("svg:stroke-opacity", (double)strokeProps.m_strokeTint/100.0,librevenge::RVNG_PERCENT);
 
     if (shape.getIsClosed())
     {
@@ -610,7 +610,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
         propList.insert("draw:stroke", "solid");
       }
 
-      propList.insert("svg:stroke-width", strokeProps.m_strokeWidth);
+      propList.insert("svg:stroke-width", (double)strokeProps.m_strokeWidth/5.0,librevenge::RVNG_POINT);
 
       if (strokeProps.m_strokeColor < m_color.size())
       {
@@ -624,7 +624,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
         PMD_DEBUG_MSG(("Stroke Color Not Available"));
       }
 
-      propList.insert("svg:stroke-opacity", strokeProps.m_strokeTint);
+      propList.insert("svg:stroke-opacity", (double)strokeProps.m_strokeTint/100.0,librevenge::RVNG_PERCENT);
 
       painter->drawPath(propList);
     }
