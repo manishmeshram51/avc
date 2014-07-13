@@ -27,11 +27,7 @@ class OutputShape
   double m_skew;
   double m_bboxLeft, m_bboxTop, m_bboxRight, m_bboxBot;
   PMDFillProperties m_fillProps;
-  uint8_t m_strokeType;
-  uint8_t m_strokeWidth;
-  uint8_t m_strokeColor;
-  uint8_t m_strokeOverprint;
-  uint8_t m_strokeTint;
+  PMDStrokeProperties m_strokeProps;
   std::string m_text;
   std::vector<PMDCharProperties> m_charProps;
   std::vector<PMDParaProperties> m_paraProps;
@@ -39,16 +35,16 @@ class OutputShape
   double m_width,m_height;
 
 public:
-  OutputShape(bool isClosed, int shape, double rotation, double skew, const PMDFillProperties &fillProps, uint8_t strokeType, uint8_t strokeWidth, uint8_t strokeColor, uint8_t strokeOverprint, uint8_t strokeTint)
+  OutputShape(bool isClosed, int shape, double rotation, double skew, const PMDFillProperties &fillProps, const PMDStrokeProperties &strokeProps)
     : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
-      m_bboxLeft(), m_bboxTop(), m_bboxRight(), m_bboxBot(), m_fillProps(fillProps), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint), m_text(), m_charProps(),  m_paraProps(), m_bitmap(), m_width(), m_height()
+      m_bboxLeft(), m_bboxTop(), m_bboxRight(), m_bboxBot(), m_fillProps(fillProps), m_strokeProps(strokeProps), m_text(), m_charProps(),  m_paraProps(), m_bitmap(), m_width(), m_height()
   { }
 
   OutputShape(bool isClosed, int shape, double rotation, double skew, std::string text, std::vector<PMDCharProperties> charProps, std::vector<PMDParaProperties> paraProps)
     : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
       m_bboxLeft(), m_bboxTop(), m_bboxRight(), m_bboxBot(),
       m_fillProps(PMDFillProperties(0,0,0,0)),
-      m_strokeType(0), m_strokeWidth(0), m_strokeColor(0), m_strokeOverprint(0), m_strokeTint(0),
+      m_strokeProps(PMDStrokeProperties(0,0,0,0,0)),
       m_text(text), m_charProps(charProps), m_paraProps(paraProps), m_bitmap(), m_width(), m_height()
   { }
 
@@ -56,7 +52,7 @@ public:
     : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
       m_bboxLeft(), m_bboxTop(), m_bboxRight(), m_bboxBot(),
       m_fillProps(PMDFillProperties(0,0,0,0)),
-      m_strokeType(0), m_strokeWidth(0), m_strokeColor(0), m_strokeOverprint(0), m_strokeTint(0),
+      m_strokeProps(PMDStrokeProperties(0,0,0,0,0)),
       m_text(), m_charProps(), m_paraProps(), m_bitmap(bitmap), m_width(), m_height()
   { }
 
@@ -85,29 +81,9 @@ public:
     return m_fillProps;
   }
 
-  uint8_t getStrokeType() const
+  const PMDStrokeProperties &getStrokeProperties() const
   {
-    return m_strokeType;
-  }
-
-  uint8_t getStrokeWidth() const
-  {
-    return m_strokeWidth;
-  }
-
-  uint8_t getStrokeColor() const
-  {
-    return m_strokeColor;
-  }
-
-  uint8_t getStrokeOverprint() const
-  {
-    return m_strokeOverprint;
-  }
-
-  uint8_t getStrokeTint() const
-  {
-    return m_strokeTint;
+    return m_strokeProps;
   }
 
   double getRotation() const

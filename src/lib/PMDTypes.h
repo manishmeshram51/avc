@@ -49,6 +49,19 @@ struct PMDFillProperties
   { }
 };
 
+struct PMDStrokeProperties
+{
+  uint8_t m_strokeType;
+  uint8_t m_strokeWidth;
+  uint8_t m_strokeColor;
+  uint8_t m_strokeOverprint;
+  uint8_t m_strokeTint;
+
+  PMDStrokeProperties(const uint8_t strokeType,const uint8_t strokeWidth,const uint8_t strokeColor,const uint8_t strokeOverprint,const uint8_t strokeTint)
+    : m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
+  { }
+};
+
 }
 
 #endif // __PMDTYPES_H__

@@ -80,13 +80,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
     points.insert("svg:points", vertices);
 
     PMDFillProperties fillProps = shape.getFillProperties();
-
-    uint8_t strokeType = shape.getStrokeType();
-    double strokeWidth = shape.getStrokeWidth();
-    strokeWidth = strokeWidth/360;
-    uint8_t strokeColor = shape.getStrokeColor();
-    //uint8_t strokeOverprint = shape.getStrokeOverprint();
-    uint8_t strokeTint = shape.getStrokeTint();
+    PMDStrokeProperties strokeProps = shape.getStrokeProperties();
 
     switch (fillProps.m_fillType)
     {
@@ -117,7 +111,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
     else
       points.insert("draw:opacity", fillProps.m_fillTint);
 
-    switch (strokeType)
+    switch (strokeProps.m_strokeType)
     {
     case STROKE_NORMAL:
       points.insert("draw:stroke", "solid");
@@ -129,11 +123,11 @@ void PMDCollector::paintShape(const OutputShape &shape,
       points.insert("draw:stroke", "solid");
     }
 
-    points.insert("svg:stroke-width", strokeWidth);
+    points.insert("svg:stroke-width", strokeProps.m_strokeWidth);
 
-    if (strokeColor < m_color.size())
+    if (strokeProps.m_strokeColor < m_color.size())
     {
-      PMDColor tempStrokeColor = m_color[strokeColor];
+      PMDColor tempStrokeColor = m_color[strokeProps.m_strokeColor];
       librevenge::RVNGString tempStrokeColorString;
       tempStrokeColorString.sprintf("#%.2x%.2x%.2x", tempStrokeColor.m_red,tempStrokeColor.m_green,tempStrokeColor.m_blue);
       points.insert("svg:stroke-color", tempStrokeColorString);
@@ -143,7 +137,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
       PMD_DEBUG_MSG(("Stroke Color Not Available"));
     }
 
-    points.insert("svg:stroke-opacity", strokeTint);
+    points.insert("svg:stroke-opacity", strokeProps.m_strokeTint);
 
     if (shape.getIsClosed())
     {
@@ -573,13 +567,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
       propList.insert("svg:d",vec);
 
       PMDFillProperties fillProps = shape.getFillProperties();
-
-      uint8_t strokeType = shape.getStrokeType();
-      double strokeWidth = shape.getStrokeWidth();
-      strokeWidth = strokeWidth/360;
-      uint8_t strokeColor = shape.getStrokeColor();
-      //uint8_t strokeOverprint = shape.getStrokeOverprint();
-      uint8_t strokeTint = shape.getStrokeTint();
+      PMDStrokeProperties strokeProps = shape.getStrokeProperties();
 
       switch (fillProps.m_fillType)
       {
@@ -610,7 +598,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
       else
         propList.insert("draw:opacity", fillProps.m_fillTint);
 
-      switch (strokeType)
+      switch (strokeProps.m_strokeType)
       {
       case STROKE_NORMAL:
         propList.insert("draw:stroke", "solid");
@@ -622,11 +610,11 @@ void PMDCollector::paintShape(const OutputShape &shape,
         propList.insert("draw:stroke", "solid");
       }
 
-      propList.insert("svg:stroke-width", strokeWidth);
+      propList.insert("svg:stroke-width", strokeProps.m_strokeWidth);
 
-      if (strokeColor < m_color.size())
+      if (strokeProps.m_strokeColor < m_color.size())
       {
-        PMDColor tempStrokeColor = m_color[strokeColor];
+        PMDColor tempStrokeColor = m_color[strokeProps.m_strokeColor];
         librevenge::RVNGString tempStrokeColorString;
         tempStrokeColorString.sprintf("#%.2x%.2x%.2x", tempStrokeColor.m_red,tempStrokeColor.m_green,tempStrokeColor.m_blue);
         propList.insert("svg:stroke-color", tempStrokeColorString);
@@ -636,7 +624,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
         PMD_DEBUG_MSG(("Stroke Color Not Available"));
       }
 
-      propList.insert("svg:stroke-opacity", strokeTint);
+      propList.insert("svg:stroke-opacity", strokeProps.m_strokeTint);
 
       painter->drawPath(propList);
     }

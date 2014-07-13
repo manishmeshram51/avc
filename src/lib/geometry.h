@@ -77,11 +77,7 @@ public:
   virtual PMDShapePoint getBboxTopLeft() const = 0;
   virtual PMDShapePoint getBboxBotRight() const = 0;
   virtual PMDFillProperties getFillProperties() const = 0;
-  virtual uint8_t getStrokeType() const = 0;
-  virtual uint8_t getStrokeWidth() const = 0;
-  virtual uint8_t getStrokeColor() const = 0;
-  virtual uint8_t getStrokeOverprint() const = 0;
-  virtual uint8_t getStrokeTint() const = 0;
+  virtual PMDStrokeProperties getStrokeProperties() const = 0;
   virtual std::string getText() const = 0;
   virtual std::vector<PMDCharProperties> getCharProperties() const = 0;
   virtual std::vector<PMDParaProperties> getParaProperties() const = 0;
@@ -98,15 +94,11 @@ class PMDLine : public PMDLineSet
   PMDShapePoint m_bboxTopLeft;
   PMDShapePoint m_bboxBotRight;
   bool m_mirrored;
-  uint8_t m_strokeType;
-  uint8_t m_strokeWidth;
-  uint8_t m_strokeColor;
-  uint8_t m_strokeOverprint;
-  uint8_t m_strokeTint;
+  PMDStrokeProperties m_strokeProps;
 
 public:
-  PMDLine(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const bool mirrored, const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
-    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_mirrored(mirrored), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
+  PMDLine(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const bool mirrored, const PMDStrokeProperties strokeProps)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_mirrored(mirrored), m_strokeProps(strokeProps)
   { }
 
   virtual double getRotation() const
@@ -176,29 +168,9 @@ public:
     return PMDFillProperties(FILL_SOLID,0,0,0);
   }
 
-  virtual uint8_t getStrokeType() const
+  virtual PMDStrokeProperties getStrokeProperties() const
   {
-    return m_strokeType;
-  }
-
-  virtual uint8_t getStrokeWidth() const
-  {
-    return m_strokeWidth;
-  }
-
-  virtual uint8_t getStrokeColor() const
-  {
-    return m_strokeColor;
-  }
-
-  virtual uint8_t getStrokeOverprint() const
-  {
-    return m_strokeOverprint;
-  }
-
-  virtual uint8_t getStrokeTint() const
-  {
-    return m_strokeTint;
+    return m_strokeProps;
   }
 
   virtual std::string getText() const
@@ -243,15 +215,11 @@ class PMDPolygon : public PMDLineSet
   PMDShapePoint m_xformTopLeft;
   PMDShapePoint m_xformBotRight;
   PMDFillProperties m_fillProps;
-  uint8_t m_strokeType;
-  uint8_t m_strokeWidth;
-  uint8_t m_strokeColor;
-  uint8_t m_strokeOverprint;
-  uint8_t m_strokeTint;
+  PMDStrokeProperties m_strokeProps;
 
 public:
-  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const double rotation, const double skew, const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const PMDFillProperties fillProps, const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
-    : m_points(points), m_isClosed(isClosed), m_rotation(rotation), m_skew(skew), m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillProps(fillProps), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
+  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const double rotation, const double skew, const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const PMDFillProperties fillProps, const PMDStrokeProperties strokeProps)
+    : m_points(points), m_isClosed(isClosed), m_rotation(rotation), m_skew(skew), m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillProps(fillProps), m_strokeProps(strokeProps)
   { }
 
   virtual double getRotation() const
@@ -309,29 +277,9 @@ public:
     return m_fillProps;
   }
 
-  virtual uint8_t getStrokeType() const
+  virtual PMDStrokeProperties getStrokeProperties() const
   {
-    return m_strokeType;
-  }
-
-  virtual uint8_t getStrokeWidth() const
-  {
-    return m_strokeWidth;
-  }
-
-  virtual uint8_t getStrokeColor() const
-  {
-    return m_strokeColor;
-  }
-
-  virtual uint8_t getStrokeOverprint() const
-  {
-    return m_strokeOverprint;
-  }
-
-  virtual uint8_t getStrokeTint() const
-  {
-    return m_strokeTint;
+    return m_strokeProps;
   }
 
   virtual std::string getText() const
@@ -441,29 +389,9 @@ public:
     return PMDFillProperties(0,0,0,0);
   }
 
-  virtual uint8_t getStrokeType() const
+  virtual PMDStrokeProperties getStrokeProperties() const
   {
-    return 0;
-  }
-
-  virtual uint8_t getStrokeWidth() const
-  {
-    return 0;
-  }
-
-  virtual uint8_t getStrokeColor() const
-  {
-    return 0;
-  }
-
-  virtual uint8_t getStrokeOverprint() const
-  {
-    return 0;
-  }
-
-  virtual uint8_t getStrokeTint() const
-  {
-    return 0;
+    return PMDStrokeProperties(0,0,0,0,0);
   }
 
   virtual std::string getText() const
@@ -502,15 +430,11 @@ class PMDRectangle : public PMDLineSet
   PMDShapePoint m_xformTopLeft;
   PMDShapePoint m_xformBotRight;
   PMDFillProperties m_fillProps;
-  uint8_t m_strokeType;
-  uint8_t m_strokeWidth;
-  uint8_t m_strokeColor;
-  uint8_t m_strokeOverprint;
-  uint8_t m_strokeTint;
+  PMDStrokeProperties m_strokeProps;
 
 public:
-  PMDRectangle(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const PMDFillProperties fillProps, const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
-    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillProps(fillProps), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
+  PMDRectangle(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const PMDFillProperties fillProps, const PMDStrokeProperties strokeProps)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillProps(fillProps), m_strokeProps(strokeProps)
   { }
 
   virtual double getRotation() const
@@ -575,29 +499,9 @@ public:
     return m_fillProps;
   }
 
-  virtual uint8_t getStrokeType() const
+  virtual PMDStrokeProperties getStrokeProperties() const
   {
-    return m_strokeType;
-  }
-
-  virtual uint8_t getStrokeWidth() const
-  {
-    return m_strokeWidth;
-  }
-
-  virtual uint8_t getStrokeColor() const
-  {
-    return m_strokeColor;
-  }
-
-  virtual uint8_t getStrokeOverprint() const
-  {
-    return m_strokeOverprint;
-  }
-
-  virtual uint8_t getStrokeTint() const
-  {
-    return m_strokeTint;
+    return m_strokeProps;
   }
 
   virtual std::string getText() const
@@ -639,15 +543,11 @@ class PMDEllipse : public PMDLineSet
   PMDShapePoint m_xformTopLeft;
   PMDShapePoint m_xformBotRight;
   PMDFillProperties m_fillProps;
-  uint8_t m_strokeType;
-  uint8_t m_strokeWidth;
-  uint8_t m_strokeColor;
-  uint8_t m_strokeOverprint;
-  uint8_t m_strokeTint;
+  PMDStrokeProperties m_strokeProps;
 
 public:
-  PMDEllipse(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const PMDFillProperties fillProps, const uint8_t strokeType, const uint8_t strokeWidth, const uint8_t strokeColor, const uint8_t strokeOverprint, const uint8_t strokeTint)
-    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillProps(fillProps), m_strokeType(strokeType), m_strokeWidth(strokeWidth), m_strokeColor(strokeColor), m_strokeOverprint(strokeOverprint), m_strokeTint(strokeTint)
+  PMDEllipse(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const PMDFillProperties fillProps, const PMDStrokeProperties strokeProps)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillProps(fillProps), m_strokeProps(strokeProps)
   { }
 
   virtual double getRotation() const
@@ -709,29 +609,9 @@ public:
     return m_fillProps;
   }
 
-  virtual uint8_t getStrokeType() const
+  virtual PMDStrokeProperties getStrokeProperties() const
   {
-    return m_strokeType;
-  }
-
-  virtual uint8_t getStrokeWidth() const
-  {
-    return m_strokeWidth;
-  }
-
-  virtual uint8_t getStrokeColor() const
-  {
-    return m_strokeColor;
-  }
-
-  virtual uint8_t getStrokeOverprint() const
-  {
-    return m_strokeOverprint;
-  }
-
-  virtual uint8_t getStrokeTint() const
-  {
-    return m_strokeTint;
+    return m_strokeProps;
   }
 
   virtual std::string getText() const
@@ -842,29 +722,9 @@ public:
     return PMDFillProperties(0,0,0,0);
   }
 
-  virtual uint8_t getStrokeType() const
+  virtual PMDStrokeProperties getStrokeProperties() const
   {
-    return 0;
-  }
-
-  virtual uint8_t getStrokeWidth() const
-  {
-    return 0;
-  }
-
-  virtual uint8_t getStrokeColor() const
-  {
-    return 0;
-  }
-
-  virtual uint8_t getStrokeOverprint() const
-  {
-    return 0;
-  }
-
-  virtual uint8_t getStrokeTint() const
-  {
-    return 0;
+    return PMDStrokeProperties(0,0,0,0,0);
   }
 
   virtual std::string getText() const

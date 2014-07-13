@@ -96,7 +96,9 @@ void PMDParser::parseLine(const PMDRecordContainer &container, unsigned recordIn
   skip(m_input, 6);
   uint8_t strokeOverprint = readU8(m_input);
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDLine(bboxTopLeft, bboxBotRight, mirrored, strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
+  PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
+
+  boost::shared_ptr<PMDLineSet> newShape(new PMDLine(bboxTopLeft, bboxBotRight, mirrored, strokeProps));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -303,6 +305,7 @@ void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned rec
   uint8_t fillTint = readU8(m_input);
 
   PMDFillProperties fillProps(fillType,fillColor,fillOverprint,fillTint);
+  PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
 
   if (rectXformId != (std::numeric_limits<uint32_t>::max)())
   {
@@ -334,7 +337,7 @@ void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned rec
   double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
   temp = (int32_t)rectSkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
-  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, fillProps, strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, fillProps, strokeProps));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -375,6 +378,7 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
   uint8_t fillTint = readU8(m_input);
 
   PMDFillProperties fillProps(fillType,fillColor,fillOverprint,fillTint);
+  PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
 
   uint32_t polySkewDegree = 0;
   PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
@@ -443,7 +447,7 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
   temp = (int32_t)polySkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, rotationRadian, skewRadian, bboxTopLeft, bboxBotRight, xformTopLeft, xformBotRight, fillProps, strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, rotationRadian, skewRadian, bboxTopLeft, bboxBotRight, xformTopLeft, xformBotRight, fillProps, strokeProps));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -484,6 +488,7 @@ void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recor
   uint8_t fillTint = readU8(m_input);
 
   PMDFillProperties fillProps(fillType,fillColor,fillOverprint,fillTint);
+  PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
 
   if (ellipseXformId != (std::numeric_limits<uint32_t>::max)())
   {
@@ -514,7 +519,7 @@ void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recor
   temp = (int32_t)ellipseSkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDEllipse(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, xformTopLeft, xformBotRight, fillProps, strokeType, strokeWidth, strokeColor, strokeOverprint, strokeTint));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDEllipse(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, xformTopLeft, xformBotRight, fillProps, strokeProps));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
