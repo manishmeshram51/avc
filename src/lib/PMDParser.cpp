@@ -90,8 +90,8 @@ void PMDParser::parseLine(const PMDRecordContainer &container, unsigned recordIn
   skip(m_input, 6);
   uint8_t strokeType = readU8(m_input);
   skip(m_input, 1);
-  uint8_t strokeWidth =readU8(m_input);
-  skip(m_input, 2);
+  uint16_t strokeWidth =readU16(m_input, m_bigEndian);
+  skip(m_input, 1);
   uint8_t strokeTint = readU8(m_input);
   skip(m_input, 6);
   uint8_t strokeOverprint = readU8(m_input);
@@ -291,8 +291,8 @@ void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned rec
 
   uint8_t strokeType = readU8(m_input);
   skip(m_input, 2);
-  uint8_t strokeWidth = readU8(m_input);
-  skip(m_input, 2);
+  uint16_t strokeWidth = readU16(m_input, m_bigEndian);
+  skip(m_input, 1);
   uint8_t fillType = readU8(m_input);
   skip(m_input, 1);
   uint8_t strokeColor = readU8(m_input);
@@ -360,8 +360,8 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
 
   uint8_t strokeType = readU8(m_input);
   skip(m_input, 2);
-  uint8_t strokeWidth = readU8(m_input);
-  skip(m_input, 2);
+  uint16_t strokeWidth = readU16(m_input, m_bigEndian);
+  skip(m_input, 1);
   uint8_t fillType = readU8(m_input);
   skip(m_input, 1);
   uint8_t strokeColor = readU8(m_input);
@@ -474,8 +474,8 @@ void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recor
 
   uint8_t strokeType = readU8(m_input);
   skip(m_input, 2);
-  uint8_t strokeWidth = readU8(m_input);
-  skip(m_input, 2);
+  uint16_t strokeWidth = readU16(m_input, m_bigEndian);
+  skip(m_input, 1);
   uint8_t fillType = readU8(m_input);
   skip(m_input, 1);
   uint8_t strokeColor = readU8(m_input);
