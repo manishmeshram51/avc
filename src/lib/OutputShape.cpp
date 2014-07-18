@@ -21,20 +21,17 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
       new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeType(), ptrToLineSet->getRotation(), ptrToLineSet->getSkew(), ptrToLineSet->getText(), ptrToLineSet->getCharProperties(), ptrToLineSet->getParaProperties()));
 
     PMDShapePoint bboxTopLeft = ptrToLineSet->getBboxTopLeft();
-    double x = bboxTopLeft.m_x.toInches() + translate.m_x;
-    double y = bboxTopLeft.m_y.toInches() + translate.m_y;
-    ptrToOutputShape->addPoint(InchPoint(x, y));
-
     PMDShapePoint bboxBotRight = ptrToLineSet->getBboxBotRight();
-    x = bboxBotRight.m_x.toInches() + translate.m_x;
-    y = bboxBotRight.m_y.toInches() + translate.m_y;
-    ptrToOutputShape->addPoint(InchPoint(x, y));
 
     double pmdRotation = ptrToLineSet->getRotation();
     double pmdSkew = ptrToLineSet->getSkew();
 
     if (pmdRotation == 0 && pmdSkew == 0)
     {
+      double x = bboxTopLeft.m_x.toInches() + translate.m_x;
+      double y = bboxTopLeft.m_y.toInches() + translate.m_y;
+      ptrToOutputShape->addPoint(InchPoint(x, y));
+
       double width = fabs(bboxBotRight.m_x.toInches() - bboxTopLeft.m_x.toInches());
       double height = fabs(bboxBotRight.m_y.toInches() - bboxTopLeft.m_y.toInches());
       ptrToOutputShape->setDimensions(width, height);
@@ -46,7 +43,18 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
       double width = fabs(pmdXformBotRight.m_x.toInches() - pmdXformTopLeft.m_x.toInches());
       double height = fabs(pmdXformBotRight.m_y.toInches() - pmdXformTopLeft.m_y.toInches());
       ptrToOutputShape->setDimensions(width, height);
+
+      PMDShapePoint pmdRotatingPoint = ptrToLineSet->getRotatingPoint();
+      double x = pmdRotatingPoint.m_x.toInches() + translate.m_x;
+      double y = pmdRotatingPoint.m_y.toInches() + translate.m_y;
+      x += (width*cos(pmdRotation)-height*sin(pmdRotation)-width)/2.0;
+      y += (width*sin(pmdRotation)+height*cos(pmdRotation)-height)/2.0;
+      ptrToOutputShape->addPoint(InchPoint(x, y));
     }
+
+    double x = bboxBotRight.m_x.toInches() + translate.m_x;
+    double y = bboxBotRight.m_y.toInches() + translate.m_y;
+    ptrToOutputShape->addPoint(InchPoint(x, y));
 
     return ptrToOutputShape;
 

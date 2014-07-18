@@ -144,7 +144,7 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
 
         textBoxRotationDegree = readU32(m_input, m_bigEndian);
         textBoxSkewDegree = readU32(m_input, m_bigEndian);
-        skip(m_input, 4);
+        skip(m_input, 2);
         xformTopLeft = readPoint(m_input, m_bigEndian);
         xformBotRight = readPoint(m_input, m_bigEndian);
         rotatingPoint = readPoint(m_input, m_bigEndian);
