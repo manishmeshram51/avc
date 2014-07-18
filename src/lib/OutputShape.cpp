@@ -53,12 +53,7 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
       ptrToOutputShape->addPoint(InchPoint(x, y));
     }
 
-    double x = bboxBotRight.m_x.toInches() + translate.m_x;
-    double y = bboxBotRight.m_y.toInches() + translate.m_y;
-    ptrToOutputShape->addPoint(InchPoint(x, y));
-
     return ptrToOutputShape;
-
   }
   else if (ptrToLineSet->shapeType() == SHAPE_TYPE_BITMAP)
   {
@@ -74,46 +69,28 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
     double pmdSkew = ptrToLineSet->getSkew();
     if (pmdRotation == 0 && pmdSkew == 0)
     {
-      for (unsigned i = 0; i < pmdPoints.size(); ++i)
-      {
-        double x = pmdPoints[i].m_x.toInches() + translate.m_x;
-        double y = pmdPoints[i].m_y.toInches() + translate.m_y;
-        ptrToOutputShape->addPoint(InchPoint(x, y));
-      }
+      double x = bboxTopLeft.m_x.toInches() + translate.m_x;
+      double y = bboxTopLeft.m_y.toInches() + translate.m_y;
+      ptrToOutputShape->addPoint(InchPoint(x, y));
+
+      double width = fabs(bboxBotRight.m_x.toInches() - bboxTopLeft.m_x.toInches());
+      double height = fabs(bboxBotRight.m_y.toInches() - bboxTopLeft.m_y.toInches());
+      ptrToOutputShape->setDimensions(width, height);
     }
     else
     {
       PMDShapePoint pmdXformTopLeft = ptrToLineSet->getXformTopLeft();
       PMDShapePoint pmdXformBotRight = ptrToLineSet->getXformBotRight();
-
       double width = fabs(pmdXformBotRight.m_x.toInches() - pmdXformTopLeft.m_x.toInches());
       double height = fabs(pmdXformBotRight.m_y.toInches() - pmdXformTopLeft.m_y.toInches());
+      ptrToOutputShape->setDimensions(width, height);
 
       PMDShapePoint pmdRotatingPoint = ptrToLineSet->getRotatingPoint();
-
-      double x1 = pmdRotatingPoint.m_x.toInches() + translate.m_x;
-      double y1 = pmdRotatingPoint.m_y.toInches() + translate.m_y;
-
-      if (pmdRotation != 0)
-      {
-        x1 += (width*cos(pmdRotation)-height*sin(pmdRotation)-width)/2.0;
-        y1 += (width*sin(pmdRotation)+height*cos(pmdRotation)-height)/2.0;
-      }
-
-      double x2 = x1 + width;
-      double y2 = y1;
-
-      double x4 = x1 ;
-      double y4 = y1 + height;
-
-      double x3 = x1 + width;
-      double y3 = y1 + height;
-
-
-      ptrToOutputShape->addPoint(InchPoint(x1, y1));
-      ptrToOutputShape->addPoint(InchPoint(x2, y2));
-      ptrToOutputShape->addPoint(InchPoint(x3, y3));
-      ptrToOutputShape->addPoint(InchPoint(x4, y4));
+      double x = pmdRotatingPoint.m_x.toInches() + translate.m_x;
+      double y = pmdRotatingPoint.m_y.toInches() + translate.m_y;
+      x += (width*cos(pmdRotation)-height*sin(pmdRotation)-width)/2.0;
+      y += (width*sin(pmdRotation)+height*cos(pmdRotation)-height)/2.0;
+      ptrToOutputShape->addPoint(InchPoint(x, y));
     }
 
     return ptrToOutputShape;

@@ -481,10 +481,10 @@ void PMDCollector::paintShape(const OutputShape &shape,
   else if (shape.shapeType() == SHAPE_TYPE_BITMAP)
   {
     librevenge::RVNGPropertyList props;
-    props.insert("svg:x", shape.getPoint(0).m_x);
-    props.insert("svg:y", shape.getPoint(0).m_y);
-    props.insert("svg:width", fabs(shape.getPoint(2).m_x - shape.getPoint(0).m_x));
-    props.insert("svg:height", fabs(shape.getPoint(2).m_y - shape.getPoint(0).m_y));
+    props.insert("svg:x", shape.getPoint(0).m_x,librevenge::RVNG_INCH);
+    props.insert("svg:y", shape.getPoint(0).m_y,librevenge::RVNG_INCH);
+    props.insert("svg:width", shape.getWidth(),librevenge::RVNG_INCH);
+    props.insert("svg:height", shape.getHeight(),librevenge::RVNG_INCH);
 
     if (shape.getRotation() != 0.0)
       props.insert("librevenge:rotate", shape.getRotation() * 180 / M_PI, librevenge::RVNG_GENERIC);
