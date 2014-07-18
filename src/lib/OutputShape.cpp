@@ -22,6 +22,7 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
 
     PMDShapePoint bboxTopLeft = ptrToLineSet->getBboxTopLeft();
     PMDShapePoint bboxBotRight = ptrToLineSet->getBboxBotRight();
+    ptrToOutputShape->setBoundingBox(InchPoint((bboxTopLeft.m_x.toInches() + translate.m_x),(bboxTopLeft.m_y.toInches() + translate.m_y)), InchPoint((bboxBotRight.m_x.toInches() + translate.m_x),(bboxBotRight.m_y.toInches() + translate.m_y)));
 
     double pmdRotation = ptrToLineSet->getRotation();
     double pmdSkew = ptrToLineSet->getSkew();
@@ -63,6 +64,10 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
   {
     boost::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(
       new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeType(), ptrToLineSet->getRotation(), ptrToLineSet->getSkew(), ptrToLineSet->getBitmap()));
+
+    PMDShapePoint bboxTopLeft = ptrToLineSet->getBboxTopLeft();
+    PMDShapePoint bboxBotRight = ptrToLineSet->getBboxBotRight();
+    ptrToOutputShape->setBoundingBox(InchPoint((bboxTopLeft.m_x.toInches() + translate.m_x),(bboxTopLeft.m_y.toInches() + translate.m_y)), InchPoint((bboxBotRight.m_x.toInches() + translate.m_x),(bboxBotRight.m_y.toInches() + translate.m_y)));
 
     std::vector<PMDShapePoint> pmdPoints = ptrToLineSet->getPoints();
     double pmdRotation = ptrToLineSet->getRotation();
@@ -118,6 +123,10 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
     boost::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(
       new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeType(), ptrToLineSet->getRotation(), ptrToLineSet->getSkew(), ptrToLineSet->getFillProperties(), ptrToLineSet->getStrokeProperties()));
 
+    PMDShapePoint bboxTopLeft = ptrToLineSet->getBboxTopLeft();
+    PMDShapePoint bboxBotRight = ptrToLineSet->getBboxBotRight();
+    ptrToOutputShape->setBoundingBox(InchPoint((bboxTopLeft.m_x.toInches() + translate.m_x),(bboxTopLeft.m_y.toInches() + translate.m_y)), InchPoint((bboxBotRight.m_x.toInches() + translate.m_x),(bboxBotRight.m_y.toInches() + translate.m_y)));
+
     if (ptrToLineSet->shapeType() == SHAPE_TYPE_LINE || ptrToLineSet->shapeType() == SHAPE_TYPE_POLY || ptrToLineSet->shapeType() == SHAPE_TYPE_RECT)
     {
       std::vector<PMDShapePoint> pmdPoints = ptrToLineSet->getPoints();
@@ -168,9 +177,6 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
         }
         else
         {
-          PMDShapePoint bboxTopLeft = ptrToLineSet->getBboxTopLeft();
-          PMDShapePoint bboxBotRight = ptrToLineSet->getBboxBotRight();
-
           double tx = (bboxBotRight.m_x.toInches() + bboxTopLeft.m_x.toInches())/2 + translate.m_x;
           double ty = (bboxBotRight.m_y.toInches() + bboxTopLeft.m_y.toInches())/2 + translate.m_y;
 

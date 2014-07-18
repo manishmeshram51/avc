@@ -125,23 +125,17 @@ public:
     return std::make_pair(InchPoint(m_bboxLeft, m_bboxTop), InchPoint(m_bboxRight, m_bboxBot));
   }
 
+  void setBoundingBox(InchPoint bboxTopLeft, InchPoint bboxBotRight)
+  {
+    m_bboxLeft = bboxTopLeft.m_x;
+    m_bboxTop = bboxTopLeft.m_y;
+    m_bboxRight = bboxBotRight.m_x;
+    m_bboxBot = bboxBotRight.m_y;
+  }
+
   void addPoint(InchPoint point)
   {
-    double x = point.m_x,
-           y = point.m_y;
-    if (m_points.empty())
-    {
-      m_bboxLeft = m_bboxRight = x;
-      m_bboxTop = m_bboxBot = y;
-    }
-    else
-    {
-      if (x < m_bboxLeft) m_bboxLeft = x;
-      if (y < m_bboxTop) m_bboxTop = y;
-      if (x > m_bboxRight) m_bboxRight = x;
-      if (y > m_bboxBot) m_bboxBot = y;
-    }
-    m_points.push_back(InchPoint(x, y));
+    m_points.push_back(InchPoint(point.m_x, point.m_y));
   }
 
   void setDimensions(double width, double height)
