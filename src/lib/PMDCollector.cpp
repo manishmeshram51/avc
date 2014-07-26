@@ -457,6 +457,8 @@ void PMDCollector::paintShape(const OutputShape &shape,
             {
               painter->insertLineBreak();
             }
+            else if (tempText[j] == 0x0e || tempText[j] == 0x0f)   //Shift Out Shift In
+            {} //Do Nothing
             else
             {
               tempStr.push_back(tempText[j]);
