@@ -232,8 +232,10 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
     uint16_t superSubSize = readU16(m_input, m_bigEndian);
     uint16_t subPos = readU16(m_input, m_bigEndian);
     uint16_t superPos = readU16(m_input, m_bigEndian);
+    skip(m_input, 2);
+    uint8_t tint = readU8(m_input);
 
-    charProps.push_back(PMDCharProperties(length,fontFace,fontSize,fontColor,boldItalicUnderline,superSubscript,kerning,superSubSize,superPos,subPos));
+    charProps.push_back(PMDCharProperties(length,fontFace,fontSize,fontColor,boldItalicUnderline,superSubscript,kerning,superSubSize,superPos,subPos,tint));
   }
 
   const PMDRecordContainer *ptrToParaContainer =

@@ -278,8 +278,10 @@ void PMDCollector::paintShape(const OutputShape &shape,
           if (charProperties[i].m_fontColor < m_color.size())
           {
             PMDColor tempColor = m_color[charProperties[i].m_fontColor];
+            double charTint = (double)charProperties[i].m_tint/100;
+            double temp_bgcolor = (1 - charTint) * 255;
             librevenge::RVNGString tempColorString;
-            tempColorString.sprintf("#%.2x%.2x%.2x", tempColor.m_red,tempColor.m_green,tempColor.m_blue);
+            tempColorString.sprintf("#%.2x%.2x%.2x",(uint16_t)(tempColor.m_red * charTint + temp_bgcolor),(uint16_t)(tempColor.m_green * charTint + temp_bgcolor),(uint16_t)(tempColor.m_blue * charTint + temp_bgcolor));
             charProps.insert("fo:color", tempColorString);
           }
           else

@@ -57,9 +57,10 @@ struct PMDCharProperties
   uint16_t m_superSubSize;
   uint16_t m_superPos;
   uint16_t m_subPos;
+  uint8_t m_tint;
 
-  PMDCharProperties(const uint16_t length, const uint16_t fontFace, const uint16_t fontSize, const uint8_t fontColor, const uint8_t boldItalicUnderline, const uint8_t superSubscript, const int16_t kerning, const uint16_t superSubSize, const uint16_t superPos, const uint16_t subPos)
-    : m_length(length), m_fontFace(fontFace), m_fontSize(fontSize), m_fontColor(fontColor), m_boldItalicUnderline(boldItalicUnderline), m_superSubscript(superSubscript), m_kerning(kerning), m_superSubSize(superSubSize), m_superPos(superPos), m_subPos(subPos)
+  PMDCharProperties(const uint16_t length, const uint16_t fontFace, const uint16_t fontSize, const uint8_t fontColor, const uint8_t boldItalicUnderline, const uint8_t superSubscript, const int16_t kerning, const uint16_t superSubSize, const uint16_t superPos, const uint16_t subPos, const uint16_t tint)
+    : m_length(length), m_fontFace(fontFace), m_fontSize(fontSize), m_fontColor(fontColor), m_boldItalicUnderline(boldItalicUnderline), m_superSubscript(superSubscript), m_kerning(kerning), m_superSubSize(superSubSize), m_superPos(superPos), m_subPos(subPos), m_tint(tint)
   { }
 };
 
@@ -181,7 +182,7 @@ public:
   virtual std::vector<PMDCharProperties> getCharProperties() const
   {
     std::vector<PMDCharProperties> temp;
-    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0));
+    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
     return temp;
   }
 
@@ -290,7 +291,7 @@ public:
   virtual std::vector<PMDCharProperties> getCharProperties() const
   {
     std::vector<PMDCharProperties> temp;
-    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0));
+    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
     return temp;
   }
 
@@ -512,7 +513,7 @@ public:
   virtual std::vector<PMDCharProperties> getCharProperties() const
   {
     std::vector<PMDCharProperties> temp;
-    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0));
+    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
     return temp;
   }
 
@@ -622,7 +623,7 @@ public:
   virtual std::vector<PMDCharProperties> getCharProperties() const
   {
     std::vector<PMDCharProperties> temp;
-    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0));
+    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
     return temp;
   }
 
@@ -735,7 +736,7 @@ public:
   virtual std::vector<PMDCharProperties> getCharProperties() const
   {
     std::vector<PMDCharProperties> temp;
-    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0));
+    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
     return temp;
   }
 
