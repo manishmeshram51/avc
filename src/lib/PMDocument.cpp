@@ -31,6 +31,9 @@ catch (...)
 
 bool PMDocument::parse(librevenge::RVNGInputStream *input, librevenge::RVNGDrawingInterface *painter) try
 {
+  if (!input || !painter)
+    return false;
+
   if (!isSupported(input))
     return false;
 
