@@ -30,40 +30,6 @@ template <typename Unit> struct Point
 typedef Point<PMDShapeUnit> PMDShapePoint;
 typedef Point<double> InchPoint;
 
-struct PMDParaProperties
-{
-  uint16_t m_length;
-  uint8_t m_align;
-  uint16_t m_leftIndent;
-  uint16_t m_firstIndent;
-  uint16_t m_rightIndent;
-  uint16_t m_beforeIndent;
-  uint16_t m_afterIndent;
-
-  PMDParaProperties(const uint16_t length, const uint8_t align,const uint16_t leftIndent,const uint16_t firstIndent,const uint16_t rightIndent,const uint16_t beforeIndent,const uint16_t afterIndent)
-    : m_length(length), m_align(align), m_leftIndent(leftIndent), m_firstIndent(firstIndent), m_rightIndent(rightIndent), m_beforeIndent(beforeIndent), m_afterIndent(afterIndent)
-  { }
-};
-
-struct PMDCharProperties
-{
-  uint16_t m_length;
-  uint16_t m_fontFace;
-  uint16_t m_fontSize;
-  uint8_t m_fontColor;
-  uint8_t m_boldItalicUnderline;
-  uint8_t m_superSubscript;
-  int16_t m_kerning;
-  uint16_t m_superSubSize;
-  uint16_t m_superPos;
-  uint16_t m_subPos;
-  uint8_t m_tint;
-
-  PMDCharProperties(const uint16_t length, const uint16_t fontFace, const uint16_t fontSize, const uint8_t fontColor, const uint8_t boldItalicUnderline, const uint8_t superSubscript, const int16_t kerning, const uint16_t superSubSize, const uint16_t superPos, const uint16_t subPos, const uint16_t tint)
-    : m_length(length), m_fontFace(fontFace), m_fontSize(fontSize), m_fontColor(fontColor), m_boldItalicUnderline(boldItalicUnderline), m_superSubscript(superSubscript), m_kerning(kerning), m_superSubSize(superSubSize), m_superPos(superPos), m_subPos(subPos), m_tint(tint)
-  { }
-};
-
 class PMDLineSet
 {
 public:
