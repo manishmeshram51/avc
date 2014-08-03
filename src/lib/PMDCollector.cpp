@@ -21,6 +21,71 @@ namespace libpagemaker
 
 static const double EM2PT = 11.95516799999881;
 
+namespace
+{
+
+void flushText(std::string &text, librevenge::RVNGDrawingInterface *const painter)
+{
+  if (!text.empty())
+  {
+    painter->insertText(text.c_str());
+    text.clear();
+  }
+}
+
+void writeTextSpan(const std::string &text, const std::size_t charStart, const std::size_t charEnd, const bool capsFlag, librevenge::RVNGDrawingInterface *const painter)
+{
+  std::string currentText;
+  bool wasSpace = false;
+  for (std::size_t i = charStart; i <= charEnd; ++i)
+  {
+    const char c = text[i];
+
+    switch (c)
+    {
+    case '\t' :
+      flushText(currentText, painter);
+      painter->insertTab();
+      break;
+    case '\r' :
+      flushText(currentText, painter);
+      painter->insertLineBreak();
+      break;
+    case ' ' :
+      if (wasSpace)
+      {
+        flushText(currentText, painter);
+        painter->insertSpace();
+      }
+      else
+      {
+        currentText.push_back(c);
+      }
+      break;
+    case 0x0e :
+    case 0x0f :
+    case 0x1b :    //Shift Out Shift In EscapeChar
+      //Do Nothing
+      break;
+    default:
+      if (capsFlag && c >=97 && c <=122)
+      {
+        currentText.push_back(c - 32);
+      }
+      else
+      {
+        currentText.push_back(c);
+      }
+    }
+
+    wasSpace = ' ' == c;
+  }
+
+  flushText(currentText, painter);
+}
+
+}
+
 PMDCollector::PMDCollector() :
   m_pageWidth(), m_pageHeight(), m_pages(), m_color(),m_font(),
   m_doubleSided(false)
@@ -239,7 +304,6 @@ void PMDCollector::paintShape(const OutputShape &shape,
       uint16_t charEnd = 0;
       uint16_t charLength = 0;
 
-      uint16_t j = 0;
       bool capsFlag = false;
 
 
@@ -438,41 +502,11 @@ void PMDCollector::paintShape(const OutputShape &shape,
 
 
           painter->openSpan(charProps);
-
-          for (j=charStart; j<=charEnd; j++)
-          {
-            std::string tempStr;
-            if (capsFlag && tempText[j] >=97 && tempText[j] <=122)
-            {
-              tempStr.push_back(tempText[j] - 32);
-              painter->insertText(tempStr.c_str());
-            }
-            else if (tempText[j] == ' ')
-            {
-              painter->insertSpace();
-            }
-            else if (tempText[j] == '\t')
-            {
-              painter->insertTab();
-            }
-            else if (tempText[j] == '\r')
-            {
-              painter->insertLineBreak();
-            }
-            else if (tempText[j] == 0x0e || tempText[j] == 0x0f || tempText[j] == 0x1b)    //Shift Out Shift In EscapeChar
-            {} //Do Nothing
-            else
-            {
-              tempStr.push_back(tempText[j]);
-              painter->insertText(tempStr.c_str());
-            }
-          }
-
-          charStart = j;
+          writeTextSpan(tempText, charStart, charEnd, capsFlag, painter);
           painter->closeSpan();
         }
-        else
-          charStart = charEnd + 1;
+
+        charStart = charEnd + 1;
       }
 
       painter->closeParagraph();
