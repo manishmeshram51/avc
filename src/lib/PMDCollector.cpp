@@ -62,38 +62,13 @@ void writeTextSpan(const std::string &text, const std::size_t charStart, const s
         currentText.push_back(c);
       }
       break;
-    // Control Characters , Do nothing untill we have any knowledge about thier use in pagemaker, atleast to make sure they doesn't raise error.
-    case 0x00 :
-    case 0x01 :
-    case 0x02 :
-    case 0x03 :
-    case 0x04 :
-    case 0x05 :
-    case 0x06 :
-    case 0x07 :
-    case 0x08 :
-    case 0x0a :
-    case 0x0b :
-    case 0x0c :
-    case 0x0e : //Shift Out
-    case 0x0f : //Shift In
-    case 0x10 :
-    case 0x11 :
-    case 0x12 :
-    case 0x13 :
-    case 0x14 :
-    case 0x15 :
-    case 0x16 :
-    case 0x17 :
-    case 0x18 :
-    case 0x1a :
-    case 0x1b : // EscapeChar
-    case 0x1c :
-    case 0x1e :
-    case 0x1f :
-      //Do Nothing
-      break;
     default:
+      // Control Characters , Do nothing untill we have any knowledge about thier use in pagemaker, atleast to make sure they doesn't raise error.
+      if (c < 0x20)
+      {
+        PMD_DEBUG_MSG(("skipping control character %#x\n", c));
+        break;
+      }
       if (capsFlag && c >=97 && c <=122)
       {
         currentText.push_back(c - 32);
