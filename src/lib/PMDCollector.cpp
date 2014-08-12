@@ -63,7 +63,8 @@ void writeTextSpan(const std::string &text, const std::size_t charStart, const s
       }
       break;
     default:
-      // Control Characters , Do nothing untill we have any knowledge about thier use in pagemaker, atleast to make sure they doesn't raise error.
+      // Ignore control characters that do not have known use in PageMaker.
+      // Specific control characters are handled in the switch already.
       if (c < 0x20)
       {
         PMD_DEBUG_MSG(("skipping control character %#x\n", c));
