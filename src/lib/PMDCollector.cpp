@@ -43,15 +43,15 @@ void writeTextSpan(const std::string &text, const std::size_t charStart, const s
 
     switch (c)
     {
-    case '\t' :   //Ascii 0x09
+    case '\t' :
       flushText(currentText, painter);
       painter->insertTab();
       break;
-    case '\r' :   //Ascii 0x0d
+    case '\r' :
       flushText(currentText, painter);
       painter->insertLineBreak();
       break;
-    case ' ' :    //Ascii 0x20
+    case ' ' :
       if (wasSpace)
       {
         flushText(currentText, painter);
