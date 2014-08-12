@@ -29,8 +29,59 @@ namespace libpagemaker
 {
 PMDParser::PMDParser(librevenge::RVNGInputStream *input, PMDCollector *collector)
   : m_input(input), m_collector(collector), m_records(), m_bigEndian(false),
-    m_recordsInOrder()
+    m_recordsInOrder(), m_xFormMap()
 { }
+
+std::vector<PMDRecordContainer> PMDParser::getRecordsBySeqNum(const uint16_t seqNum)
+{
+  std::vector<PMDRecordContainer> tempContainer;
+
+
+  for (unsigned j=0; j<m_recordsInOrder.size(); ++j)
+  {
+    const PMDRecordContainer *ptrToContainer = &(m_recordsInOrder[j]);
+    const PMDRecordContainer &container = *ptrToContainer;
+
+    if (container.m_seqNum == seqNum)
+    {
+      tempContainer.push_back(container);
+    }
+  }
+  return tempContainer;
+}
+
+std::vector<PMDRecordContainer> PMDParser::getRecordsByRecType(const uint16_t recType)
+{
+  std::vector<PMDRecordContainer> tempContainer;
+
+  for (unsigned j=0; j<m_recordsInOrder.size(); ++j)
+  {
+    const PMDRecordContainer *ptrToContainer = &(m_recordsInOrder[j]);
+    const PMDRecordContainer &container = *ptrToContainer;
+
+    if (container.m_recordType == recType)
+    {
+      tempContainer.push_back(container);
+    }
+  }
+  return tempContainer;
+}
+
+const PMDRecordContainer &PMDParser::getSingleRecordBySeqNum(const uint16_t seqNum) const
+{
+  for (unsigned j=0; j<m_recordsInOrder.size(); ++j)
+  {
+    const PMDRecordContainer *ptrToContainer = &(m_recordsInOrder[j]);
+    const PMDRecordContainer &container = *ptrToContainer;
+
+    if (container.m_seqNum == seqNum)
+    {
+      return container;
+    }
+  }
+  PMD_ERR_MSG("No record with the given sequence number.\n");
+  throw RecordNotFoundException(seqNum);
+}
 
 void seekToRecord(librevenge::RVNGInputStream *const input, const PMDRecordContainer &container, const unsigned recordIndex)
 {
@@ -127,29 +178,20 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
   uint32_t textBoxXformId = readU32(m_input, m_bigEndian);
   uint32_t textBoxTextBlockId = readU32(m_input, m_bigEndian);
 
-  if (textBoxXformId != (std::numeric_limits<uint32_t>::max)())
+  if (textBoxXformId != (std::numeric_limits<uint32_t>::max)() && textBoxXformId != 0)
   {
-    const PMDRecordContainer *ptrToXformContainer = &(m_recordsInOrder[0x0c]);
-    const PMDRecordContainer &xformContainer = *ptrToXformContainer;
 
-    for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
+    std::map<uint32_t, PMDXForm>::iterator it = m_xFormMap.find(textBoxXformId);
+
+    if (it != m_xFormMap.end())
     {
-      seekToRecord(m_input, xformContainer, i);
+      PMDXForm tempXForm = it->second;
 
-      skip(m_input, 0x16);
-      uint32_t xformId = readU32(m_input, m_bigEndian);
-      if (xformId == textBoxXformId)
-      {
-        seekToRecord(m_input, xformContainer, i); // return to the beginning
-
-        textBoxRotationDegree = readU32(m_input, m_bigEndian);
-        textBoxSkewDegree = readU32(m_input, m_bigEndian);
-        skip(m_input, 2);
-        xformTopLeft = readPoint(m_input, m_bigEndian);
-        xformBotRight = readPoint(m_input, m_bigEndian);
-        rotatingPoint = readPoint(m_input, m_bigEndian);
-        break;
-      }
+      textBoxRotationDegree = tempXForm.m_rotationDegree;
+      textBoxSkewDegree = tempXForm.m_skewDegree;
+      xformTopLeft = tempXForm.m_xformTopLeft;
+      xformBotRight = tempXForm.m_xformBotRight;
+      rotatingPoint = tempXForm.m_rotatingPoint;
     }
   }
 
@@ -158,8 +200,7 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
   temp = (int32_t)textBoxSkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
 
-  const PMDRecordContainer *ptrToTextBlockContainer = &(m_recordsInOrder[TEXT_BLOCK_OFFSET]);
-  const PMDRecordContainer &textBlockContainer = *ptrToTextBlockContainer;
+  const PMDRecordContainer &textBlockContainer = getSingleRecordBySeqNum(TEXT_BLOCK_OFFSET);
 
   for (unsigned i = 0; i < textBlockContainer.m_numRecords; ++i)
   {
@@ -188,32 +229,27 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
     }
 
   }
-  const PMDRecordContainer *ptrToTextContainer =
-    (textBoxText < m_recordsInOrder.size()) ? &(m_recordsInOrder[textBoxText]) : NULL;
-  if (!ptrToTextContainer)
-  {
-    PMD_ERR_MSG("No text with the given sequence number.\n");
-    return;
-  }
+
   std::string text = "";
-  const PMDRecordContainer &textContainer = *(ptrToTextContainer);
 
-  seekToRecord(m_input, textContainer, 0);
-  for (unsigned i = 0; i < textContainer.m_numRecords; ++i)
+  std::vector<PMDRecordContainer> tempContainer = getRecordsBySeqNum(textBoxText);
+  if (tempContainer.empty())
   {
-    text.push_back(readU8(m_input));
+    PMD_ERR_MSG("No Text Found.\n");
   }
 
-  const PMDRecordContainer *ptrToCharsContainer =
-    (textBoxChars < m_recordsInOrder.size()) ? &(m_recordsInOrder[textBoxChars]) : NULL;
-  if (!ptrToCharsContainer)
+  for (unsigned j=0; j<tempContainer.size(); ++j)
   {
-    PMD_ERR_MSG("No chars with the given sequence number.\n");
-    return;
+    const PMDRecordContainer &textContainer = tempContainer[j];
+    seekToRecord(m_input, textContainer, 0);
+    for (unsigned i = 0; i < textContainer.m_numRecords; ++i)
+    {
+      text.push_back(readU8(m_input));
+    }
   }
 
   std::vector<PMDCharProperties> charProps;
-  const PMDRecordContainer &charsContainer = *(ptrToCharsContainer);
+  const PMDRecordContainer &charsContainer = getSingleRecordBySeqNum(textBoxChars);
   for (unsigned i = 0; i < charsContainer.m_numRecords; ++i)
   {
     seekToRecord(m_input, charsContainer, i);
@@ -238,16 +274,8 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
     charProps.push_back(PMDCharProperties(length,fontFace,fontSize,fontColor,boldItalicUnderline,superSubscript,kerning,superSubSize,superPos,subPos,tint));
   }
 
-  const PMDRecordContainer *ptrToParaContainer =
-    (textBoxPara < m_recordsInOrder.size()) ? &(m_recordsInOrder[textBoxPara]) : NULL;
-  if (!ptrToParaContainer)
-  {
-    PMD_ERR_MSG("No para with the given sequence number.\n");
-    return;
-  }
-
   std::vector<PMDParaProperties> paraProps;
-  const PMDRecordContainer &paraContainer = *(ptrToParaContainer);
+  const PMDRecordContainer &paraContainer = getSingleRecordBySeqNum(textBoxPara);
   for (unsigned i = 0; i < paraContainer.m_numRecords; ++i)
   {
     seekToRecord(m_input, paraContainer, i);
@@ -264,7 +292,6 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
 
     paraProps.push_back(PMDParaProperties(length,align,leftIndent,firstIndent,rightIndent,beforeIndent,afterIndent));
   }
-
 
   boost::shared_ptr<PMDLineSet> newShape(new PMDTextBox(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, text, charProps, paraProps));
   m_collector->addShapeToPage(pageID, newShape);
@@ -309,30 +336,19 @@ void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned rec
   PMDFillProperties fillProps(fillType,fillColor,fillOverprint,fillTint);
   PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
 
-  if (rectXformId != (std::numeric_limits<uint32_t>::max)())
+  if (rectXformId != (std::numeric_limits<uint32_t>::max)() && rectXformId != 0)
   {
-    PMD_DEBUG_MSG(("Rectangle contains rotation\n"));
-    const PMDRecordContainer *ptrToXformContainer = &(m_recordsInOrder[0x0c]);
-    const PMDRecordContainer &xformContainer = *ptrToXformContainer;
+    std::map<uint32_t, PMDXForm>::iterator it = m_xFormMap.find(rectXformId);
 
-    for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
+    if (it != m_xFormMap.end())
     {
-      seekToRecord(m_input, xformContainer, i);
+      PMDXForm tempXForm = it->second;
 
-      skip(m_input, 0x16);
-      uint32_t xformId = readU32(m_input, m_bigEndian);
-      if (xformId == rectXformId)
-      {
-        seekToRecord(m_input, xformContainer, i); // return to the beginning
-
-        rectRotationDegree = readU32(m_input, m_bigEndian);
-        rectSkewDegree = readU32(m_input, m_bigEndian);
-        skip(m_input, 2);
-        xformTopLeft = readPoint(m_input, m_bigEndian);
-        xformBotRight = readPoint(m_input, m_bigEndian);
-        rotatingPoint = readPoint(m_input, m_bigEndian);
-        break;
-      }
+      rectRotationDegree = tempXForm.m_rotationDegree;
+      rectSkewDegree = tempXForm.m_skewDegree;
+      xformTopLeft = tempXForm.m_xformTopLeft;
+      xformBotRight = tempXForm.m_xformBotRight;
+      rotatingPoint = tempXForm.m_rotatingPoint;
     }
   }
   int32_t temp = (int32_t)rectRotationDegree;
@@ -403,14 +419,7 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
     break;
   }
 
-  const PMDRecordContainer *ptrToLineSetContainer =
-    (lineSetSeqNum < m_recordsInOrder.size()) ? &(m_recordsInOrder[lineSetSeqNum]) : NULL;
-  if (!ptrToLineSetContainer)
-  {
-    PMD_ERR_MSG("No line set with the given sequence number.\n");
-    return;
-  }
-  const PMDRecordContainer &lineSetContainer = *(ptrToLineSetContainer);
+  const PMDRecordContainer &lineSetContainer = getSingleRecordBySeqNum(lineSetSeqNum);
   std::vector<PMDShapePoint> points;
   for (unsigned i = 0; i < lineSetContainer.m_numRecords; ++i)
   {
@@ -420,28 +429,19 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
 
   uint32_t polyRotationDegree = 0;
 
-  if (polyXformId != (std::numeric_limits<uint32_t>::max)())
+  if (polyXformId != (std::numeric_limits<uint32_t>::max)() && polyXformId != 0)
   {
-    const PMDRecordContainer *ptrToXformContainer = &(m_recordsInOrder[0x0c]);
-    const PMDRecordContainer &xformContainer = *ptrToXformContainer;
 
-    for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
+    std::map<uint32_t, PMDXForm>::iterator it = m_xFormMap.find(polyXformId);
+
+    if (it != m_xFormMap.end())
     {
-      seekToRecord(m_input, xformContainer, i);
+      PMDXForm tempXForm = it->second;
 
-      skip(m_input, 0x16);
-      uint32_t xformId = readU32(m_input, m_bigEndian);
-      if (xformId == polyXformId)
-      {
-        seekToRecord(m_input, xformContainer, i); // return to the beginning
-
-        polyRotationDegree = readU32(m_input, m_bigEndian);
-        polySkewDegree = readU32(m_input, m_bigEndian);
-        skip(m_input, 2);
-        xformTopLeft = readPoint(m_input, m_bigEndian);
-        xformBotRight = readPoint(m_input, m_bigEndian);
-        break;
-      }
+      polyRotationDegree = tempXForm.m_rotationDegree;
+      polySkewDegree = tempXForm.m_skewDegree;
+      xformTopLeft = tempXForm.m_xformTopLeft;
+      xformBotRight = tempXForm.m_xformBotRight;
     }
   }
   int32_t temp = (int32_t)polyRotationDegree;
@@ -492,28 +492,19 @@ void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recor
   PMDFillProperties fillProps(fillType,fillColor,fillOverprint,fillTint);
   PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
 
-  if (ellipseXformId != (std::numeric_limits<uint32_t>::max)())
+  if (ellipseXformId != (std::numeric_limits<uint32_t>::max)() && ellipseXformId != 0)
   {
-    const PMDRecordContainer *ptrToXformContainer = &(m_recordsInOrder[0x0c]);
-    const PMDRecordContainer &xformContainer = *ptrToXformContainer;
 
-    for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
+    std::map<uint32_t, PMDXForm>::iterator it = m_xFormMap.find(ellipseXformId);
+
+    if (it != m_xFormMap.end())
     {
-      seekToRecord(m_input, xformContainer, i);
+      PMDXForm tempXForm = it->second;
 
-      skip(m_input, 0x16);
-      uint32_t xformId = readU32(m_input, m_bigEndian);
-      if (xformId == ellipseXformId)
-      {
-        seekToRecord(m_input, xformContainer, i); // return to the beginning
-
-        ellipseRotationDegree = readU32(m_input, m_bigEndian);
-        ellipseSkewDegree = readU32(m_input, m_bigEndian);
-        skip(m_input, 2);
-        xformTopLeft = readPoint(m_input, m_bigEndian);
-        xformBotRight = readPoint(m_input, m_bigEndian);
-        break;
-      }
+      ellipseRotationDegree = tempXForm.m_rotationDegree;
+      ellipseSkewDegree = tempXForm.m_skewDegree;
+      xformTopLeft = tempXForm.m_xformTopLeft;
+      xformBotRight = tempXForm.m_xformBotRight;
     }
   }
   int32_t temp = (int32_t)ellipseRotationDegree;
@@ -544,102 +535,59 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
   skip(m_input, 16);
   uint16_t bitmapRecordSeqNum = readU16(m_input);
 
-  if (bboxXformId != (std::numeric_limits<uint32_t>::max)())
+  std::vector<PMDRecordContainer> tempContainer;
+
+  if (bboxXformId != (std::numeric_limits<uint32_t>::max)() && bboxXformId != 0)
   {
-    const PMDRecordContainer *ptrToXformContainer = &(m_recordsInOrder[0x0c]);
-    const PMDRecordContainer &xformContainer = *ptrToXformContainer;
 
-    for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
+    std::map<uint32_t, PMDXForm>::iterator it = m_xFormMap.find(bboxXformId);
+
+    if (it != m_xFormMap.end())
     {
-      seekToRecord(m_input, xformContainer, i);
+      PMDXForm tempXForm = it->second;
 
-      skip(m_input, 0x16);
-      uint32_t xformId = readU32(m_input, m_bigEndian);
-      if (xformId == bboxXformId)
-      {
-        seekToRecord(m_input, xformContainer, i); // return to the beginning
-
-        bboxRotationDegree = readU32(m_input, m_bigEndian);
-        bboxSkewDegree = readU32(m_input, m_bigEndian);
-        skip(m_input, 2);
-        xformTopLeft = readPoint(m_input, m_bigEndian);
-        xformBotRight = readPoint(m_input, m_bigEndian);
-        rotatingPoint = readPoint(m_input, m_bigEndian);
-        break;
-      }
+      bboxRotationDegree = tempXForm.m_rotationDegree;
+      bboxSkewDegree = tempXForm.m_skewDegree;
+      xformTopLeft = tempXForm.m_xformTopLeft;
+      xformBotRight = tempXForm.m_xformBotRight;
+      rotatingPoint = tempXForm.m_rotatingPoint;
     }
   }
   int32_t temp = (int32_t)bboxRotationDegree;
   double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
   temp = (int32_t)bboxSkewDegree;
   double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
-  const PMDRecordContainer *ptrToTiffContainer =
-    (bitmapRecordSeqNum < m_recordsInOrder.size()) ? &(m_recordsInOrder[bitmapRecordSeqNum]) : NULL;
-  if (!ptrToTiffContainer)
+
+  tempContainer = getRecordsBySeqNum(bitmapRecordSeqNum);
+  if (tempContainer.empty())
   {
     throw RecordNotFoundException(TIFF, bitmapRecordSeqNum);
   }
-  const PMDRecordContainer &tiffContainer = *ptrToTiffContainer;
-  if (tiffContainer.m_containsSubRecord)
+
+  for (unsigned j=0; j<tempContainer.size(); ++j)
   {
-
-    for (unsigned i = 0; i < tiffContainer.m_numRecords; ++i)
-    {
-      seekToRecord(m_input, tiffContainer, i);
-
-      uint16_t recType = readU16(m_input, m_bigEndian);
-      uint16_t numRecs = readU16(m_input, m_bigEndian);
-      uint32_t offset = readU32(m_input, m_bigEndian);
-
-      if (numRecs > 0)
-      {
-        PMDRecordContainer tempSubContainer(recType, offset, 0, numRecs);
-        seekToRecord(m_input, tempSubContainer, 0);
-        const unsigned char *const tempBytes = readNBytes(m_input,numRecs);
-        bitmap.append(tempBytes,numRecs);
-      }
-    }
-  }
-  else
-  {
+    const PMDRecordContainer *ptrToTiffContainer = &(tempContainer[j]);
+    const PMDRecordContainer &tiffContainer = *ptrToTiffContainer;
     seekToRecord(m_input, tiffContainer, 0);
     const unsigned char *const tempBytes = readNBytes(m_input,tiffContainer.m_numRecords);
     bitmap.append(tempBytes,tiffContainer.m_numRecords);
   }
 
-  const PMDRecordContainer *ptrToTiffSecondContainer =
-    (bitmapRecordSeqNum < m_recordsInOrder.size()) ? &(m_recordsInOrder[bitmapRecordSeqNum + 1]) : NULL;
-  if (!ptrToTiffSecondContainer)
+  tempContainer = getRecordsBySeqNum(bitmapRecordSeqNum + 1);
+  if (tempContainer.empty())
   {
-    throw RecordNotFoundException(TIFF, bitmapRecordSeqNum + 1);
+    throw RecordNotFoundException(TIFF, bitmapRecordSeqNum);
   }
-  const PMDRecordContainer &tiffSecondContainer = *ptrToTiffSecondContainer;
-
-  if (tiffSecondContainer.m_containsSubRecord)
+  for (unsigned j=0; j<tempContainer.size(); ++j)
   {
-    for (unsigned i = 0; i < tiffSecondContainer.m_numRecords; ++i)
-    {
-      seekToRecord(m_input, tiffSecondContainer, i);
-
-      uint16_t recType = readU16(m_input, m_bigEndian);
-      uint16_t numRecs = readU16(m_input, m_bigEndian);
-      uint32_t offset = readU32(m_input, m_bigEndian);
-
-      if (numRecs > 0)
-      {
-        PMDRecordContainer subContainer(recType, offset, 0, numRecs);
-        seekToRecord(m_input, subContainer, 0);
-        const unsigned char *const tempBytes = readNBytes(m_input,numRecs);
-        bitmap.append(tempBytes,numRecs);
-      }
-    }
-  }
-  else
-  {
+    const PMDRecordContainer *ptrToTiffSecondContainer = &(tempContainer[j]);
+    const PMDRecordContainer &tiffSecondContainer = *ptrToTiffSecondContainer;
     seekToRecord(m_input, tiffSecondContainer, 0);
     const unsigned char *const tempBytes = readNBytes(m_input,tiffSecondContainer.m_numRecords);
     bitmap.append(tempBytes,tiffSecondContainer.m_numRecords);
   }
+
+
   boost::shared_ptr<PMDLineSet> newShape(new PMDBitmap(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, bitmap));
   m_collector->addShapeToPage(pageID, newShape);
 
@@ -647,117 +595,158 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
 
 void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
 {
-  const PMDRecordContainer *ptrToContainer =
-    (seqNum < m_recordsInOrder.size()) ? &(m_recordsInOrder[seqNum]) : NULL;
-  if (!ptrToContainer)
-  {
-    throw RecordNotFoundException(SHAPE, seqNum);
-  }
-  const PMDRecordContainer &container = *ptrToContainer;
-  for (unsigned i = 0; i < container.m_numRecords; ++i)
-  {
-    seekToRecord(m_input, container, i);
+  std::vector<PMDRecordContainer> tempContainer = getRecordsBySeqNum(seqNum);
 
-    uint8_t shapeType = readU8(m_input);
-    switch (shapeType)
+  for (unsigned j=0; j<tempContainer.size(); ++j)
+  {
+    const PMDRecordContainer *ptrToContainer = &(tempContainer[j]);
+    const PMDRecordContainer &container = *ptrToContainer;
+
+    for (unsigned i = 0; i < container.m_numRecords; ++i)
     {
-    case LINE_RECORD:
-      parseLine(container, i, pageID);
-      break;
-    case RECTANGLE_RECORD:
-      parseRectangle(container, i, pageID);
-      break;
-    case POLYGON_RECORD:
-      parsePolygon(container, i, pageID);
-      break;
-    case ELLIPSE_RECORD:
-      parseEllipse(container, i, pageID);
-      break;
-    case TEXT_RECORD:
-      parseTextBox(container, i, pageID);
-      break;
-    case BITMAP_RECORD:
-    case METAFILE_RECORD:
-      parseBitmap(container, i, pageID);
-      break;
-    default:
-      PMD_ERR_MSG("Encountered shape of unknown type.\n");
-      continue;
-    }
-  }
-}
+      seekToRecord(m_input, container, i);
 
-void PMDParser::parseFonts(const PMDRecordContainer &container)
-{
-  uint16_t fontIndex = 0;
-
-  for (unsigned i = 0; i < container.m_numRecords; ++i)
-  {
-    seekToRecord(m_input, container, i);
-
-    uint16_t recType = readU16(m_input, m_bigEndian);
-    uint16_t numRecs = readU16(m_input, m_bigEndian);
-    uint16_t offset = readU16(m_input, m_bigEndian);
-
-    if (recType == FONTS)
-    {
-      PMDRecordContainer subContainer(recType, offset, 0, numRecs);
-
-      for (unsigned k = 0; k < subContainer.m_numRecords; ++k)
+      uint8_t shapeType = readU8(m_input);
+      switch (shapeType)
       {
-        std::string fontName;
-
-        seekToRecord(m_input, subContainer, k);
-        uint8_t temp = readU8(m_input);
-
-        while (temp)
-        {
-          fontName.push_back(temp);
-          temp = readU8(m_input);
-        }
-        m_collector->addFont(PMDFont(fontIndex, fontName));
-        fontIndex++;
+      case LINE_RECORD:
+        parseLine(container, i, pageID);
+        break;
+      case RECTANGLE_RECORD:
+        parseRectangle(container, i, pageID);
+        break;
+      case POLYGON_RECORD:
+        parsePolygon(container, i, pageID);
+        break;
+      case ELLIPSE_RECORD:
+        parseEllipse(container, i, pageID);
+        break;
+      case TEXT_RECORD:
+        parseTextBox(container, i, pageID);
+        break;
+      case BITMAP_RECORD:
+      case METAFILE_RECORD:
+        parseBitmap(container, i, pageID);
+        break;
+      default:
+        PMD_ERR_MSG("Encountered shape of unknown type.\n");
+        continue;
       }
     }
   }
 }
 
-void PMDParser::parseColors(const PMDRecordContainer &container)
+void PMDParser::parseFonts()
 {
-  for (unsigned i = 0; i < container.m_numRecords; ++i)
+  std::vector<PMDRecordContainer> tempContainer = getRecordsByRecType(FONTS);
+
+  if (tempContainer.empty())
   {
-    seekToRecord(m_input, container, i);
-    skip(m_input, 0x22);
+    PMD_ERR_MSG("No Font Record Found.\n");
+  }
 
-    uint8_t colorModel = readU8(m_input);
-    uint8_t red = 0;
-    uint8_t blue = 0;
-    uint8_t green = 0;
+  uint16_t fontIndex = 0;
+  for (unsigned j=0; j<tempContainer.size(); ++j)
+  {
+    const PMDRecordContainer &container = tempContainer[j];
 
-    skip(m_input, 3);
-    if (colorModel == RGB)
+    for (unsigned i = 0; i < container.m_numRecords; ++i)
     {
-      red = readU8(m_input);
-      green = readU8(m_input);
-      blue = readU8(m_input);
+      seekToRecord(m_input, container, i);
+
+      std::string fontName;
+
+      uint8_t temp = readU8(m_input);
+
+      while (temp)
+      {
+        fontName.push_back(temp);
+        temp = readU8(m_input);
+      }
+      m_collector->addFont(PMDFont(fontIndex, fontName));
+      fontIndex++;
     }
-    else if (colorModel == CMYK || colorModel == HLS) // HLS is also stroed in CMYK format
-    {
-      uint16_t cyan = readU16(m_input, m_bigEndian);
-      uint16_t magenta = readU16(m_input, m_bigEndian);
-      uint16_t yellow = readU16(m_input, m_bigEndian);
-      uint16_t black = readU16(m_input, m_bigEndian);
-
-      uint16_t max = (std::numeric_limits<uint16_t>::max)();
-
-      red = 255*(1 - std::min(1.0, (double)cyan/max + (double)black/max));
-      green = 255*(1 - std::min(1.0, (double)magenta/max + (double)black/max));
-      blue = 255*(1 - std::min(1.0, (double)yellow/max + (double)black/max));
-    }
-
-    m_collector->addColor(PMDColor(i, red, green, blue));
   }
 }
+
+void PMDParser::parseColors()
+{
+
+  std::vector<PMDRecordContainer> tempContainer = getRecordsByRecType(COLORS);
+
+  if (tempContainer.empty())
+  {
+    PMD_ERR_MSG("No Color Record Found.\n");
+  }
+
+  for (unsigned j=0; j<tempContainer.size(); ++j)
+  {
+    const PMDRecordContainer &container = tempContainer[j];
+
+    for (unsigned i = 0; i < container.m_numRecords; ++i)
+    {
+      seekToRecord(m_input, container, i);
+      skip(m_input, 0x22);
+
+      uint8_t colorModel = readU8(m_input);
+      uint8_t red = 0;
+      uint8_t blue = 0;
+      uint8_t green = 0;
+
+      skip(m_input, 3);
+      if (colorModel == RGB)
+      {
+        red = readU8(m_input);
+        green = readU8(m_input);
+        blue = readU8(m_input);
+      }
+      else if (colorModel == CMYK || colorModel == HLS) // HLS is also stroed in CMYK format
+      {
+        uint16_t cyan = readU16(m_input, m_bigEndian);
+        uint16_t magenta = readU16(m_input, m_bigEndian);
+        uint16_t yellow = readU16(m_input, m_bigEndian);
+        uint16_t black = readU16(m_input, m_bigEndian);
+
+        uint16_t max = (std::numeric_limits<uint16_t>::max)();
+
+        red = 255*(1 - std::min(1.0, (double)cyan/max + (double)black/max));
+        green = 255*(1 - std::min(1.0, (double)magenta/max + (double)black/max));
+        blue = 255*(1 - std::min(1.0, (double)yellow/max + (double)black/max));
+      }
+
+      m_collector->addColor(PMDColor(i, red, green, blue));
+    }
+  }
+}
+
+void PMDParser::parseXforms()
+{
+
+  std::vector<PMDRecordContainer> tempContainer = getRecordsByRecType(XFORM);
+
+  for (unsigned j=0; j<tempContainer.size(); ++j)
+  {
+    const PMDRecordContainer &xformContainer = tempContainer[j];
+
+    for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
+    {
+
+      seekToRecord(m_input, xformContainer, i);
+
+      uint32_t rotationDegree = readU32(m_input, m_bigEndian);
+      uint32_t skewDegree = readU32(m_input, m_bigEndian);
+      skip(m_input, 2);
+      PMDShapePoint xformTopLeft = readPoint(m_input, m_bigEndian);
+      PMDShapePoint xformBotRight = readPoint(m_input, m_bigEndian);
+      PMDShapePoint rotatingPoint = readPoint(m_input, m_bigEndian);
+      uint32_t xformId = readU32(m_input, m_bigEndian);
+
+      m_xFormMap.insert(std::pair<uint32_t, PMDXForm>(xformId,PMDXForm(rotationDegree,skewDegree,xformTopLeft,xformBotRight,rotatingPoint,xformId)));
+    }
+  }
+
+}
+
 
 void PMDParser::parsePages(const PMDRecordContainer &container)
 {
@@ -828,12 +817,29 @@ unsigned PMDParser::readNextRecordFromTableOfContents(unsigned seqNum)
   uint32_t offset = readU32(m_input, m_bigEndian);
 
   skip(m_input, 2);
-  const bool containsSubRecord = readU8(m_input) != 0x01;
 
+  if (readU8(m_input) != 0x01)
+  {
+    uint32_t temp = m_input->tell();
+    seek(m_input,offset);
+    for (uint32_t i = 0; i<numRecs; ++i)
+    {
+      uint16_t subRecType = readU16(m_input, m_bigEndian);
+      uint16_t subNumRecs = readU16(m_input, m_bigEndian);
+      uint32_t subOffset = readU32(m_input, m_bigEndian);
+      skip(m_input, 2);
+      m_recordsInOrder.push_back(PMDRecordContainer(subRecType, subOffset, seqNum, subNumRecs));
+      m_records[subRecType].push_back((unsigned)(m_recordsInOrder.size() - 1));
+    }
+    seek(m_input,temp);
+  }
+  else
+  {
+    m_recordsInOrder.push_back(PMDRecordContainer(recType, offset, seqNum, numRecs));
+    m_records[recType].push_back((unsigned)(m_recordsInOrder.size() - 1));
+
+  }
   skip(m_input, 5);
-
-  m_recordsInOrder.push_back(PMDRecordContainer(recType, offset, seqNum, numRecs,containsSubRecord));
-  m_records[recType].push_back((unsigned)(m_recordsInOrder.size() - 1));
   return numRecs;
 }
 
@@ -861,6 +867,9 @@ void PMDParser::parse()
   uint16_t tocLength;
   parseHeader(&tocOffset, &tocLength);
   parseTableOfContents(tocOffset, tocLength);
+  parseFonts();
+  parseColors();
+  parseXforms();
 
   typedef std::map<uint16_t, std::vector<unsigned> >::iterator RecIter;
 
@@ -875,28 +884,6 @@ void PMDParser::parse()
     throw RecordNotFoundException(GLOBAL_INFO);
   }
 
-  i = m_records.find(COLORS);
-  if (i != m_records.end()
-      && !(i->second.empty()))
-  {
-    parseColors(m_recordsInOrder[i->second[0]]);
-  }
-  else
-  {
-    throw RecordNotFoundException(COLORS);
-  }
-
-  i = m_records.find(FONTS_PARENT);
-  if (i != m_records.end()
-      && !(i->second.empty()))
-  {
-    parseFonts(m_recordsInOrder[i->second[0]]);
-  }
-  else
-  {
-    throw RecordNotFoundException(FONTS_PARENT);
-  }
-
   i = m_records.find(PAGE);
   if (i != m_records.end()
       && !(i->second.empty()))
@@ -908,6 +895,5 @@ void PMDParser::parse()
     throw RecordNotFoundException(PAGE);
   }
 }
-
 }
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

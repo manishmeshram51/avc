@@ -16,6 +16,7 @@
 #include <map>
 
 #include "PMDRecord.h"
+#include "geometry.h"
 
 namespace libpagemaker
 {
@@ -28,11 +29,12 @@ class PMDParser
   std::map<uint16_t, std::vector<unsigned> > m_records;
   bool m_bigEndian;
   std::vector<PMDRecordContainer> m_recordsInOrder;
+  std::map<uint32_t, PMDXForm> m_xFormMap;
 
   /* Private functions. */
   void parseGlobalInfo(const PMDRecordContainer &container);
-  void parseFonts(const PMDRecordContainer &container);
-  void parseColors(const PMDRecordContainer &container);
+  void parseFonts();
+  void parseColors();
   void parsePages(const PMDRecordContainer &container);
   void parseShapes(uint16_t seqNum, unsigned pageID);
   void parseLine(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID);
@@ -44,6 +46,10 @@ class PMDParser
   void parseHeader(uint32_t *tocOffset, uint16_t *tocLength);
   unsigned readNextRecordFromTableOfContents(unsigned seqNum);
   void parseTableOfContents(uint32_t offset, uint16_t length);
+  std::vector<PMDRecordContainer> getRecordsBySeqNum(const uint16_t seqNum);
+  std::vector<PMDRecordContainer> getRecordsByRecType(const uint16_t recType);
+  const PMDRecordContainer &getSingleRecordBySeqNum(const uint16_t seqNum) const;
+  void parseXforms();
 
   /* Prevent copy and assignment */
   PMDParser &operator=(const PMDParser &);

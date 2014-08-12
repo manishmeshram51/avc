@@ -30,6 +30,20 @@ template <typename Unit> struct Point
 typedef Point<PMDShapeUnit> PMDShapePoint;
 typedef Point<double> InchPoint;
 
+struct PMDXForm
+{
+  uint32_t m_rotationDegree;
+  uint32_t m_skewDegree;
+  PMDShapePoint m_xformTopLeft;
+  PMDShapePoint m_xformBotRight;
+  PMDShapePoint m_rotatingPoint;
+  uint32_t m_xformId;
+
+  PMDXForm(const uint32_t rotationDegree, const uint32_t skewDegree, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const PMDShapePoint rotatingPoint, const uint32_t xformId)
+    : m_rotationDegree(rotationDegree), m_skewDegree(skewDegree), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_rotatingPoint(rotatingPoint), m_xformId(xformId)
+  { }
+};
+
 class PMDLineSet
 {
 public:
