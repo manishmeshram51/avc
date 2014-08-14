@@ -83,6 +83,19 @@ const PMDRecordContainer &PMDParser::getSingleRecordBySeqNum(const uint16_t seqN
   throw RecordNotFoundException(seqNum);
 }
 
+const PMDXForm &PMDParser::getXForm(const uint32_t xFormId) const
+{
+  if (xFormId != (std::numeric_limits<uint32_t>::max)() && xFormId != 0)
+  {
+    std::map<uint32_t, PMDXForm>::const_iterator it = m_xFormMap.find(xFormId);
+
+    if (it != m_xFormMap.end())
+      return it->second;
+  }
+
+  return m_xFormMap.find(0)->second;
+}
+
 void seekToRecord(librevenge::RVNGInputStream *const input, const PMDRecordContainer &container, const unsigned recordIndex)
 {
   uint32_t recordOffset = container.m_offset;
@@ -161,11 +174,6 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
   skip(m_input, 6);
   PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
   PMDShapePoint bboxBotRight = readPoint(m_input, m_bigEndian);
-  uint32_t textBoxRotationDegree = 0;
-  uint32_t textBoxSkewDegree = 0;
-  PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
-  PMDShapePoint xformBotRight = PMDShapePoint(0,0);
-  PMDShapePoint rotatingPoint = PMDShapePoint(0, 0);
 
   uint16_t textBoxTextPropsOne = 0;
   uint16_t textBoxTextPropsTwo = 0;
@@ -178,27 +186,7 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
   uint32_t textBoxXformId = readU32(m_input, m_bigEndian);
   uint32_t textBoxTextBlockId = readU32(m_input, m_bigEndian);
 
-  if (textBoxXformId != (std::numeric_limits<uint32_t>::max)() && textBoxXformId != 0)
-  {
-
-    std::map<uint32_t, PMDXForm>::iterator it = m_xFormMap.find(textBoxXformId);
-
-    if (it != m_xFormMap.end())
-    {
-      PMDXForm tempXForm = it->second;
-
-      textBoxRotationDegree = tempXForm.m_rotationDegree;
-      textBoxSkewDegree = tempXForm.m_skewDegree;
-      xformTopLeft = tempXForm.m_xformTopLeft;
-      xformBotRight = tempXForm.m_xformBotRight;
-      rotatingPoint = tempXForm.m_rotatingPoint;
-    }
-  }
-
-  int32_t temp = (int32_t)textBoxRotationDegree;
-  double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
-  temp = (int32_t)textBoxSkewDegree;
-  double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
+  const PMDXForm xFormContainer = getXForm(textBoxXformId);
 
   const PMDRecordContainer &textBlockContainer = getSingleRecordBySeqNum(TEXT_BLOCK_OFFSET);
 
@@ -293,7 +281,7 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
     paraProps.push_back(PMDParaProperties(length,align,leftIndent,firstIndent,rightIndent,beforeIndent,afterIndent));
   }
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDTextBox(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, text, charProps, paraProps));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDTextBox(bboxTopLeft, bboxBotRight, xFormContainer, text, charProps, paraProps));
   m_collector->addShapeToPage(pageID, newShape);
 
 }
@@ -310,11 +298,6 @@ void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned rec
   skip(m_input, 1);
   PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
   PMDShapePoint bboxBotRight = readPoint(m_input, m_bigEndian);
-  uint32_t rectRotationDegree = 0;
-  uint32_t rectSkewDegree = 0;
-  PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
-  PMDShapePoint xformBotRight = PMDShapePoint(0,0);
-  PMDShapePoint rotatingPoint = PMDShapePoint(0, 0);
   skip(m_input, 14);
   uint32_t rectXformId = readU32(m_input, m_bigEndian);
 
@@ -336,26 +319,8 @@ void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned rec
   PMDFillProperties fillProps(fillType,fillColor,fillOverprint,fillTint);
   PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
 
-  if (rectXformId != (std::numeric_limits<uint32_t>::max)() && rectXformId != 0)
-  {
-    std::map<uint32_t, PMDXForm>::iterator it = m_xFormMap.find(rectXformId);
-
-    if (it != m_xFormMap.end())
-    {
-      PMDXForm tempXForm = it->second;
-
-      rectRotationDegree = tempXForm.m_rotationDegree;
-      rectSkewDegree = tempXForm.m_skewDegree;
-      xformTopLeft = tempXForm.m_xformTopLeft;
-      xformBotRight = tempXForm.m_xformBotRight;
-      rotatingPoint = tempXForm.m_rotatingPoint;
-    }
-  }
-  int32_t temp = (int32_t)rectRotationDegree;
-  double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
-  temp = (int32_t)rectSkewDegree;
-  double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
-  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, fillProps, strokeProps));
+  const PMDXForm &xFormContainer = getXForm(rectXformId);
+  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(bboxTopLeft, bboxBotRight, xFormContainer, fillProps, strokeProps));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -398,10 +363,6 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
   PMDFillProperties fillProps(fillType,fillColor,fillOverprint,fillTint);
   PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
 
-  uint32_t polySkewDegree = 0;
-  PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
-  PMDShapePoint xformBotRight = PMDShapePoint(0,0);
-
   bool closed;
   switch (closedMarker)
   {
@@ -427,29 +388,8 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
     points.push_back(readPoint(m_input, m_bigEndian));
   }
 
-  uint32_t polyRotationDegree = 0;
-
-  if (polyXformId != (std::numeric_limits<uint32_t>::max)() && polyXformId != 0)
-  {
-
-    std::map<uint32_t, PMDXForm>::iterator it = m_xFormMap.find(polyXformId);
-
-    if (it != m_xFormMap.end())
-    {
-      PMDXForm tempXForm = it->second;
-
-      polyRotationDegree = tempXForm.m_rotationDegree;
-      polySkewDegree = tempXForm.m_skewDegree;
-      xformTopLeft = tempXForm.m_xformTopLeft;
-      xformBotRight = tempXForm.m_xformBotRight;
-    }
-  }
-  int32_t temp = (int32_t)polyRotationDegree;
-  double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
-  temp = (int32_t)polySkewDegree;
-  double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
-
-  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, rotationRadian, skewRadian, bboxTopLeft, bboxBotRight, xformTopLeft, xformBotRight, fillProps, strokeProps));
+  const PMDXForm &xFormContainer = getXForm(polyXformId);
+  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, bboxTopLeft, bboxBotRight, xFormContainer, fillProps, strokeProps));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -465,11 +405,6 @@ void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recor
   skip(m_input, 1);
   PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
   PMDShapePoint bboxBotRight = readPoint(m_input, m_bigEndian);
-
-  uint32_t ellipseRotationDegree = 0;
-  uint32_t ellipseSkewDegree = 0;
-  PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
-  PMDShapePoint xformBotRight = PMDShapePoint(0,0);
 
   skip(m_input, 14);
   uint32_t ellipseXformId = readU32(m_input, m_bigEndian);
@@ -492,27 +427,8 @@ void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recor
   PMDFillProperties fillProps(fillType,fillColor,fillOverprint,fillTint);
   PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
 
-  if (ellipseXformId != (std::numeric_limits<uint32_t>::max)() && ellipseXformId != 0)
-  {
-
-    std::map<uint32_t, PMDXForm>::iterator it = m_xFormMap.find(ellipseXformId);
-
-    if (it != m_xFormMap.end())
-    {
-      PMDXForm tempXForm = it->second;
-
-      ellipseRotationDegree = tempXForm.m_rotationDegree;
-      ellipseSkewDegree = tempXForm.m_skewDegree;
-      xformTopLeft = tempXForm.m_xformTopLeft;
-      xformBotRight = tempXForm.m_xformBotRight;
-    }
-  }
-  int32_t temp = (int32_t)ellipseRotationDegree;
-  double rotationRadian = -1 * (double)temp/1000 *(M_PI/180);
-  temp = (int32_t)ellipseSkewDegree;
-  double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
-
-  boost::shared_ptr<PMDLineSet> newShape(new PMDEllipse(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, xformTopLeft, xformBotRight, fillProps, strokeProps));
+  const PMDXForm &xFormContainer = getXForm(ellipseXformId);
+  boost::shared_ptr<PMDLineSet> newShape(new PMDEllipse(bboxTopLeft, bboxBotRight, xFormContainer, fillProps, strokeProps));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -524,11 +440,6 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
   skip(m_input, 6);
   PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
   PMDShapePoint bboxBotRight = readPoint(m_input, m_bigEndian);
-  uint32_t bboxRotationDegree = 0;
-  uint32_t bboxSkewDegree = 0;
-  PMDShapePoint xformTopLeft = PMDShapePoint(0,0);
-  PMDShapePoint xformBotRight = PMDShapePoint(0,0);
-  PMDShapePoint rotatingPoint = PMDShapePoint(0, 0);
   skip(m_input, 14);
   uint32_t bboxXformId = readU32(m_input, m_bigEndian);
 
@@ -537,26 +448,7 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
 
   std::vector<PMDRecordContainer> tempContainer;
 
-  if (bboxXformId != (std::numeric_limits<uint32_t>::max)() && bboxXformId != 0)
-  {
-
-    std::map<uint32_t, PMDXForm>::iterator it = m_xFormMap.find(bboxXformId);
-
-    if (it != m_xFormMap.end())
-    {
-      PMDXForm tempXForm = it->second;
-
-      bboxRotationDegree = tempXForm.m_rotationDegree;
-      bboxSkewDegree = tempXForm.m_skewDegree;
-      xformTopLeft = tempXForm.m_xformTopLeft;
-      xformBotRight = tempXForm.m_xformBotRight;
-      rotatingPoint = tempXForm.m_rotatingPoint;
-    }
-  }
-  int32_t temp = (int32_t)bboxRotationDegree;
-  double rotationRadian = -1 * (double)temp/1000 * (M_PI/180);
-  temp = (int32_t)bboxSkewDegree;
-  double skewRadian = -1 * (double)temp/1000 * (M_PI/180);
+  const PMDXForm &xFormContainer = getXForm(bboxXformId);
 
   tempContainer = getRecordsBySeqNum(bitmapRecordSeqNum);
   if (tempContainer.empty())
@@ -588,7 +480,7 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
   }
 
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDBitmap(bboxTopLeft, bboxBotRight, rotationRadian, skewRadian, rotatingPoint, xformTopLeft, xformBotRight, bitmap));
+  boost::shared_ptr<PMDLineSet> newShape(new PMDBitmap(bboxTopLeft, bboxBotRight, xFormContainer, bitmap));
   m_collector->addShapeToPage(pageID, newShape);
 
 }
@@ -744,7 +636,7 @@ void PMDParser::parseXforms()
       m_xFormMap.insert(std::pair<uint32_t, PMDXForm>(xformId,PMDXForm(rotationDegree,skewDegree,xformTopLeft,xformBotRight,rotatingPoint,xformId)));
     }
   }
-
+  m_xFormMap.insert(std::pair<uint32_t,PMDXForm>(0,PMDXForm(0,0,PMDShapePoint(0,0),PMDShapePoint(0,0),PMDShapePoint(0,0),0))); //Default XForm
 }
 
 

@@ -15,6 +15,7 @@
 #include "constants.h"
 #include <librevenge/librevenge.h>
 #include <PMDTypes.h>
+#include "libpagemaker_utils.h"
 
 namespace libpagemaker
 {
@@ -189,43 +190,42 @@ class PMDPolygon : public PMDLineSet
 {
   std::vector<PMDShapePoint> m_points;
   bool m_isClosed;
-  double m_rotation;
-  double m_skew;
   PMDShapePoint m_bboxTopLeft;
   PMDShapePoint m_bboxBotRight;
-  PMDShapePoint m_xformTopLeft;
-  PMDShapePoint m_xformBotRight;
+  PMDXForm m_xFormContainer;
   PMDFillProperties m_fillProps;
   PMDStrokeProperties m_strokeProps;
 
 public:
-  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const double rotation, const double skew, const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const PMDFillProperties fillProps, const PMDStrokeProperties strokeProps)
-    : m_points(points), m_isClosed(isClosed), m_rotation(rotation), m_skew(skew), m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillProps(fillProps), m_strokeProps(strokeProps)
+  PMDPolygon(std::vector<PMDShapePoint> points, bool isClosed, const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const PMDXForm &xFormContainer, const PMDFillProperties fillProps, const PMDStrokeProperties strokeProps)
+    : m_points(points), m_isClosed(isClosed), m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_xFormContainer(xFormContainer), m_fillProps(fillProps), m_strokeProps(strokeProps)
   { }
 
   virtual double getRotation() const
   {
-    return m_rotation;
+    int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
+    return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   virtual double getSkew() const
   {
-    return m_skew;
+    int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
+    return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   virtual PMDShapePoint getXformTopLeft() const
   {
-    return m_xformTopLeft;
+    return m_xFormContainer.m_xformTopLeft;
   }
 
   virtual PMDShapePoint getXformBotRight() const
   {
-    return m_xformBotRight;
+    return m_xFormContainer.m_xformBotRight;
   }
 
   virtual PMDShapePoint getRotatingPoint() const
   {
-    return PMDShapePoint(0,0);
+    return m_xFormContainer.m_rotatingPoint;
   }
 
   virtual PMDShapePoint getBboxTopLeft() const
@@ -297,43 +297,41 @@ class PMDTextBox : public PMDLineSet
 {
   PMDShapePoint m_bboxTopLeft;
   PMDShapePoint m_bboxBotRight;
-  double m_rotation;
-  double m_skew;
-  PMDShapePoint m_rotatingPoint;
-  PMDShapePoint m_xformTopLeft;
-  PMDShapePoint m_xformBotRight;
+  PMDXForm m_xFormContainer;
   std::string m_text;
   std::vector<PMDCharProperties> m_charProps;
   std::vector<PMDParaProperties> m_paraProps;
 
 public:
-  PMDTextBox(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const std::string text, const std::vector<PMDCharProperties> charProps, const std::vector<PMDParaProperties> paraProps)
-    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_text(text), m_charProps(charProps), m_paraProps(paraProps)
+  PMDTextBox(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const PMDXForm &xFormContainer, const std::string text, const std::vector<PMDCharProperties> charProps, const std::vector<PMDParaProperties> paraProps)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight),m_xFormContainer(xFormContainer), m_text(text), m_charProps(charProps), m_paraProps(paraProps)
   { }
 
   virtual double getRotation() const
   {
-    return m_rotation;
+    int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
+    return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   virtual double getSkew() const
   {
-    return m_skew;
+    int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
+    return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   virtual PMDShapePoint getXformTopLeft() const
   {
-    return m_xformTopLeft;
+    return m_xFormContainer.m_xformTopLeft;
   }
 
   virtual PMDShapePoint getXformBotRight() const
   {
-    return m_xformBotRight;
+    return m_xFormContainer.m_xformBotRight;
   }
 
   virtual PMDShapePoint getRotatingPoint() const
   {
-    return m_rotatingPoint;
+    return m_xFormContainer.m_rotatingPoint;
   }
 
   virtual PMDShapePoint getBboxTopLeft() const
@@ -405,42 +403,40 @@ class PMDRectangle : public PMDLineSet
 {
   PMDShapePoint m_bboxTopLeft;
   PMDShapePoint m_bboxBotRight;
-  double m_rotation;
-  double m_skew;
-  PMDShapePoint m_rotatingPoint;
-  PMDShapePoint m_xformTopLeft;
-  PMDShapePoint m_xformBotRight;
+  PMDXForm m_xFormContainer;
   PMDFillProperties m_fillProps;
   PMDStrokeProperties m_strokeProps;
 
 public:
-  PMDRectangle(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const PMDFillProperties fillProps, const PMDStrokeProperties strokeProps)
-    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillProps(fillProps), m_strokeProps(strokeProps)
+  PMDRectangle(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const PMDXForm &xFormContainer, const PMDFillProperties fillProps, const PMDStrokeProperties strokeProps)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight),m_xFormContainer(xFormContainer), m_fillProps(fillProps), m_strokeProps(strokeProps)
   { }
 
   virtual double getRotation() const
   {
-    return m_rotation;
+    int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
+    return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   virtual double getSkew() const
   {
-    return m_skew;
+    int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
+    return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   virtual PMDShapePoint getXformTopLeft() const
   {
-    return m_xformTopLeft;
+    return m_xFormContainer.m_xformTopLeft;
   }
 
   virtual PMDShapePoint getXformBotRight() const
   {
-    return m_xformBotRight;
+    return m_xFormContainer.m_xformBotRight;
   }
 
   virtual PMDShapePoint getRotatingPoint() const
   {
-    return m_rotatingPoint;
+    return m_xFormContainer.m_rotatingPoint;
   }
 
   virtual PMDShapePoint getBboxTopLeft() const
@@ -519,42 +515,42 @@ class PMDEllipse : public PMDLineSet
 {
   PMDShapePoint m_bboxTopLeft;
   PMDShapePoint m_bboxBotRight;
-  double m_rotation;
-  double m_skew;
-  PMDShapePoint m_xformTopLeft;
-  PMDShapePoint m_xformBotRight;
+  PMDXForm m_xFormContainer;
   PMDFillProperties m_fillProps;
   PMDStrokeProperties m_strokeProps;
 
 public:
-  PMDEllipse(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const PMDFillProperties fillProps, const PMDStrokeProperties strokeProps)
-    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight), m_fillProps(fillProps), m_strokeProps(strokeProps)
+  PMDEllipse(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const PMDXForm &xFormContainer, const PMDFillProperties fillProps, const PMDStrokeProperties strokeProps)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_xFormContainer(xFormContainer), m_fillProps(fillProps), m_strokeProps(strokeProps)
   { }
 
   virtual double getRotation() const
   {
-    return m_rotation;
+    int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
+    return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   virtual double getSkew() const
   {
-    return m_skew;
+    int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
+    return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   virtual PMDShapePoint getXformTopLeft() const
   {
-    return m_xformTopLeft;
+    return m_xFormContainer.m_xformTopLeft;
   }
 
   virtual PMDShapePoint getXformBotRight() const
   {
-    return m_xformBotRight;
+    return m_xFormContainer.m_xformBotRight;
   }
 
   virtual PMDShapePoint getRotatingPoint() const
   {
-    return PMDShapePoint(0,0);
+    return m_xFormContainer.m_rotatingPoint;
   }
+
   virtual bool getIsClosed() const
   {
     return true;
@@ -629,41 +625,39 @@ class PMDBitmap : public PMDLineSet
 {
   PMDShapePoint m_bboxTopLeft;
   PMDShapePoint m_bboxBotRight;
-  double m_rotation;
-  double m_skew;
-  PMDShapePoint m_rotatingPoint;
-  PMDShapePoint m_xformTopLeft;
-  PMDShapePoint m_xformBotRight;
+  PMDXForm m_xFormContainer;
   librevenge::RVNGBinaryData m_bitmap;
 
 public:
-  PMDBitmap(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const double rotation, const double skew, const PMDShapePoint rotatingPoint, const PMDShapePoint xformTopLeft, const PMDShapePoint xformBotRight, const librevenge::RVNGBinaryData &bitmap)
-    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_rotation(rotation), m_skew(skew), m_rotatingPoint(rotatingPoint), m_xformTopLeft(xformTopLeft), m_xformBotRight(xformBotRight),m_bitmap(bitmap)
+  PMDBitmap(const PMDShapePoint &bboxTopLeft, const PMDShapePoint &bboxBotRight, const PMDXForm &xFormContainer, const librevenge::RVNGBinaryData &bitmap)
+    : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_xFormContainer(xFormContainer),m_bitmap(bitmap)
   { }
 
   virtual double getRotation() const
   {
-    return m_rotation;
+    int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
+    return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   virtual double getSkew() const
   {
-    return m_skew;
+    int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
+    return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   virtual PMDShapePoint getXformTopLeft() const
   {
-    return m_xformTopLeft;
+    return m_xFormContainer.m_xformTopLeft;
   }
 
   virtual PMDShapePoint getXformBotRight() const
   {
-    return m_xformBotRight;
+    return m_xFormContainer.m_xformBotRight;
   }
 
   virtual PMDShapePoint getRotatingPoint() const
   {
-    return m_rotatingPoint;
+    return m_xFormContainer.m_rotatingPoint;
   }
 
   virtual PMDShapePoint getBboxTopLeft() const

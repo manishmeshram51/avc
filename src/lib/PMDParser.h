@@ -50,6 +50,7 @@ class PMDParser
   std::vector<PMDRecordContainer> getRecordsByRecType(const uint16_t recType);
   const PMDRecordContainer &getSingleRecordBySeqNum(const uint16_t seqNum) const;
   void parseXforms();
+  const PMDXForm &getXForm(const uint32_t xFormId) const;
 
   /* Prevent copy and assignment */
   PMDParser &operator=(const PMDParser &);
