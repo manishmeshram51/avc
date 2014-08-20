@@ -1,3 +1,17 @@
+libpagemaker-0.0.1
+
+- Fix build on MS Windows.
+- Parse HLS colors.
+- Parse bitmaps.
+- Parse WMF metafiles.
+- Fix output of multi-page documents.
+- Fix parsing of polygons.
+- Handle rotation of various shapes correctly.
+- Fix handling of text that contains ASCII control characters.
+- Fix parsing of big data blocks, where the data are saved in indirect
+  records (sub-records).
+- And many other small fixes and improvements.
+
 libpagemaker-0.0.0
 
 - First release.
