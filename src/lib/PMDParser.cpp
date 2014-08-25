@@ -188,39 +188,47 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
 
   const PMDXForm xFormContainer = getXForm(textBoxXformId);
 
-  const PMDRecordContainer &textBlockContainer = getSingleRecordBySeqNum(TEXT_BLOCK_OFFSET);
-
-  for (unsigned i = 0; i < textBlockContainer.m_numRecords; ++i)
+  std::vector<PMDRecordContainer> tempContainer = getRecordsByRecType(TEXT_BLOCK);
+  if (tempContainer.empty())
   {
-    seekToRecord(m_input, textBlockContainer, i);
-
-    skip(m_input, 0x20);
-    uint32_t textBlockId = readU32(m_input, m_bigEndian);
-
-    if (textBlockId == textBoxTextBlockId)
-    {
-      seekToRecord(m_input, textBlockContainer, i); // return to the beginning of the record
-      textBoxTextPropsOne = readU16(m_input, m_bigEndian);
-      textBoxTextPropsTwo = readU16(m_input, m_bigEndian);
-      textBoxText = readU16(m_input, m_bigEndian);
-      textBoxChars = readU16(m_input, m_bigEndian);
-      textBoxPara = readU16(m_input, m_bigEndian);
-      textBoxTextStyle = readU16(m_input, m_bigEndian);
-
-      (void) textBoxTextPropsOne;
-      (void) textBoxTextPropsTwo;
-      (void) textBoxTextStyle;
-      PMD_DEBUG_MSG(("Text Box Props One is %x \n",textBoxTextPropsOne));
-      PMD_DEBUG_MSG(("Text Box Props Two is %x \n",textBoxTextPropsTwo));
-      PMD_DEBUG_MSG(("Text Box Style is %x \n",textBoxTextStyle));
-      break;
-    }
-
+    PMD_ERR_MSG("No Text Block Record Found.\n");
   }
 
+  for (unsigned j=0; j<tempContainer.size(); ++j)
+  {
+    const PMDRecordContainer &textBlockContainer = tempContainer[j];
+
+    for (unsigned i = 0; i < textBlockContainer.m_numRecords; ++i)
+    {
+      seekToRecord(m_input, textBlockContainer, i);
+
+      skip(m_input, 0x20);
+      uint32_t textBlockId = readU32(m_input, m_bigEndian);
+
+      if (textBlockId == textBoxTextBlockId)
+      {
+        seekToRecord(m_input, textBlockContainer, i); // return to the beginning of the record
+        textBoxTextPropsOne = readU16(m_input, m_bigEndian);
+        textBoxTextPropsTwo = readU16(m_input, m_bigEndian);
+        textBoxText = readU16(m_input, m_bigEndian);
+        textBoxChars = readU16(m_input, m_bigEndian);
+        textBoxPara = readU16(m_input, m_bigEndian);
+        textBoxTextStyle = readU16(m_input, m_bigEndian);
+
+        (void) textBoxTextPropsOne;
+        (void) textBoxTextPropsTwo;
+        (void) textBoxTextStyle;
+        PMD_DEBUG_MSG(("Text Box Props One is %x \n",textBoxTextPropsOne));
+        PMD_DEBUG_MSG(("Text Box Props Two is %x \n",textBoxTextPropsTwo));
+        PMD_DEBUG_MSG(("Text Box Style is %x \n",textBoxTextStyle));
+        break;
+      }
+
+    }
+  }
   std::string text = "";
 
-  std::vector<PMDRecordContainer> tempContainer = getRecordsBySeqNum(textBoxText);
+  tempContainer = getRecordsBySeqNum(textBoxText);
   if (tempContainer.empty())
   {
     PMD_ERR_MSG("No Text Found.\n");

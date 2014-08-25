@@ -14,8 +14,6 @@ const unsigned TABLE_OF_CONTENTS_OFFSET_OFFSET = 0x30;
 const unsigned TABLE_OF_CONTENTS_LENGTH_OFFSET = 0x2E;
 const unsigned ENDIANNESS_MARKER_OFFSET = 0x06;
 
-const unsigned TEXT_BLOCK_OFFSET = 0x02;
-
 #endif /* __LIBPAGEMAKER_OFFSETS_H__ */
 
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */
