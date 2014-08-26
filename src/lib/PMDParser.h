@@ -44,7 +44,7 @@ class PMDParser
   void parseEllipse(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID);
   void parseBitmap(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID);
   void parseHeader(uint32_t *tocOffset, uint16_t *tocLength);
-  unsigned readNextRecordFromTableOfContents(unsigned seqNum);
+  unsigned readNextRecordFromTableOfContents(unsigned &seqNum);
   void parseTableOfContents(uint32_t offset, uint16_t length);
   std::vector<PMDRecordContainer> getRecordsBySeqNum(const uint16_t seqNum);
   std::vector<PMDRecordContainer> getRecordsByRecType(const uint16_t recType);
