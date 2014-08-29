@@ -18,8 +18,12 @@
 #else
 #define PAGEMAKERAPI __declspec(dllimport)
 #endif
+#else // !DLL_EXPORT
+#ifdef LIBPAGEMAKER_VISIBILITY
+#define PAGEMAKERAPI __attribute__((visibility("default")))
 #else
 #define PAGEMAKERAPI
+#endif
 #endif
 
 namespace libpagemaker
