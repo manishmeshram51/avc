@@ -781,6 +781,9 @@ void PMDParser::parseTableOfContents(uint32_t offset, uint16_t length) try
   PMD_DEBUG_MSG(("[TOC] Seeking to offset 0x%x to read ToC\n", offset));
   seek(m_input, offset);
   PMD_DEBUG_MSG(("[TOC] entries to read: %d\n", length));
+  const size_t minRecordSize = 10;
+  const size_t maxPossibleRecords = (m_length-offset)/minRecordSize;
+  length = std::min<size_t>(length, maxPossibleRecords);
   unsigned j=0;
   std::set<unsigned long> tocOffsets;
   for (unsigned i = 0; i < length; ++i)
