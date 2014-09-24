@@ -28,9 +28,10 @@
 namespace libpagemaker
 {
 PMDParser::PMDParser(librevenge::RVNGInputStream *input, PMDCollector *collector)
-  : m_input(input), m_collector(collector), m_records(), m_bigEndian(false),
-    m_recordsInOrder(), m_xFormMap()
-{ }
+  : m_input(input), m_length(getLength(input)), m_collector(collector),
+    m_records(), m_bigEndian(false), m_recordsInOrder(), m_xFormMap()
+{
+}
 
 std::vector<PMDRecordContainer> PMDParser::getRecordsBySeqNum(const uint16_t seqNum)
 {
@@ -712,6 +713,8 @@ void PMDParser::parseHeader(uint32_t *tocOffset, uint16_t *tocLength)
 
 unsigned PMDParser::readNextRecordFromTableOfContents(std::set<unsigned long> &tocOffsets, unsigned &seqNum)
 {
+  const size_t minRecordSize = 10;
+
   if (tocOffsets.end() != tocOffsets.find(m_input->tell()))
   {
     PMD_DEBUG_MSG(("[TOC] ToC entry at offset %ld has already been read. The file is probably broken. Skipping...\n", m_input->tell()));
@@ -730,6 +733,8 @@ unsigned PMDParser::readNextRecordFromTableOfContents(std::set<unsigned long> &t
   {
     uint32_t temp = m_input->tell();
     seek(m_input,offset);
+    const size_t maxPossibleRecords = (m_length-offset)/minRecordSize;
+    numRecs = std::min<size_t>(numRecs, maxPossibleRecords);
     for (unsigned i = 0; i < numRecs; ++i)
     {
       unsigned numRead = readNextRecordFromTableOfContents(tocOffsets, seqNum);
@@ -745,6 +750,8 @@ unsigned PMDParser::readNextRecordFromTableOfContents(std::set<unsigned long> &t
     {
       uint32_t temp = m_input->tell();
       seek(m_input,offset);
+      const size_t maxPossibleRecords = (m_length-offset)/minRecordSize;
+      numRecs = std::min<size_t>(numRecs, maxPossibleRecords);
       for (uint32_t i = 0; i<numRecs; ++i)
       {
         uint16_t subRecType = readU16(m_input, m_bigEndian);

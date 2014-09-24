@@ -26,6 +26,7 @@ class PMDCollector;
 class PMDParser
 {
   librevenge::RVNGInputStream *m_input;
+  unsigned long m_length;
   PMDCollector *m_collector;
   std::map<uint16_t, std::vector<unsigned> > m_records;
   bool m_bigEndian;
