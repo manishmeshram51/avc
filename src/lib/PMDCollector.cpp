@@ -729,7 +729,7 @@ void PMDCollector::fillOutputShapesByPage_TwoSided(PageShapesList_t &pageShapes)
     }
   }
 
-  if (pageShapes.back().empty()) // the last "page" only has left side
+  if ((pageShapes.size() > 1) && pageShapes.back().empty()) // the last "page" only has left side
     pageShapes.pop_back();
 }
 
