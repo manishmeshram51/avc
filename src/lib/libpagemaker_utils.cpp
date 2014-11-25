@@ -129,7 +129,8 @@ void skip(const RVNGInputStreamPtr &input, unsigned long numBytes)
 
 void seek(const RVNGInputStreamPtr &input, const unsigned long pos)
 {
-  checkStream(input);
+  if (!input)
+    throw EndOfStreamException();
 
   if (0 != input->seek(static_cast<long>(pos), librevenge::RVNG_SEEK_SET))
     throw SeekFailedException();
@@ -137,7 +138,8 @@ void seek(const RVNGInputStreamPtr &input, const unsigned long pos)
 
 void seekRelative(const RVNGInputStreamPtr &input, const long pos)
 {
-  checkStream(input);
+  if (!input)
+    throw EndOfStreamException();
 
   if (0 != input->seek(pos, librevenge::RVNG_SEEK_CUR))
     throw SeekFailedException();
