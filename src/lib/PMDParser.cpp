@@ -710,8 +710,16 @@ void PMDParser::parseHeader(uint32_t *tocOffset, uint16_t *tocLength)
   }
 }
 
-unsigned PMDParser::readNextRecordFromTableOfContents(unsigned &seqNum)
+unsigned PMDParser::readNextRecordFromTableOfContents(std::set<unsigned long> &tocOffsets, unsigned &seqNum)
 {
+  if (tocOffsets.end() != tocOffsets.find(m_input->tell()))
+  {
+    PMD_DEBUG_MSG(("[TOC] ToC entry at offset %ld has already been read. The file is probably broken. Skipping...\n", m_input->tell()));
+    return 0;
+  }
+
+  tocOffsets.insert(m_input->tell());
+
   uint16_t recType = readU16(m_input, m_bigEndian);
   uint16_t numRecs = readU16(m_input, m_bigEndian);
   uint32_t offset = readU32(m_input, m_bigEndian);
@@ -724,7 +732,7 @@ unsigned PMDParser::readNextRecordFromTableOfContents(unsigned &seqNum)
     seek(m_input,offset);
     for (unsigned i = 0; i < numRecs; ++i)
     {
-      unsigned numRead = readNextRecordFromTableOfContents(seqNum);
+      unsigned numRead = readNextRecordFromTableOfContents(tocOffsets, seqNum);
       (void)numRead;
       PMD_DEBUG_MSG(("[TOC] Learned about %d TMD records from ToC entry %d.\n",
                      numRead, i));
@@ -767,9 +775,10 @@ void PMDParser::parseTableOfContents(uint32_t offset, uint16_t length) try
   seek(m_input, offset);
   PMD_DEBUG_MSG(("[TOC] entries to read: %d\n", length));
   unsigned j=0;
+  std::set<unsigned long> tocOffsets;
   for (unsigned i = 0; i < length; ++i)
   {
-    unsigned numRead = readNextRecordFromTableOfContents(j);
+    unsigned numRead = readNextRecordFromTableOfContents(tocOffsets, j);
     (void)numRead;
     PMD_DEBUG_MSG(("[TOC] Learned about %d TMD records from ToC entry %d.\n",
                    numRead, i));
