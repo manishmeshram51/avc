@@ -33,11 +33,15 @@ void flushText(std::string &text, librevenge::RVNGDrawingInterface *const painte
   }
 }
 
-void writeTextSpan(const std::string &text, const std::size_t charStart, const std::size_t charEnd, const bool capsFlag, librevenge::RVNGDrawingInterface *const painter)
+void writeTextSpan(const std::string &text, const std::size_t charStart, std::size_t charEnd, const bool capsFlag, librevenge::RVNGDrawingInterface *const painter)
 {
+  ++charEnd;
+  if (charEnd > text.size())
+    charEnd = text.size();
+
   std::string currentText;
   bool wasSpace = false;
-  for (std::size_t i = charStart; i <= charEnd; ++i)
+  for (std::size_t i = charStart; i < charEnd; ++i)
   {
     const char c = text[i];
 
