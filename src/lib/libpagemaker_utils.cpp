@@ -147,17 +147,20 @@ void seekRelative(const RVNGInputStreamPtr &input, const long pos)
 
 unsigned long getLength(const RVNGInputStreamPtr &input)
 {
-  checkStream(input);
+  if (!input)
+    throw EndOfStreamException();
 
-  const long begin = input->tell();
+  const long orig = input->tell();
 
-  if (0 > begin)
-    throw SeekFailedException();
+  seek(input, 0);
 
-  long end = begin;
+  if (input->isEnd()) // shortcut
+    return 0;
+
+  unsigned long end = 0;
 
   if (0 == input->seek(0, librevenge::RVNG_SEEK_END))
-    end = input->tell();
+    end = static_cast<unsigned long>(input->tell());
   else
   {
     // RVNG_SEEK_END does not work. Use the harder way.
@@ -168,11 +171,9 @@ unsigned long getLength(const RVNGInputStreamPtr &input)
     }
   }
 
-  seek(input, begin);
+  seek(input, orig);
 
-  assert(begin <= end);
-
-  return static_cast<unsigned long>(end - begin);
+  return end;
 }
 
 EndOfStreamException::EndOfStreamException()
