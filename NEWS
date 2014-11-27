@@ -1,3 +1,14 @@
+libpagemaker-0.0.2
+
+- Use record type to identify records in the trailer, instead of expecting
+  that they are always at a specific position. This fixes reading of some
+  real-world documents.
+- Use symbol visibility on Linux. The library only exports the two public
+  functions now.
+- Fix several crashes and hangs when reading broken files, found with the help
+  of american-fuzzy-lop.
+- Fix several minor issues reported by Coverity.
+
 libpagemaker-0.0.1
 
 - Fix build on MS Windows.
