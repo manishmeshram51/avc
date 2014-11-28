@@ -14,7 +14,7 @@ AM_CXXFLAGS = -I$(top_srcdir)/inc $(REVENGE_CFLAGS) $(REVENGE_STREAM_CFLAGS) $(D
 
 libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_LIBADD  = $(REVENGE_LIBS) @LIBPMD_WIN32_RESOURCE@
 libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_DEPENDENCIES = @LIBPMD_WIN32_RESOURCE@
-libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_LDFLAGS = $(version_info) -export-dynamic -no-undefines
+libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_LDFLAGS = $(version_info) -export-dynamic -no-undefined
 libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_SOURCES = \
 	OutputShape.cpp \
 	OutputShape.h \
