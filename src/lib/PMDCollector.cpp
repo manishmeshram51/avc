@@ -704,8 +704,8 @@ void PMDCollector::fillOutputShapesByPage_TwoSided(PageShapesList_t &pageShapes)
 {
   pageShapes.assign(m_pages.size() * 2 - 1, PageShapes_t()); // the first "page" only has right side
 
-  double centerToEdge_x = m_pageWidth.get().toInches() / 2;
-  double centerToEdge_y = m_pageHeight.get().toInches() / 2;
+  double centerToEdge_x = m_pageWidth.get_value_or(0).toInches() / 2;
+  double centerToEdge_y = m_pageHeight.get_value_or(0).toInches() / 2;
   InchPoint translateForLeftPage(centerToEdge_x * 2, centerToEdge_y);
   InchPoint translateForRightPage(0, centerToEdge_y);
 
