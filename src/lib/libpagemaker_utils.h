@@ -71,15 +71,15 @@ typedef __int64 int64_t;
 #define PMD_DEBUG_MSG(M) std::printf M
 #define PMD_DEBUG(M) M
 #endif
+
+#define PMD_WARN_MSG(M) std::fprintf(stderr, "PageMaker [WARN] %15s:%d: ", __FILE__, __LINE__); std::fprintf(stderr, M)
+#define PMD_ERR_MSG(M) std::fprintf(stderr, "PageMaker [ERROR] %15s:%d: ", __FILE__, __LINE__); std::fprintf(stderr, M)
 #else
 #define PMD_DEBUG_MSG(M)
 #define PMD_DEBUG(M)
+#define PMD_WARN_MSG(M)
+#define PMD_ERR_MSG(M)
 #endif
-
-// Log Warnings and Errors, even for a release compile.
-#define PMD_WARN_MSG(M) std::fprintf(stderr, "PageMaker [WARN] %15s:%d: ", __FILE__, __LINE__); std::fprintf(stderr, M)
-#define PMD_ERR_MSG(M) std::fprintf(stderr, "PageMaker [ERROR] %15s:%d: ", __FILE__, __LINE__); std::fprintf(stderr, M)
-
 
 #define PMD_NUM_ELEMENTS(array) sizeof(array)/sizeof(array[0])
 
