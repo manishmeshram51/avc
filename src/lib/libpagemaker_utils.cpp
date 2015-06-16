@@ -151,12 +151,6 @@ unsigned long getLength(const RVNGInputStreamPtr &input)
     throw EndOfStreamException();
 
   const long orig = input->tell();
-
-  seek(input, 0);
-
-  if (input->isEnd()) // shortcut
-    return 0;
-
   unsigned long end = 0;
 
   if (0 == input->seek(0, librevenge::RVNG_SEEK_END))
@@ -164,6 +158,7 @@ unsigned long getLength(const RVNGInputStreamPtr &input)
   else
   {
     // RVNG_SEEK_END does not work. Use the harder way.
+    seek(input, 0);
     while (!input->isEnd())
     {
       readU8(input);
