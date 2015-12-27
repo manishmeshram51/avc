@@ -7,6 +7,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
@@ -16,16 +20,33 @@
 
 #include <libpagemaker/libpagemaker.h>
 
+#ifndef VERSION
+#define VERSION "UNKNOWN VERSION"
+#endif
+
+#define TOOL "pmd2svg"
+
 namespace
 {
 
 int printUsage()
 {
-  printf("Usage: pmd2svg [OPTION] <PageMaker File>\n");
+  printf("`" TOOL "' converts Adobe PageMaker documents to SVG.\n");
+  printf("\n");
+  printf("Usage: " TOOL " [OPTION] INPUT\n");
   printf("\n");
   printf("Options:\n");
-  printf("--help                Shows this help message\n");
+  printf("\t--help                show this help message\n");
+  printf("\t--version             show version information and exit\n");
+  printf("\n");
+  printf("Report bugs to <https://bugs.documentfoundation.org/>.\n");
   return -1;
+}
+
+int printVersion()
+{
+  printf(TOOL " " VERSION "\n");
+  return 0;
 }
 
 } // anonymous namespace
@@ -39,7 +60,9 @@ int main(int argc, char *argv[])
 
   for (int i = 1; i < argc; i++)
   {
-    if (!file && strncmp(argv[i], "--", 2))
+    if (!strcmp(argv[i], "--version"))
+      return printVersion();
+    else if (!file && strncmp(argv[i], "--", 2))
       file = argv[i];
     else
       return printUsage();
