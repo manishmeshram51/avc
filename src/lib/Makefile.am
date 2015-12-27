@@ -5,10 +5,6 @@ version_info = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 endif
 
 lib_LTLIBRARIES = libpagemaker-@PMD_MAJOR_VERSION@.@PMD_MINOR_VERSION@.la
-libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_includedir = $(includedir)/libpagemaker-@PMD_MAJOR_VERSION@.@PMD_MINOR_VERSION@/libpagemaker
-libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_include_HEADERS = \
-	$(top_srcdir)/inc/libpagemaker/libpagemaker.h \
-	$(top_srcdir)/inc/libpagemaker/PMDocument.h
 
 AM_CXXFLAGS = -I$(top_srcdir)/inc $(REVENGE_CFLAGS) $(REVENGE_STREAM_CFLAGS) $(DEBUG_CXXFLAGS) -DLIBPAGEMAKER_BUILD
 
