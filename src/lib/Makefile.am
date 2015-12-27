@@ -41,8 +41,5 @@ endif
 
 
 EXTRA_DIST = \
-	libpagemaker.rc.in
-
-# These may be in the builddir too
-BUILD_EXTRA_DIST = \
+	libpagemaker.rc.in \
 	libpagemaker.rc
