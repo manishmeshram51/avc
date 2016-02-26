@@ -8,6 +8,7 @@
  */
 
 #include <cassert>
+#include <cstdarg>
 
 #include "libpagemaker_utils.h"
 
@@ -26,6 +27,16 @@ void checkStream(const RVNGInputStreamPtr &input)
 struct SeekFailedException : public PMDStreamException {};
 
 }
+
+#ifdef DEBUG
+void debugPrint(const char *const format, ...)
+{
+  va_list args;
+  va_start(args, format);
+  std::vfprintf(stderr, format, args);
+  va_end(args);
+}
+#endif
 
 uint8_t readU8(const RVNGInputStreamPtr &input, bool /* bigEndian */)
 {

@@ -59,16 +59,26 @@ typedef __int64 int64_t;
 
 #endif
 
+#if defined(__clang__) || defined(__GNUC__)
+#  define PMD_ATTRIBUTE_PRINTF(fmt, arg) __attribute__((__format__(__printf__, fmt, arg)))
+#else
+#  define PMD_ATTRIBUTE_PRINTF(fmt, arg)
+#endif
+
 // debug message includes source file and line number
 //#define VERBOSE_DEBUG 1
 
 // do nothing with debug messages in a release compile
 #ifdef DEBUG
+namespace libpagemaker
+{
+void debugPrint(const char *format, ...) PMD_ATTRIBUTE_PRINTF(1, 2);
+}
 #ifdef VERBOSE_DEBUG
-#define PMD_DEBUG_MSG(M) std::printf("%15s:%5d: ", __FILE__, __LINE__); std::printf M
+#define PMD_DEBUG_MSG(M) libpagemaker::debugPrint("%15s:%5d: ", __FILE__, __LINE__); libpagemaker::debugPrint M
 #define PMD_DEBUG(M) M
 #else
-#define PMD_DEBUG_MSG(M) std::printf M
+#define PMD_DEBUG_MSG(M) libpagemaker::debugPrint M
 #define PMD_DEBUG(M) M
 #endif
 
