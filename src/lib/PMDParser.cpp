@@ -692,7 +692,7 @@ void PMDParser::parseHeader(uint32_t *tocOffset, uint16_t *tocLength)
   try
   {
     seek(m_input, TABLE_OF_CONTENTS_LENGTH_OFFSET);
-    *tocLength = readU32(m_input, m_bigEndian);
+    *tocLength = readU16(m_input, m_bigEndian);
     PMD_DEBUG_MSG(("[Header] TOC length is %d\n", *tocLength));
   }
   catch (PMDStreamException)
