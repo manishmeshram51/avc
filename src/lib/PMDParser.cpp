@@ -453,7 +453,7 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
   uint32_t bboxXformId = readU32(m_input, m_bigEndian);
 
   skip(m_input, 16);
-  uint16_t bitmapRecordSeqNum = readU16(m_input);
+  uint16_t bitmapRecordSeqNum = readU16(m_input, m_bigEndian);
 
   std::vector<PMDRecordContainer> tempContainer;
 
