@@ -33,6 +33,8 @@ class PMDParser
   std::vector<PMDRecordContainer> m_recordsInOrder;
   std::map<uint32_t, PMDXForm> m_xFormMap;
 
+  struct ToCState;
+
   /* Private functions. */
   void parseGlobalInfo(const PMDRecordContainer &container);
   void parseFonts();
@@ -46,7 +48,8 @@ class PMDParser
   void parseEllipse(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID);
   void parseBitmap(const PMDRecordContainer &container, unsigned recordIndex, unsigned pageID);
   void parseHeader(uint32_t *tocOffset, uint16_t *tocLength);
-  unsigned readNextRecordFromTableOfContents(std::set<unsigned long> &tocOffsets, unsigned &seqNum);
+  void readNextRecordFromTableOfContents(ToCState &state, bool subRecord, uint16_t subRecordType = 0);
+  void readTableOfContents(ToCState &state, uint32_t offset, unsigned records, bool subRecords, uint16_t subRecordType = 0);
   void parseTableOfContents(uint32_t offset, uint16_t length);
   std::vector<PMDRecordContainer> getRecordsBySeqNum(const uint16_t seqNum);
   std::vector<PMDRecordContainer> getRecordsByRecType(const uint16_t recType);

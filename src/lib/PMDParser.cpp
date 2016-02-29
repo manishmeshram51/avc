@@ -27,6 +27,21 @@
 
 namespace libpagemaker
 {
+
+struct PMDParser::ToCState
+{
+  ToCState();
+
+  std::set<unsigned long> parsedBlocks;
+  unsigned seqNum;
+};
+
+PMDParser::ToCState::ToCState()
+  : parsedBlocks()
+  , seqNum(0)
+{
+}
+
 PMDParser::PMDParser(librevenge::RVNGInputStream *input, PMDCollector *collector)
   : m_input(input), m_length(getLength(input)), m_collector(collector),
     m_records(), m_bigEndian(false), m_recordsInOrder(), m_xFormMap()
@@ -711,90 +726,92 @@ void PMDParser::parseHeader(uint32_t *tocOffset, uint16_t *tocLength)
   }
 }
 
-unsigned PMDParser::readNextRecordFromTableOfContents(std::set<unsigned long> &tocOffsets, unsigned &seqNum)
+void PMDParser::readNextRecordFromTableOfContents(ToCState &state, const bool subRecord, const uint16_t subRecordType)
 {
-  const size_t minRecordSize = 10;
-
-  if (tocOffsets.end() != tocOffsets.find(m_input->tell()))
-  {
-    PMD_DEBUG_MSG(("[TOC] ToC entry at offset %ld has already been read. The file is probably broken. Skipping...\n", m_input->tell()));
-    return 0;
-  }
-
-  tocOffsets.insert(m_input->tell());
-
   skip(m_input, 1);
-  const uint16_t recType = readU8(m_input);
+  uint16_t recType = readU8(m_input);
   uint16_t numRecs = readU16(m_input, m_bigEndian);
   uint32_t offset = readU32(m_input, m_bigEndian);
-
   skip(m_input, 2);
 
-  if (recType == 0 && numRecs > 0)
+  uint16_t subType = 0;
+
+  if (!subRecord && (recType != 0 || numRecs == 0))
   {
-    uint32_t temp = m_input->tell();
-    seek(m_input,offset);
-    const size_t maxPossibleRecords = (m_length-offset)/minRecordSize;
-    numRecs = std::min<size_t>(numRecs, maxPossibleRecords);
-    for (unsigned i = 0; i < numRecs; ++i)
+    skip(m_input, 1);
+    subType = readU8(m_input);
+    if (subType == 0)
     {
-      unsigned numRead = readNextRecordFromTableOfContents(tocOffsets, seqNum);
-      (void)numRead;
-      PMD_DEBUG_MSG(("[TOC] Learned about %d TMD records from ToC entry %d.\n",
-                     numRead, i));
+      PMD_DEBUG_MSG(("[TOC] invalid subrecord type\n"));
     }
-    seek(m_input,temp);
+    skip(m_input, 4);
+  }
+
+  if (recType == 0 && numRecs == 0)
+  {
+    // empty record
+    ++state.seqNum;
+  }
+  else if (!subRecord && recType == 1)
+  {
+    readTableOfContents(state, offset, numRecs, true, subType);
+    ++state.seqNum;
+  }
+  else if (!subRecord && recType == 0)
+  {
+    readTableOfContents(state, offset, numRecs, false);
   }
   else
   {
-    if (readU8(m_input) != 0x01)
+    if (numRecs != 0 && offset != 0)
     {
-      uint32_t temp = m_input->tell();
-      seek(m_input,offset);
-      const size_t maxPossibleRecords = (m_length-offset)/minRecordSize;
-      numRecs = std::min<size_t>(numRecs, maxPossibleRecords);
-      for (uint32_t i = 0; i<numRecs; ++i)
+      if (subRecord && recType != subRecordType)
       {
-        skip(m_input, 1);
-        const uint16_t subRecType = readU8(m_input);
-        uint16_t subNumRecs = readU16(m_input, m_bigEndian);
-        uint32_t subOffset = readU32(m_input, m_bigEndian);
-        skip(m_input, 2);
-        m_recordsInOrder.push_back(PMDRecordContainer(subRecType, subOffset, seqNum, subNumRecs));
-        m_records[subRecType].push_back((unsigned)(m_recordsInOrder.size() - 1));
+        PMD_DEBUG_MSG(("[TOC] subrecord type mismatch: expected %hu, got %hu.\n", subRecordType, recType));
+        if (subRecordType != 0) // can only happen in a broken file -- better ignore
+          recType = subRecordType;
       }
-      seek(m_input,temp);
-    }
-    else
-    {
-      m_recordsInOrder.push_back(PMDRecordContainer(recType, offset, seqNum, numRecs));
+      m_recordsInOrder.push_back(PMDRecordContainer(recType, offset, state.seqNum, numRecs));
       m_records[recType].push_back((unsigned)(m_recordsInOrder.size() - 1));
-
     }
-    ++seqNum;
-    skip(m_input, 5);
+    if (!subRecord)
+      ++state.seqNum;
+  }
+}
+
+void PMDParser::readTableOfContents(ToCState &state, const uint32_t offset, unsigned records, const bool subRecords, const uint16_t subRecordType)
+{
+  if (state.parsedBlocks.end() != state.parsedBlocks.find(m_input->tell()))
+  {
+    PMD_DEBUG_MSG(("[TOC] ToC block at offset %ld has already been read. The file is probably broken. Skipping...\n", m_input->tell()));
+    return;
   }
 
-  return numRecs;
+  state.parsedBlocks.insert(m_input->tell());
+
+  if (records == 0 || offset == 0)
+  {
+    PMD_DEBUG_MSG(("[TOC] no records to read\n"));
+    return;
+  }
+
+  const long orig = m_input->tell();
+
+  PMD_DEBUG_MSG(("[TOC] reading %sblock at offset 0x%x\n", subRecords ? "subrecord " : "", offset));
+  seek(m_input, offset);
+  PMD_DEBUG_MSG(("[TOC] records to read: %d\n", records));
+  const size_t minRecordSize = subRecords ? 10 : 16;
+  const size_t maxPossibleRecords = (m_length-offset)/minRecordSize;
+  for (unsigned i = 0; i < std::min<size_t>(records, maxPossibleRecords); ++i)
+    readNextRecordFromTableOfContents(state, subRecords, subRecordType);
+
+  seek(m_input, orig);
 }
 
 void PMDParser::parseTableOfContents(uint32_t offset, uint16_t length) try
 {
-  PMD_DEBUG_MSG(("[TOC] Seeking to offset 0x%x to read ToC\n", offset));
-  seek(m_input, offset);
-  PMD_DEBUG_MSG(("[TOC] entries to read: %d\n", length));
-  const size_t minRecordSize = 10;
-  const size_t maxPossibleRecords = (m_length-offset)/minRecordSize;
-  length = std::min<size_t>(length, maxPossibleRecords);
-  unsigned j=0;
-  std::set<unsigned long> tocOffsets;
-  for (unsigned i = 0; i < length; ++i)
-  {
-    unsigned numRead = readNextRecordFromTableOfContents(tocOffsets, j);
-    (void)numRead;
-    PMD_DEBUG_MSG(("[TOC] Learned about %d TMD records from ToC entry %d.\n",
-                   numRead, i));
-  }
+  ToCState state;
+  readTableOfContents(state, offset, length, false);
 }
 catch (...)
 {
