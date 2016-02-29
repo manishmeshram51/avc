@@ -13,18 +13,18 @@
 #include <stdint.h>
 
 /* PMD record types */
-const uint16_t FONTS_PARENT = 0x0100;
-const uint16_t PAGE = 0x0500;
-const uint16_t PARA = 0x0b00;
-const uint16_t TIFF = 0x0e00;
-const uint16_t LINE_SET = 0x1100;
-const uint16_t FONTS = 0x1300;
-const uint16_t COLORS = 0x1500;
-const uint16_t GLOBAL_INFO = 0x1800;
-const uint16_t SHAPE = 0x1900;
-const uint16_t TEXT_BLOCK = 0x1a00;
-const uint16_t CHARS = 0x1c00;
-const uint16_t XFORM = 0x2800;
+const uint8_t FONTS_PARENT = 0x01;
+const uint8_t PAGE = 0x05;
+const uint8_t PARA = 0x0b;
+const uint8_t TIFF = 0x0e;
+const uint8_t LINE_SET = 0x11;
+const uint8_t FONTS = 0x13;
+const uint8_t COLORS = 0x15;
+const uint8_t GLOBAL_INFO = 0x18;
+const uint8_t SHAPE = 0x19;
+const uint8_t TEXT_BLOCK = 0x1a;
+const uint8_t CHARS = 0x1c;
+const uint8_t XFORM = 0x28;
 
 /* Color record types */
 const uint8_t CMYK = 0x08;

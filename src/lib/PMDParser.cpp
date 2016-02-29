@@ -723,7 +723,8 @@ unsigned PMDParser::readNextRecordFromTableOfContents(std::set<unsigned long> &t
 
   tocOffsets.insert(m_input->tell());
 
-  uint16_t recType = readU16(m_input, m_bigEndian);
+  skip(m_input, 1);
+  const uint16_t recType = readU8(m_input);
   uint16_t numRecs = readU16(m_input, m_bigEndian);
   uint32_t offset = readU32(m_input, m_bigEndian);
 
@@ -754,7 +755,8 @@ unsigned PMDParser::readNextRecordFromTableOfContents(std::set<unsigned long> &t
       numRecs = std::min<size_t>(numRecs, maxPossibleRecords);
       for (uint32_t i = 0; i<numRecs; ++i)
       {
-        uint16_t subRecType = readU16(m_input, m_bigEndian);
+        skip(m_input, 1);
+        const uint16_t subRecType = readU8(m_input);
         uint16_t subNumRecs = readU16(m_input, m_bigEndian);
         uint32_t subOffset = readU32(m_input, m_bigEndian);
         skip(m_input, 2);
