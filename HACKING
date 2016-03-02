@@ -1,7 +1,7 @@
 = Coding style =
 
-This project uses mostly the same file naming and coding style like
-libwpd and the rest of Fridrich's libraries. Please run
+This project uses mostly the same file naming and coding style as
+librevenge and the rest of DLP's libraries. Please do not forget to run
 
     make astyle
 
@@ -10,5 +10,6 @@ before committing.
 
 = Reverse-Engineering notes =
 
-Some notes on the format of the Pagemaker files can be found in the NOTES file. Included are the names of the test files
-that exhibit the behavior.
+Some notes on the format of the Pagemaker files can be found in the
+NOTES file. Included are the names of the test files that exhibit the
+behavior.
