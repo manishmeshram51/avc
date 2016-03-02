@@ -1,0 +1,8 @@
+libpagemaker is a library and a set of tools for reading and converting
+Aldus/Macromedia/Adobe PageMaker documents. Supported are documents
+created by versions 6-7 (both Windows and Mac). Documents created by
+older versions might work, but they are untested.
+
+libpagemaker requires boost and librevenge to build.
+
+The library is available under MPL 2.0+.
