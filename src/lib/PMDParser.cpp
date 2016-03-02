@@ -10,9 +10,11 @@
 #include <stdint.h>
 #include <string>
 #include <cassert>
+#include <iterator>
 #include <vector>
 #include <limits>
 #include <librevenge/librevenge.h>
+#include <boost/operators.hpp>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
 #include "PMDRecord.h"
@@ -42,61 +44,149 @@ PMDParser::ToCState::ToCState()
 {
 }
 
+class PMDParser::RecordIterator : boost::bidirectional_iteratable<PMDParser::RecordIterator, RecordContainerList_t::const_iterator::pointer>
+{
+  typedef RecordContainerList_t::const_iterator Iter_t;
+
+public:
+  typedef std::bidirectional_iterator_tag category; // enough for our purpose
+  typedef Iter_t::value_type value_type;
+  typedef Iter_t::difference_type difference_type;
+  typedef Iter_t::pointer pointer;
+  typedef Iter_t::reference reference;
+
+public:
+  RecordIterator(const RecordContainerList_t &records);
+  RecordIterator(const RecordContainerList_t &records, uint16_t seqNum);
+  RecordIterator(const RecordContainerList_t &records, const RecordTypeMap_t &types, uint16_t recType);
+
+  reference operator*() const;
+
+  RecordIterator &operator++();
+  RecordIterator &operator--();
+
+  friend bool operator==(const RecordIterator &left, const RecordIterator &right)
+  {
+    return (left.m_it == left.m_end && right.m_it == right.m_end) || left.m_it == right.m_it;
+  }
+
+private:
+  void next();
+  void prev();
+
+private:
+  RecordContainerList_t::const_iterator m_it;
+  RecordContainerList_t::const_iterator m_begin;
+  RecordContainerList_t::const_iterator m_end;
+  boost::optional<uint16_t> m_selector;
+  boost::optional<RecordTypeMap_t::mapped_type::const_iterator> m_recIt;
+  RecordTypeMap_t::mapped_type::const_iterator m_recBegin;
+  RecordTypeMap_t::mapped_type::const_iterator m_recEnd;
+};
+
+PMDParser::RecordIterator::RecordIterator(const RecordContainerList_t &records)
+  : m_it(records.end())
+  , m_begin(records.begin())
+  , m_end(records.end())
+  , m_selector()
+  , m_recIt()
+  , m_recBegin()
+  , m_recEnd()
+{
+}
+
+PMDParser::RecordIterator::RecordIterator(const RecordContainerList_t &records, const uint16_t seqNum)
+  : m_it(records.begin())
+  , m_begin(records.begin())
+  , m_end(records.end())
+  , m_selector(seqNum)
+  , m_recIt()
+  , m_recBegin()
+  , m_recEnd()
+{
+  next();
+}
+
+PMDParser::RecordIterator::RecordIterator(const RecordContainerList_t &records, const RecordTypeMap_t &types, const uint16_t recType)
+  : m_it(records.end())
+  , m_begin(records.begin())
+  , m_end(records.end())
+  , m_selector()
+  , m_recIt()
+  , m_recBegin()
+  , m_recEnd()
+{
+  const RecordTypeMap_t::const_iterator it = types.find(recType);
+  if (it != types.end())
+  {
+    m_recBegin = it->second.begin();
+    m_recIt = m_recBegin;
+    m_recEnd = it->second.end();
+    if (get(m_recIt) != m_recEnd)
+      m_it = m_begin + *get(m_recIt);
+  }
+}
+
+PMDParser::RecordIterator::reference PMDParser::RecordIterator::operator*() const
+{
+  return *m_it;
+}
+
+PMDParser::RecordIterator &PMDParser::RecordIterator::operator++()
+{
+  next();
+  return *this;
+}
+
+PMDParser::RecordIterator &PMDParser::RecordIterator::operator--()
+{
+  prev();
+  return *this;
+}
+
+void PMDParser::RecordIterator::next()
+{
+  if (m_selector)
+  {
+    if (m_it != m_end)
+    {
+      ++m_it;
+      while (m_it != m_end && m_it->m_seqNum != get(m_selector))
+        ++m_it;
+    }
+  }
+  else if (m_recIt && get(m_recIt) != m_recEnd)
+  {
+    ++get(m_recIt);
+    if (get(m_recIt) == m_recEnd)
+      m_it = m_end;
+    else
+      m_it = m_begin + *get(m_recIt);
+  }
+}
+
+void PMDParser::RecordIterator::prev()
+{
+  if (m_selector)
+  {
+    if (m_it != m_begin)
+    {
+      --m_it;
+      while (m_it != m_begin && m_it->m_seqNum != get(m_selector))
+        --m_it;
+    }
+  }
+  else if (m_recIt && get(m_recIt) != m_recBegin)
+  {
+    --get(m_recIt);
+    m_it = m_begin + *get(m_recIt);
+  }
+}
+
 PMDParser::PMDParser(librevenge::RVNGInputStream *input, PMDCollector *collector)
   : m_input(input), m_length(getLength(input)), m_collector(collector),
     m_records(), m_bigEndian(false), m_recordsInOrder(), m_xFormMap()
 {
-}
-
-std::vector<PMDRecordContainer> PMDParser::getRecordsBySeqNum(const uint16_t seqNum)
-{
-  std::vector<PMDRecordContainer> tempContainer;
-
-
-  for (unsigned j=0; j<m_recordsInOrder.size(); ++j)
-  {
-    const PMDRecordContainer *ptrToContainer = &(m_recordsInOrder[j]);
-    const PMDRecordContainer &container = *ptrToContainer;
-
-    if (container.m_seqNum == seqNum)
-    {
-      tempContainer.push_back(container);
-    }
-  }
-  return tempContainer;
-}
-
-std::vector<PMDRecordContainer> PMDParser::getRecordsByRecType(const uint16_t recType)
-{
-  std::vector<PMDRecordContainer> tempContainer;
-
-  for (unsigned j=0; j<m_recordsInOrder.size(); ++j)
-  {
-    const PMDRecordContainer *ptrToContainer = &(m_recordsInOrder[j]);
-    const PMDRecordContainer &container = *ptrToContainer;
-
-    if (container.m_recordType == recType)
-    {
-      tempContainer.push_back(container);
-    }
-  }
-  return tempContainer;
-}
-
-const PMDRecordContainer &PMDParser::getSingleRecordBySeqNum(const uint16_t seqNum) const
-{
-  for (unsigned j=0; j<m_recordsInOrder.size(); ++j)
-  {
-    const PMDRecordContainer *ptrToContainer = &(m_recordsInOrder[j]);
-    const PMDRecordContainer &container = *ptrToContainer;
-
-    if (container.m_seqNum == seqNum)
-    {
-      return container;
-    }
-  }
-  PMD_ERR_MSG("No record with the given sequence number.\n");
-  throw RecordNotFoundException(seqNum);
 }
 
 const PMDXForm &PMDParser::getXForm(const uint32_t xFormId) const
@@ -204,15 +294,15 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
 
   const PMDXForm xFormContainer = getXForm(textBoxXformId);
 
-  std::vector<PMDRecordContainer> tempContainer = getRecordsByRecType(TEXT_BLOCK);
-  if (tempContainer.empty())
+  RecordIterator textBlockIt = beginRecordsOfType(TEXT_BLOCK);
+  if (textBlockIt == endRecords())
   {
     PMD_ERR_MSG("No Text Block Record Found.\n");
   }
 
-  for (unsigned j=0; j<tempContainer.size(); ++j)
+  for (; textBlockIt != endRecords(); ++textBlockIt)
   {
-    const PMDRecordContainer &textBlockContainer = tempContainer[j];
+    const PMDRecordContainer &textBlockContainer = *textBlockIt;
 
     for (unsigned i = 0; i < textBlockContainer.m_numRecords; ++i)
     {
@@ -244,15 +334,15 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
   }
   std::string text = "";
 
-  tempContainer = getRecordsBySeqNum(textBoxText);
-  if (tempContainer.empty())
+  RecordIterator textIt = beginRecordsWithSeqNumber(textBoxText);
+  if (textIt == endRecords())
   {
     PMD_ERR_MSG("No Text Found.\n");
   }
 
-  for (unsigned j=0; j<tempContainer.size(); ++j)
+  for (; textIt != endRecords(); ++textIt)
   {
-    const PMDRecordContainer &textContainer = tempContainer[j];
+    const PMDRecordContainer &textContainer = *textIt;
     seekToRecord(m_input, textContainer, 0);
     for (unsigned i = 0; i < textContainer.m_numRecords; ++i)
     {
@@ -261,48 +351,54 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
   }
 
   std::vector<PMDCharProperties> charProps;
-  const PMDRecordContainer &charsContainer = getSingleRecordBySeqNum(textBoxChars);
-  for (unsigned i = 0; i < charsContainer.m_numRecords; ++i)
+  for (RecordIterator it = beginRecordsWithSeqNumber(textBoxChars); it != endRecords(); ++it)
   {
-    seekToRecord(m_input, charsContainer, i);
+    const PMDRecordContainer &charsContainer = *it;
+    for (unsigned i = 0; i < charsContainer.m_numRecords; ++i)
+    {
+      seekToRecord(m_input, charsContainer, i);
 
-    uint16_t length = readU16(m_input, m_bigEndian);
-    uint16_t fontFace = readU16(m_input, m_bigEndian);
-    uint16_t fontSize = readU16(m_input, m_bigEndian);
-    skip(m_input, 2);
-    uint8_t fontColor = readU8(m_input);
-    skip(m_input, 1);
-    uint8_t boldItalicUnderline = readU8(m_input);
-    uint8_t superSubscript = readU8(m_input);
-    skip(m_input, 4);
-    int16_t kerning = readS16(m_input, m_bigEndian);
-    skip(m_input, 2);
-    uint16_t superSubSize = readU16(m_input, m_bigEndian);
-    uint16_t subPos = readU16(m_input, m_bigEndian);
-    uint16_t superPos = readU16(m_input, m_bigEndian);
-    skip(m_input, 2);
-    uint8_t tint = readU8(m_input);
+      uint16_t length = readU16(m_input, m_bigEndian);
+      uint16_t fontFace = readU16(m_input, m_bigEndian);
+      uint16_t fontSize = readU16(m_input, m_bigEndian);
+      skip(m_input, 2);
+      uint8_t fontColor = readU8(m_input);
+      skip(m_input, 1);
+      uint8_t boldItalicUnderline = readU8(m_input);
+      uint8_t superSubscript = readU8(m_input);
+      skip(m_input, 4);
+      int16_t kerning = readS16(m_input, m_bigEndian);
+      skip(m_input, 2);
+      uint16_t superSubSize = readU16(m_input, m_bigEndian);
+      uint16_t subPos = readU16(m_input, m_bigEndian);
+      uint16_t superPos = readU16(m_input, m_bigEndian);
+      skip(m_input, 2);
+      uint8_t tint = readU8(m_input);
 
-    charProps.push_back(PMDCharProperties(length,fontFace,fontSize,fontColor,boldItalicUnderline,superSubscript,kerning,superSubSize,superPos,subPos,tint));
+      charProps.push_back(PMDCharProperties(length,fontFace,fontSize,fontColor,boldItalicUnderline,superSubscript,kerning,superSubSize,superPos,subPos,tint));
+    }
   }
 
   std::vector<PMDParaProperties> paraProps;
-  const PMDRecordContainer &paraContainer = getSingleRecordBySeqNum(textBoxPara);
-  for (unsigned i = 0; i < paraContainer.m_numRecords; ++i)
+  for (RecordIterator it = beginRecordsWithSeqNumber(textBoxPara); it != endRecords(); ++it)
   {
-    seekToRecord(m_input, paraContainer, i);
+    const PMDRecordContainer &paraContainer = *it;
+    for (unsigned i = 0; i < paraContainer.m_numRecords; ++i)
+    {
+      seekToRecord(m_input, paraContainer, i);
 
-    uint16_t length = readU16(m_input, m_bigEndian);
-    skip(m_input, 1);
-    uint8_t align = readU8(m_input);
-    skip(m_input, 6);
-    uint16_t leftIndent = readU16(m_input, m_bigEndian);
-    uint16_t firstIndent = readU16(m_input, m_bigEndian);
-    uint16_t rightIndent = readU16(m_input, m_bigEndian);
-    uint16_t beforeIndent = readU16(m_input, m_bigEndian); // Above Para Spacing
-    uint16_t afterIndent = readU16(m_input, m_bigEndian); // Below Para Spacing
+      uint16_t length = readU16(m_input, m_bigEndian);
+      skip(m_input, 1);
+      uint8_t align = readU8(m_input);
+      skip(m_input, 6);
+      uint16_t leftIndent = readU16(m_input, m_bigEndian);
+      uint16_t firstIndent = readU16(m_input, m_bigEndian);
+      uint16_t rightIndent = readU16(m_input, m_bigEndian);
+      uint16_t beforeIndent = readU16(m_input, m_bigEndian); // Above Para Spacing
+      uint16_t afterIndent = readU16(m_input, m_bigEndian); // Below Para Spacing
 
-    paraProps.push_back(PMDParaProperties(length,align,leftIndent,firstIndent,rightIndent,beforeIndent,afterIndent));
+      paraProps.push_back(PMDParaProperties(length,align,leftIndent,firstIndent,rightIndent,beforeIndent,afterIndent));
+    }
   }
 
   boost::shared_ptr<PMDLineSet> newShape(new PMDTextBox(bboxTopLeft, bboxBotRight, xFormContainer, text, charProps, paraProps));
@@ -404,12 +500,15 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
     break;
   }
 
-  const PMDRecordContainer &lineSetContainer = getSingleRecordBySeqNum(lineSetSeqNum);
   std::vector<PMDShapePoint> points;
-  for (unsigned i = 0; i < lineSetContainer.m_numRecords; ++i)
+  for (RecordIterator it = beginRecordsWithSeqNumber(lineSetSeqNum); it != endRecords(); ++it)
   {
-    seekToRecord(m_input, lineSetContainer, i);
-    points.push_back(readPoint(m_input, m_bigEndian));
+    const PMDRecordContainer &lineSetContainer = *it;
+    for (unsigned i = 0; i < lineSetContainer.m_numRecords; ++i)
+    {
+      seekToRecord(m_input, lineSetContainer, i);
+      points.push_back(readPoint(m_input, m_bigEndian));
+    }
   }
 
   const PMDXForm &xFormContainer = getXForm(polyXformId);
@@ -470,34 +569,30 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
   skip(m_input, 16);
   uint16_t bitmapRecordSeqNum = readU16(m_input, m_bigEndian);
 
-  std::vector<PMDRecordContainer> tempContainer;
-
   const PMDXForm &xFormContainer = getXForm(bboxXformId);
 
-  tempContainer = getRecordsBySeqNum(bitmapRecordSeqNum);
-  if (tempContainer.empty())
+  RecordIterator tiffIt = beginRecordsWithSeqNumber(bitmapRecordSeqNum);
+  if (tiffIt == endRecords())
   {
     throw RecordNotFoundException(TIFF, bitmapRecordSeqNum);
   }
 
-  for (unsigned j=0; j<tempContainer.size(); ++j)
+  for (; tiffIt != endRecords(); ++tiffIt)
   {
-    const PMDRecordContainer *ptrToTiffContainer = &(tempContainer[j]);
-    const PMDRecordContainer &tiffContainer = *ptrToTiffContainer;
+    const PMDRecordContainer &tiffContainer = *tiffIt;
     seekToRecord(m_input, tiffContainer, 0);
     const unsigned char *const tempBytes = readNBytes(m_input,tiffContainer.m_numRecords);
     bitmap.append(tempBytes,tiffContainer.m_numRecords);
   }
 
-  tempContainer = getRecordsBySeqNum(bitmapRecordSeqNum + 1);
-  if (tempContainer.empty())
+  tiffIt = beginRecordsWithSeqNumber(bitmapRecordSeqNum + 1);
+  if (tiffIt == endRecords())
   {
     throw RecordNotFoundException(TIFF, bitmapRecordSeqNum);
   }
-  for (unsigned j=0; j<tempContainer.size(); ++j)
+  for (; tiffIt != endRecords(); ++tiffIt)
   {
-    const PMDRecordContainer *ptrToTiffSecondContainer = &(tempContainer[j]);
-    const PMDRecordContainer &tiffSecondContainer = *ptrToTiffSecondContainer;
+    const PMDRecordContainer &tiffSecondContainer = *tiffIt;
     seekToRecord(m_input, tiffSecondContainer, 0);
     const unsigned char *const tempBytes = readNBytes(m_input,tiffSecondContainer.m_numRecords);
     bitmap.append(tempBytes,tiffSecondContainer.m_numRecords);
@@ -511,12 +606,9 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
 
 void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
 {
-  std::vector<PMDRecordContainer> tempContainer = getRecordsBySeqNum(seqNum);
-
-  for (unsigned j=0; j<tempContainer.size(); ++j)
+  for (RecordIterator it = beginRecordsWithSeqNumber(seqNum); it != endRecords(); ++it)
   {
-    const PMDRecordContainer *ptrToContainer = &(tempContainer[j]);
-    const PMDRecordContainer &container = *ptrToContainer;
+    const PMDRecordContainer &container = *it;
 
     for (unsigned i = 0; i < container.m_numRecords; ++i)
     {
@@ -554,17 +646,17 @@ void PMDParser::parseShapes(uint16_t seqNum, unsigned pageID)
 
 void PMDParser::parseFonts()
 {
-  std::vector<PMDRecordContainer> tempContainer = getRecordsByRecType(FONTS);
+  RecordIterator it = beginRecordsOfType(FONTS);
 
-  if (tempContainer.empty())
+  if (it != endRecords())
   {
     PMD_ERR_MSG("No Font Record Found.\n");
   }
 
   uint16_t fontIndex = 0;
-  for (unsigned j=0; j<tempContainer.size(); ++j)
+  for (; it != endRecords(); ++it)
   {
-    const PMDRecordContainer &container = tempContainer[j];
+    const PMDRecordContainer &container = *it;
 
     for (unsigned i = 0; i < container.m_numRecords; ++i)
     {
@@ -587,17 +679,16 @@ void PMDParser::parseFonts()
 
 void PMDParser::parseColors()
 {
+  RecordIterator it = beginRecordsOfType(COLORS);
 
-  std::vector<PMDRecordContainer> tempContainer = getRecordsByRecType(COLORS);
-
-  if (tempContainer.empty())
+  if (it != endRecords())
   {
     PMD_ERR_MSG("No Color Record Found.\n");
   }
 
-  for (unsigned j=0; j<tempContainer.size(); ++j)
+  for (; it != endRecords(); ++it)
   {
-    const PMDRecordContainer &container = tempContainer[j];
+    const PMDRecordContainer &container = *it;
 
     for (unsigned i = 0; i < container.m_numRecords; ++i)
     {
@@ -637,12 +728,11 @@ void PMDParser::parseColors()
 
 void PMDParser::parseXforms()
 {
+  RecordIterator it = beginRecordsOfType(XFORM);
 
-  std::vector<PMDRecordContainer> tempContainer = getRecordsByRecType(XFORM);
-
-  for (unsigned j=0; j<tempContainer.size(); ++j)
+  for (; it != endRecords(); ++it)
   {
-    const PMDRecordContainer &xformContainer = tempContainer[j];
+    const PMDRecordContainer &xformContainer = *it;
 
     for (unsigned i = 0; i < xformContainer.m_numRecords; ++i)
     {
@@ -852,5 +942,21 @@ void PMDParser::parse()
     throw RecordNotFoundException(PAGE);
   }
 }
+
+PMDParser::RecordIterator PMDParser::beginRecordsWithSeqNumber(const uint16_t seqNum) const
+{
+  return RecordIterator(m_recordsInOrder, seqNum);
+}
+
+PMDParser::RecordIterator PMDParser::beginRecordsOfType(const uint16_t recType) const
+{
+  return RecordIterator(m_recordsInOrder, m_records, recType);
+}
+
+PMDParser::RecordIterator PMDParser::endRecords() const
+{
+  return RecordIterator(m_recordsInOrder);
+}
+
 }
 /* vim:set shiftwidth=2 softtabstop=2 expandtab: */

@@ -50,6 +50,7 @@ AC_SUBST([REVENGE_LIBS])
 # ==========
 AC_CHECK_HEADERS(
         boost/format.hpp \
+        boost/operators.hpp \
         boost/optional.hpp \
         boost/scoped_ptr.hpp \
         boost/shared_ptr.hpp,

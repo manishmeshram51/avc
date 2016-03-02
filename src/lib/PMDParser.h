@@ -25,15 +25,19 @@ namespace libpagemaker
 class PMDCollector;
 class PMDParser
 {
+  typedef std::vector<PMDRecordContainer> RecordContainerList_t;
+  typedef std::map<uint16_t, std::vector<unsigned> > RecordTypeMap_t;
+
   librevenge::RVNGInputStream *m_input;
   unsigned long m_length;
   PMDCollector *m_collector;
-  std::map<uint16_t, std::vector<unsigned> > m_records;
+  RecordTypeMap_t m_records;
   bool m_bigEndian;
-  std::vector<PMDRecordContainer> m_recordsInOrder;
+  RecordContainerList_t m_recordsInOrder;
   std::map<uint32_t, PMDXForm> m_xFormMap;
 
   struct ToCState;
+  class RecordIterator;
 
   /* Private functions. */
   void parseGlobalInfo(const PMDRecordContainer &container);
@@ -51,11 +55,12 @@ class PMDParser
   void readNextRecordFromTableOfContents(ToCState &state, bool subRecord, uint16_t subRecordType = 0);
   void readTableOfContents(ToCState &state, uint32_t offset, unsigned records, bool subRecords, uint16_t subRecordType = 0);
   void parseTableOfContents(uint32_t offset, uint16_t length);
-  std::vector<PMDRecordContainer> getRecordsBySeqNum(const uint16_t seqNum);
-  std::vector<PMDRecordContainer> getRecordsByRecType(const uint16_t recType);
-  const PMDRecordContainer &getSingleRecordBySeqNum(const uint16_t seqNum) const;
   void parseXforms();
   const PMDXForm &getXForm(const uint32_t xFormId) const;
+
+  RecordIterator beginRecordsWithSeqNumber(uint16_t seqNum) const;
+  RecordIterator beginRecordsOfType(uint16_t recType) const;
+  RecordIterator endRecords() const;
 
   /* Prevent copy and assignment */
   PMDParser &operator=(const PMDParser &);
