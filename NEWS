@@ -1,3 +1,9 @@
+libpagemaker 0.0.3
+
+- Make --help output of conversion tools help2man-friendly.
+- Read big endian (Mac) files (tdf#91419).
+- Other small fixes and improvements.
+
 libpagemaker-0.0.2
 
 - Use record type to identify records in the trailer, instead of expecting
