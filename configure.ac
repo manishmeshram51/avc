@@ -265,6 +265,8 @@ src/conv/raw/Makefile
 src/conv/raw/pmd2raw.rc
 src/conv/svg/Makefile
 src/conv/svg/pmd2svg.rc
+src/conv/text/Makefile
+src/conv/text/pmd2text.rc
 src/lib/Makefile
 src/lib/libpagemaker.rc
 inc/Makefile
