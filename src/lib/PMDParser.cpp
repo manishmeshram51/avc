@@ -14,7 +14,7 @@
 #include <vector>
 #include <limits>
 #include <librevenge/librevenge.h>
-#include <boost/operators.hpp>
+#include <boost/iterator/iterator_facade.hpp>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
 #include "PMDRecord.h"
@@ -44,35 +44,27 @@ PMDParser::ToCState::ToCState()
 {
 }
 
-class PMDParser::RecordIterator : boost::bidirectional_iteratable<PMDParser::RecordIterator, RecordContainerList_t::const_iterator::pointer>
+class PMDParser::RecordIterator :
+  public boost::iterator_facade
+  < PMDParser::RecordIterator
+  , RecordContainerList_t::const_iterator::value_type
+  , std::bidirectional_iterator_tag
+  , RecordContainerList_t::const_iterator::reference
+  , RecordContainerList_t::const_iterator::difference_type
+  >
 {
-  typedef RecordContainerList_t::const_iterator Iter_t;
-
-public:
-  typedef std::bidirectional_iterator_tag category; // enough for our purpose
-  typedef Iter_t::value_type value_type;
-  typedef Iter_t::difference_type difference_type;
-  typedef Iter_t::pointer pointer;
-  typedef Iter_t::reference reference;
-
 public:
   RecordIterator(const RecordContainerList_t &records);
   RecordIterator(const RecordContainerList_t &records, uint16_t seqNum);
   RecordIterator(const RecordContainerList_t &records, const RecordTypeMap_t &types, uint16_t recType);
 
-  reference operator*() const;
-
-  RecordIterator &operator++();
-  RecordIterator &operator--();
-
-  friend bool operator==(const RecordIterator &left, const RecordIterator &right)
-  {
-    return (left.m_it == left.m_end && right.m_it == right.m_end) || left.m_it == right.m_it;
-  }
-
 private:
-  void next();
-  void prev();
+  friend class boost::iterator_core_access;
+
+  reference dereference() const;
+  bool equal(const RecordIterator &other) const;
+  void increment();
+  void decrement();
 
 private:
   RecordContainerList_t::const_iterator m_it;
@@ -104,7 +96,7 @@ PMDParser::RecordIterator::RecordIterator(const RecordContainerList_t &records, 
   , m_recBegin()
   , m_recEnd()
 {
-  next();
+  increment();
 }
 
 PMDParser::RecordIterator::RecordIterator(const RecordContainerList_t &records, const RecordTypeMap_t &types, const uint16_t recType)
@@ -127,24 +119,17 @@ PMDParser::RecordIterator::RecordIterator(const RecordContainerList_t &records, 
   }
 }
 
-PMDParser::RecordIterator::reference PMDParser::RecordIterator::operator*() const
+PMDParser::RecordIterator::reference PMDParser::RecordIterator::dereference() const
 {
   return *m_it;
 }
 
-PMDParser::RecordIterator &PMDParser::RecordIterator::operator++()
+bool PMDParser::RecordIterator::equal(const RecordIterator &other) const
 {
-  next();
-  return *this;
+  return (m_it == m_end && other.m_it == other.m_end) || m_it == other.m_it;
 }
 
-PMDParser::RecordIterator &PMDParser::RecordIterator::operator--()
-{
-  prev();
-  return *this;
-}
-
-void PMDParser::RecordIterator::next()
+void PMDParser::RecordIterator::increment()
 {
   if (m_selector)
   {
@@ -165,7 +150,7 @@ void PMDParser::RecordIterator::next()
   }
 }
 
-void PMDParser::RecordIterator::prev()
+void PMDParser::RecordIterator::decrement()
 {
   if (m_selector)
   {
