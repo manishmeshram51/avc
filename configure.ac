@@ -236,23 +236,34 @@ AM_CONDITIONAL([WITH_LIBPMD_DOCS], [test "x$build_docs" != "xno"])
 # Tools
 # =====
 AC_ARG_ENABLE([tools],
-	[AS_HELP_STRING([--disable-tools], [Build conversion tools])],
-	[enable_tools="$enableval"],
-	[enable_tools=yes]
+        [AS_HELP_STRING([--disable-tools], [Build conversion tools])],
+        [enable_tools="$enableval"],
+        [enable_tools=yes]
 )
-AS_IF([test "x$enable_tools" = "xyes"], [
-	PKG_CHECK_MODULES([REVENGE_GENERATORS],[
-		librevenge-generators-0.0
-	])
-	PKG_CHECK_MODULES([REVENGE_STREAM],[
-		librevenge-stream-0.0
-	])
+AM_CONDITIONAL(BUILD_TOOLS, [test "x$enable_tools" = "xyes"])
+
+# =======
+# Fuzzers
+# =======
+AC_ARG_ENABLE([fuzzers],
+        [AS_HELP_STRING([--enable-fuzzers], [Build fuzzer(s)])],
+        [enable_fuzzers="$enableval"],
+        [enable_fuzzers=no]
+)
+AM_CONDITIONAL(BUILD_FUZZERS, [test "x$enable_fuzzers" = "xyes"])
+
+AS_IF([test "x$enable_tools" = "xyes" -o "x$enable_fuzzers" = "xyes"], [
+        PKG_CHECK_MODULES([REVENGE_STREAM],[
+                librevenge-stream-0.0
+        ])
+        PKG_CHECK_MODULES([REVENGE_GENERATORS],[
+                librevenge-generators-0.0
+        ])
 ])
-AC_SUBST([REVENGE_GENERATORS_CFLAGS])
-AC_SUBST([REVENGE_GENERATORS_LIBS])
 AC_SUBST([REVENGE_STREAM_CFLAGS])
 AC_SUBST([REVENGE_STREAM_LIBS])
-AM_CONDITIONAL(BUILD_TOOLS, [test "x$enable_tools" = "xyes"])
+AC_SUBST([REVENGE_GENERATORS_CFLAGS])
+AC_SUBST([REVENGE_GENERATORS_LIBS])
 
 # =====================
 # Prepare all .in files
@@ -267,6 +278,7 @@ src/conv/svg/Makefile
 src/conv/svg/pmd2svg.rc
 src/conv/text/Makefile
 src/conv/text/pmd2text.rc
+src/fuzz/Makefile
 src/lib/Makefile
 src/lib/libpagemaker.rc
 inc/Makefile
@@ -287,6 +299,7 @@ AC_MSG_NOTICE([
 Build configuration:
     debug:           ${enable_debug}
     docs:            ${build_docs}
+    fuzzers:         ${enable_fuzzers}
     werror:          ${enable_werror}
 ==============================================================================
 ])
