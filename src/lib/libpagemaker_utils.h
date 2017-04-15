@@ -28,7 +28,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-#if defined(__clang__) || defined(__GNUC__)
+#if defined(HAVE_FUNC_ATTRIBUTE_FORMAT)
 #  define PMD_ATTRIBUTE_PRINTF(fmt, arg) __attribute__((__format__(__printf__, fmt, arg)))
 #else
 #  define PMD_ATTRIBUTE_PRINTF(fmt, arg)
