@@ -51,6 +51,7 @@ AC_SUBST([REVENGE_LIBS])
 # Find boost
 # ==========
 AC_CHECK_HEADERS(
+        boost/cstdint.hpp \
         boost/format.hpp \
         boost/iterator/iterator_facade.hpp \
         boost/optional.hpp \

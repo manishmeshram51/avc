@@ -10,51 +10,22 @@
 #ifndef __LIBPAGEMAKER_UTILS_H__
 #define __LIBPAGEMAKER_UTILS_H__
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <cmath>
 #include <cstdio>
 #include <memory>
 #include <string>
+
+#include <boost/cstdint.hpp>
 
 #include <librevenge-stream/librevenge-stream.h>
 #include <librevenge/librevenge.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
-#endif
-
-#ifdef _MSC_VER
-
-typedef unsigned char uint8_t;
-typedef signed char int8_t;
-typedef unsigned short uint16_t;
-typedef short int16_t;
-typedef unsigned uint32_t;
-typedef int int32_t;
-typedef unsigned __int64 uint64_t;
-typedef __int64 int64_t;
-
-#else
-
-#ifdef HAVE_CONFIG_H
-
-#include <config.h>
-
-#ifdef HAVE_STDINT_H
-#include <stdint.h>
-#endif
-
-#ifdef HAVE_INTTYPES_H
-#include <inttypes.h>
-#endif
-
-#else
-
-// assume that the headers are there inside LibreOffice build when no HAVE_CONFIG_H is defined
-#include <stdint.h>
-#include <inttypes.h>
-
-#endif
-
 #endif
 
 #if defined(__clang__) || defined(__GNUC__)
