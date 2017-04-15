@@ -129,7 +129,7 @@ void PMDCollector::addFont(const PMDFont &font)
   m_font.push_back(font);
 }
 
-void PMDCollector::addShapeToPage(unsigned pageID, const boost::shared_ptr<PMDLineSet> &shape)
+void PMDCollector::addShapeToPage(unsigned pageID, const std::shared_ptr<PMDLineSet> &shape)
 {
   m_pages.at(pageID).addShape(shape);
 }
@@ -679,7 +679,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
 
 void PMDCollector::writePage(const PMDPage & /*page*/,
                              librevenge::RVNGDrawingInterface *painter,
-                             const std::vector<boost::shared_ptr<const OutputShape> > &outputShapes) const
+                             const std::vector<std::shared_ptr<const OutputShape> > &outputShapes) const
 {
   librevenge::RVNGPropertyList pageProps;
   if (m_pageWidth.is_initialized())
@@ -716,7 +716,7 @@ void PMDCollector::fillOutputShapesByPage_TwoSided(PageShapesList_t &pageShapes)
     const PMDPage &page = m_pages[i];
     for (unsigned j = 0; j < page.numShapes(); ++j)
     {
-      boost::shared_ptr<const OutputShape> right = newOutputShape(page.getShape(j), translateForRightPage);
+      std::shared_ptr<const OutputShape> right = newOutputShape(page.getShape(j), translateForRightPage);
       if (right->getBoundingBox().second.m_x >= 0)
       {
         pageShapes[i].push_back(right);
@@ -724,7 +724,7 @@ void PMDCollector::fillOutputShapesByPage_TwoSided(PageShapesList_t &pageShapes)
       }
       if (leftPageExists)
       {
-        boost::shared_ptr<const OutputShape> left = newOutputShape(page.getShape(j), translateForLeftPage);
+        std::shared_ptr<const OutputShape> left = newOutputShape(page.getShape(j), translateForLeftPage);
         if (left->getBoundingBox().first.m_x <= centerToEdge_x * 2)
         {
           pageShapes[i - 1].push_back(left);

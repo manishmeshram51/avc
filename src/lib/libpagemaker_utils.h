@@ -12,10 +12,8 @@
 
 #include <cmath>
 #include <cstdio>
-
+#include <memory>
 #include <string>
-
-#include <boost/shared_ptr.hpp>
 
 #include <librevenge-stream/librevenge-stream.h>
 #include <librevenge/librevenge.h>

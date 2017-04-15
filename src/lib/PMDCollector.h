@@ -12,11 +12,11 @@
 
 #include <stdint.h>
 
+#include <memory>
 #include <vector>
 #include <string>
 
 #include <boost/optional.hpp>
-#include <boost/shared_ptr.hpp>
 
 
 #include "geometry.h"
@@ -39,7 +39,7 @@ namespace libpagemaker
  */
 class PMDCollector
 {
-  typedef std::vector<boost::shared_ptr<const OutputShape> > PageShapes_t;
+  typedef std::vector<std::shared_ptr<const OutputShape> > PageShapes_t;
   typedef std::vector<PageShapes_t> PageShapesList_t;
 
   /*
@@ -56,7 +56,7 @@ class PMDCollector
 
   void writePage(const PMDPage &,
                  librevenge::RVNGDrawingInterface *,
-                 const std::vector<boost::shared_ptr<const OutputShape> > &) const;
+                 const std::vector<std::shared_ptr<const OutputShape> > &) const;
 
   void paintShape(const OutputShape &shape,
                   librevenge::RVNGDrawingInterface *) const;
@@ -71,7 +71,7 @@ public:
   void setPageWidth(PMDPageUnit);
   void setPageHeight(PMDPageUnit);
   void setDoubleSided(bool);
-  void addShapeToPage(unsigned pageID, const boost::shared_ptr<PMDLineSet> &shape);
+  void addShapeToPage(unsigned pageID, const std::shared_ptr<PMDLineSet> &shape);
   void addColor(const PMDColor &color);
   void addFont(const PMDFont &font);
 

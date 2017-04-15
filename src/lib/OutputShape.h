@@ -12,7 +12,7 @@
 
 #include "geometry.h"
 #include "PMDExceptions.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vector>
 #include "libpagemaker_utils.h"
 namespace libpagemaker
@@ -156,8 +156,8 @@ public:
 };
 
 
-boost::shared_ptr<OutputShape> newOutputShape(
-  const boost::shared_ptr<const PMDLineSet> &lineSet, const InchPoint &translate);
+std::shared_ptr<OutputShape> newOutputShape(
+  const std::shared_ptr<const PMDLineSet> &lineSet, const InchPoint &translate);
 
 }
 

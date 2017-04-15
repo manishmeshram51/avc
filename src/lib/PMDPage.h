@@ -12,8 +12,8 @@
 
 #include "geometry.h"
 
+#include <memory>
 #include <vector>
-#include <boost/shared_ptr.hpp>
 #include <librevenge/librevenge.h>
 
 namespace libpagemaker
@@ -21,12 +21,12 @@ namespace libpagemaker
 
 class PMDPage
 {
-  std::vector<boost::shared_ptr<PMDLineSet> > m_shapes;
+  std::vector<std::shared_ptr<PMDLineSet> > m_shapes;
 public:
   PMDPage() : m_shapes()
   { }
 
-  void addShape(const boost::shared_ptr<PMDLineSet> &shape)
+  void addShape(const std::shared_ptr<PMDLineSet> &shape)
   {
     m_shapes.push_back(shape);
   }
@@ -36,7 +36,7 @@ public:
     return m_shapes.size();
   }
 
-  boost::shared_ptr<const PMDLineSet> getShape(unsigned i) const
+  std::shared_ptr<const PMDLineSet> getShape(unsigned i) const
   {
     return m_shapes.at(i);
   }

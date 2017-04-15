@@ -11,12 +11,12 @@
 #include <string>
 #include <cassert>
 #include <iterator>
+#include <memory>
 #include <vector>
 #include <limits>
 #include <librevenge/librevenge.h>
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/optional.hpp>
-#include <boost/shared_ptr.hpp>
 #include "PMDRecord.h"
 #include "PMDParser.h"
 #include "PMDCollector.h"
@@ -253,7 +253,7 @@ void PMDParser::parseLine(const PMDRecordContainer &container, unsigned recordIn
 
   PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDLine(bboxTopLeft, bboxBotRight, mirrored, strokeProps));
+  std::shared_ptr<PMDLineSet> newShape(new PMDLine(bboxTopLeft, bboxBotRight, mirrored, strokeProps));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -386,7 +386,7 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
     }
   }
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDTextBox(bboxTopLeft, bboxBotRight, xFormContainer, text, charProps, paraProps));
+  std::shared_ptr<PMDLineSet> newShape(new PMDTextBox(bboxTopLeft, bboxBotRight, xFormContainer, text, charProps, paraProps));
   m_collector->addShapeToPage(pageID, newShape);
 
 }
@@ -425,7 +425,7 @@ void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned rec
   PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
 
   const PMDXForm &xFormContainer = getXForm(rectXformId);
-  boost::shared_ptr<PMDLineSet> newShape(new PMDRectangle(bboxTopLeft, bboxBotRight, xFormContainer, fillProps, strokeProps));
+  std::shared_ptr<PMDLineSet> newShape(new PMDRectangle(bboxTopLeft, bboxBotRight, xFormContainer, fillProps, strokeProps));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -497,7 +497,7 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
   }
 
   const PMDXForm &xFormContainer = getXForm(polyXformId);
-  boost::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, bboxTopLeft, bboxBotRight, xFormContainer, fillProps, strokeProps));
+  std::shared_ptr<PMDLineSet> newShape(new PMDPolygon(points, closed, bboxTopLeft, bboxBotRight, xFormContainer, fillProps, strokeProps));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -536,7 +536,7 @@ void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recor
   PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
 
   const PMDXForm &xFormContainer = getXForm(ellipseXformId);
-  boost::shared_ptr<PMDLineSet> newShape(new PMDEllipse(bboxTopLeft, bboxBotRight, xFormContainer, fillProps, strokeProps));
+  std::shared_ptr<PMDLineSet> newShape(new PMDEllipse(bboxTopLeft, bboxBotRight, xFormContainer, fillProps, strokeProps));
   m_collector->addShapeToPage(pageID, newShape);
 }
 
@@ -584,7 +584,7 @@ void PMDParser::parseBitmap(const PMDRecordContainer &container, unsigned record
   }
 
 
-  boost::shared_ptr<PMDLineSet> newShape(new PMDBitmap(bboxTopLeft, bboxBotRight, xFormContainer, bitmap));
+  std::shared_ptr<PMDLineSet> newShape(new PMDBitmap(bboxTopLeft, bboxBotRight, xFormContainer, bitmap));
   m_collector->addShapeToPage(pageID, newShape);
 
 }

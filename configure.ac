@@ -55,7 +55,7 @@ AC_CHECK_HEADERS(
         boost/iterator/iterator_facade.hpp \
         boost/optional.hpp \
         boost/scoped_ptr.hpp \
-        boost/shared_ptr.hpp,
+        ,
     [],
     [AC_MSG_ERROR([Required boost headers not found.])],
     []

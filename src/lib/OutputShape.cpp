@@ -11,13 +11,13 @@
 #include "geometry.h"
 #include <math.h>
 #include "libpagemaker_utils.h"
-boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
-  const boost::shared_ptr<const PMDLineSet> &ptrToLineSet, const InchPoint &translate)
+std::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
+  const std::shared_ptr<const PMDLineSet> &ptrToLineSet, const InchPoint &translate)
 {
   if (ptrToLineSet->shapeType() == SHAPE_TYPE_TEXTBOX)
   {
 
-    boost::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(
+    std::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(
       new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeType(), ptrToLineSet->getRotation(), ptrToLineSet->getSkew(), ptrToLineSet->getText(), ptrToLineSet->getCharProperties(), ptrToLineSet->getParaProperties()));
 
     PMDShapePoint bboxTopLeft = ptrToLineSet->getBboxTopLeft();
@@ -57,7 +57,7 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
   }
   else if (ptrToLineSet->shapeType() == SHAPE_TYPE_BITMAP)
   {
-    boost::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(
+    std::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(
       new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeType(), ptrToLineSet->getRotation(), ptrToLineSet->getSkew(), ptrToLineSet->getBitmap()));
 
     PMDShapePoint bboxTopLeft = ptrToLineSet->getBboxTopLeft();
@@ -97,7 +97,7 @@ boost::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
   }
   else
   {
-    boost::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(
+    std::shared_ptr<libpagemaker::OutputShape> ptrToOutputShape(
       new OutputShape(ptrToLineSet->getIsClosed(), ptrToLineSet->shapeType(), ptrToLineSet->getRotation(), ptrToLineSet->getSkew(), ptrToLineSet->getFillProperties(), ptrToLineSet->getStrokeProperties()));
 
     PMDShapePoint bboxTopLeft = ptrToLineSet->getBboxTopLeft();
