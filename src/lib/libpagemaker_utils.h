@@ -34,23 +34,14 @@
 #  define PMD_ATTRIBUTE_PRINTF(fmt, arg)
 #endif
 
-// debug message includes source file and line number
-//#define VERBOSE_DEBUG 1
-
 // do nothing with debug messages in a release compile
 #ifdef DEBUG
 namespace libpagemaker
 {
 void debugPrint(const char *format, ...) PMD_ATTRIBUTE_PRINTF(1, 2);
 }
-#ifdef VERBOSE_DEBUG
-#define PMD_DEBUG_MSG(M) libpagemaker::debugPrint("%15s:%5d: ", __FILE__, __LINE__); libpagemaker::debugPrint M
-#define PMD_DEBUG(M) M
-#else
 #define PMD_DEBUG_MSG(M) libpagemaker::debugPrint M
 #define PMD_DEBUG(M) M
-#endif
-
 #define PMD_WARN_MSG(M) std::fprintf(stderr, "PageMaker [WARN] %15s:%d: ", __FILE__, __LINE__); std::fprintf(stderr, M)
 #define PMD_ERR_MSG(M) std::fprintf(stderr, "PageMaker [ERROR] %15s:%d: ", __FILE__, __LINE__); std::fprintf(stderr, M)
 #else
