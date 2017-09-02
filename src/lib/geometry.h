@@ -83,47 +83,47 @@ public:
     : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_mirrored(mirrored), m_strokeProps(strokeProps)
   { }
 
-  virtual double getRotation() const
+  double getRotation() const override
   {
     return 0;
   }
 
-  virtual double getSkew() const
+  double getSkew() const override
   {
     return 0;
   }
 
-  virtual PMDShapePoint getXformTopLeft() const
+  PMDShapePoint getXformTopLeft() const override
   {
     return PMDShapePoint(0,0);
   }
 
-  virtual PMDShapePoint getXformBotRight() const
+  PMDShapePoint getXformBotRight() const override
   {
     return PMDShapePoint(0,0);
   }
 
-  virtual PMDShapePoint getRotatingPoint() const
+  PMDShapePoint getRotatingPoint() const override
   {
     return PMDShapePoint(0,0);
   }
 
-  virtual bool getIsClosed() const
+  bool getIsClosed() const override
   {
     return false;
   }
 
-  virtual PMDShapePoint getBboxTopLeft() const
+  PMDShapePoint getBboxTopLeft() const override
   {
     return m_bboxTopLeft;
   }
 
-  virtual PMDShapePoint getBboxBotRight() const
+  PMDShapePoint getBboxBotRight() const override
   {
     return m_bboxBotRight;
   }
 
-  virtual std::vector<PMDShapePoint> getPoints() const
+  std::vector<PMDShapePoint> getPoints() const override
   {
     std::vector<PMDShapePoint> points;
 
@@ -140,47 +140,47 @@ public:
     return points;
   }
 
-  virtual uint8_t shapeType() const
+  uint8_t shapeType() const override
   {
     return SHAPE_TYPE_LINE;
   }
 
-  virtual PMDFillProperties getFillProperties() const
+  PMDFillProperties getFillProperties() const override
   {
     return PMDFillProperties(FILL_SOLID,0,0,0);
   }
 
-  virtual PMDStrokeProperties getStrokeProperties() const
+  PMDStrokeProperties getStrokeProperties() const override
   {
     return m_strokeProps;
   }
 
-  virtual std::string getText() const
+  std::string getText() const override
   {
     return "";
   }
 
-  virtual std::vector<PMDCharProperties> getCharProperties() const
+  std::vector<PMDCharProperties> getCharProperties() const override
   {
     std::vector<PMDCharProperties> temp;
     temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
     return temp;
   }
 
-  virtual std::vector<PMDParaProperties> getParaProperties() const
+  std::vector<PMDParaProperties> getParaProperties() const override
   {
     std::vector<PMDParaProperties> temp;
     temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
     return temp;
   }
 
-  virtual librevenge::RVNGBinaryData getBitmap() const
+  librevenge::RVNGBinaryData getBitmap() const override
   {
     librevenge::RVNGBinaryData temp;
     return temp;
   }
 
-  virtual ~PMDLine()
+  ~PMDLine() override
   {
   }
 };
@@ -201,94 +201,94 @@ public:
     : m_points(points), m_isClosed(isClosed), m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_xFormContainer(xFormContainer), m_fillProps(fillProps), m_strokeProps(strokeProps)
   { }
 
-  virtual double getRotation() const
+  double getRotation() const override
   {
     int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
-  virtual double getSkew() const
+  double getSkew() const override
   {
     int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
-  virtual PMDShapePoint getXformTopLeft() const
+  PMDShapePoint getXformTopLeft() const override
   {
     return m_xFormContainer.m_xformTopLeft;
   }
 
-  virtual PMDShapePoint getXformBotRight() const
+  PMDShapePoint getXformBotRight() const override
   {
     return m_xFormContainer.m_xformBotRight;
   }
 
-  virtual PMDShapePoint getRotatingPoint() const
+  PMDShapePoint getRotatingPoint() const override
   {
     return m_xFormContainer.m_rotatingPoint;
   }
 
-  virtual PMDShapePoint getBboxTopLeft() const
+  PMDShapePoint getBboxTopLeft() const override
   {
     return m_bboxTopLeft;
   }
 
-  virtual PMDShapePoint getBboxBotRight() const
+  PMDShapePoint getBboxBotRight() const override
   {
     return m_bboxBotRight;
   }
 
-  virtual bool getIsClosed() const
+  bool getIsClosed() const override
   {
     return m_isClosed;
   }
 
-  virtual std::vector<PMDShapePoint> getPoints() const
+  std::vector<PMDShapePoint> getPoints() const override
   {
     return m_points;
   }
 
-  virtual uint8_t shapeType() const
+  uint8_t shapeType() const override
   {
     return SHAPE_TYPE_POLY;
   }
 
-  virtual PMDFillProperties getFillProperties() const
+  PMDFillProperties getFillProperties() const override
   {
     return m_fillProps;
   }
 
-  virtual PMDStrokeProperties getStrokeProperties() const
+  PMDStrokeProperties getStrokeProperties() const override
   {
     return m_strokeProps;
   }
 
-  virtual std::string getText() const
+  std::string getText() const override
   {
     return "";
   }
 
-  virtual std::vector<PMDCharProperties> getCharProperties() const
+  std::vector<PMDCharProperties> getCharProperties() const override
   {
     std::vector<PMDCharProperties> temp;
     temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
     return temp;
   }
 
-  virtual std::vector<PMDParaProperties> getParaProperties() const
+  std::vector<PMDParaProperties> getParaProperties() const override
   {
     std::vector<PMDParaProperties> temp;
     temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
     return temp;
   }
 
-  virtual librevenge::RVNGBinaryData getBitmap() const
+  librevenge::RVNGBinaryData getBitmap() const override
   {
     librevenge::RVNGBinaryData temp;
     return temp;
   }
 
-  virtual ~PMDPolygon()
+  ~PMDPolygon() override
   {
   }
 };
@@ -307,49 +307,49 @@ public:
     : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight),m_xFormContainer(xFormContainer), m_text(text), m_charProps(charProps), m_paraProps(paraProps)
   { }
 
-  virtual double getRotation() const
+  double getRotation() const override
   {
     int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
-  virtual double getSkew() const
+  double getSkew() const override
   {
     int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
-  virtual PMDShapePoint getXformTopLeft() const
+  PMDShapePoint getXformTopLeft() const override
   {
     return m_xFormContainer.m_xformTopLeft;
   }
 
-  virtual PMDShapePoint getXformBotRight() const
+  PMDShapePoint getXformBotRight() const override
   {
     return m_xFormContainer.m_xformBotRight;
   }
 
-  virtual PMDShapePoint getRotatingPoint() const
+  PMDShapePoint getRotatingPoint() const override
   {
     return m_xFormContainer.m_rotatingPoint;
   }
 
-  virtual PMDShapePoint getBboxTopLeft() const
+  PMDShapePoint getBboxTopLeft() const override
   {
     return m_bboxTopLeft;
   }
 
-  virtual PMDShapePoint getBboxBotRight() const
+  PMDShapePoint getBboxBotRight() const override
   {
     return m_bboxBotRight;
   }
 
-  virtual bool getIsClosed() const
+  bool getIsClosed() const override
   {
     return true;
   }
 
-  virtual std::vector<PMDShapePoint> getPoints() const
+  std::vector<PMDShapePoint> getPoints() const override
   {
     std::vector<PMDShapePoint> points;
 
@@ -358,43 +358,43 @@ public:
     return points;
   }
 
-  virtual uint8_t shapeType() const
+  uint8_t shapeType() const override
   {
     return SHAPE_TYPE_TEXTBOX;
   }
 
-  virtual PMDFillProperties getFillProperties() const
+  PMDFillProperties getFillProperties() const override
   {
     return PMDFillProperties(0,0,0,0);
   }
 
-  virtual PMDStrokeProperties getStrokeProperties() const
+  PMDStrokeProperties getStrokeProperties() const override
   {
     return PMDStrokeProperties(0,0,0,0,0);
   }
 
-  virtual std::string getText() const
+  std::string getText() const override
   {
     return m_text;
   }
 
-  virtual std::vector<PMDCharProperties> getCharProperties() const
+  std::vector<PMDCharProperties> getCharProperties() const override
   {
     return m_charProps;
   }
 
-  virtual std::vector<PMDParaProperties> getParaProperties() const
+  std::vector<PMDParaProperties> getParaProperties() const override
   {
     return m_paraProps;
   }
 
-  virtual librevenge::RVNGBinaryData getBitmap() const
+  librevenge::RVNGBinaryData getBitmap() const override
   {
     librevenge::RVNGBinaryData temp;
     return temp;
   }
 
-  virtual ~PMDTextBox()
+  ~PMDTextBox() override
   {
   }
 };
@@ -412,49 +412,49 @@ public:
     : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight),m_xFormContainer(xFormContainer), m_fillProps(fillProps), m_strokeProps(strokeProps)
   { }
 
-  virtual double getRotation() const
+  double getRotation() const override
   {
     int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
-  virtual double getSkew() const
+  double getSkew() const override
   {
     int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
-  virtual PMDShapePoint getXformTopLeft() const
+  PMDShapePoint getXformTopLeft() const override
   {
     return m_xFormContainer.m_xformTopLeft;
   }
 
-  virtual PMDShapePoint getXformBotRight() const
+  PMDShapePoint getXformBotRight() const override
   {
     return m_xFormContainer.m_xformBotRight;
   }
 
-  virtual PMDShapePoint getRotatingPoint() const
+  PMDShapePoint getRotatingPoint() const override
   {
     return m_xFormContainer.m_rotatingPoint;
   }
 
-  virtual PMDShapePoint getBboxTopLeft() const
+  PMDShapePoint getBboxTopLeft() const override
   {
     return m_bboxTopLeft;
   }
 
-  virtual PMDShapePoint getBboxBotRight() const
+  PMDShapePoint getBboxBotRight() const override
   {
     return m_bboxBotRight;
   }
 
-  virtual bool getIsClosed() const
+  bool getIsClosed() const override
   {
     return true;
   }
 
-  virtual std::vector<PMDShapePoint> getPoints() const
+  std::vector<PMDShapePoint> getPoints() const override
   {
     std::vector<PMDShapePoint> points;
 
@@ -466,47 +466,47 @@ public:
     return points;
   }
 
-  virtual uint8_t shapeType() const
+  uint8_t shapeType() const override
   {
     return SHAPE_TYPE_RECT;
   }
 
-  virtual PMDFillProperties getFillProperties() const
+  PMDFillProperties getFillProperties() const override
   {
     return m_fillProps;
   }
 
-  virtual PMDStrokeProperties getStrokeProperties() const
+  PMDStrokeProperties getStrokeProperties() const override
   {
     return m_strokeProps;
   }
 
-  virtual std::string getText() const
+  std::string getText() const override
   {
     return "";
   }
 
-  virtual std::vector<PMDCharProperties> getCharProperties() const
+  std::vector<PMDCharProperties> getCharProperties() const override
   {
     std::vector<PMDCharProperties> temp;
     temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
     return temp;
   }
 
-  virtual std::vector<PMDParaProperties> getParaProperties() const
+  std::vector<PMDParaProperties> getParaProperties() const override
   {
     std::vector<PMDParaProperties> temp;
     temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
     return temp;
   }
 
-  virtual librevenge::RVNGBinaryData getBitmap() const
+  librevenge::RVNGBinaryData getBitmap() const override
   {
     librevenge::RVNGBinaryData temp;
     return temp;
   }
 
-  virtual ~PMDRectangle()
+  ~PMDRectangle() override
   {
   }
 };
@@ -524,39 +524,39 @@ public:
     : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_xFormContainer(xFormContainer), m_fillProps(fillProps), m_strokeProps(strokeProps)
   { }
 
-  virtual double getRotation() const
+  double getRotation() const override
   {
     int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
-  virtual double getSkew() const
+  double getSkew() const override
   {
     int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
-  virtual PMDShapePoint getXformTopLeft() const
+  PMDShapePoint getXformTopLeft() const override
   {
     return m_xFormContainer.m_xformTopLeft;
   }
 
-  virtual PMDShapePoint getXformBotRight() const
+  PMDShapePoint getXformBotRight() const override
   {
     return m_xFormContainer.m_xformBotRight;
   }
 
-  virtual PMDShapePoint getRotatingPoint() const
+  PMDShapePoint getRotatingPoint() const override
   {
     return m_xFormContainer.m_rotatingPoint;
   }
 
-  virtual bool getIsClosed() const
+  bool getIsClosed() const override
   {
     return true;
   }
 
-  virtual std::vector<PMDShapePoint> getPoints() const
+  std::vector<PMDShapePoint> getPoints() const override
   {
     std::vector<PMDShapePoint> points;
 
@@ -566,57 +566,57 @@ public:
     return points;
   }
 
-  virtual PMDShapePoint getBboxTopLeft() const
+  PMDShapePoint getBboxTopLeft() const override
   {
     return m_bboxTopLeft;
   }
 
-  virtual PMDShapePoint getBboxBotRight() const
+  PMDShapePoint getBboxBotRight() const override
   {
     return m_bboxBotRight;
   }
 
-  virtual uint8_t shapeType() const
+  uint8_t shapeType() const override
   {
     return SHAPE_TYPE_ELLIPSE;
   }
 
-  virtual PMDFillProperties getFillProperties() const
+  PMDFillProperties getFillProperties() const override
   {
     return m_fillProps;
   }
 
-  virtual PMDStrokeProperties getStrokeProperties() const
+  PMDStrokeProperties getStrokeProperties() const override
   {
     return m_strokeProps;
   }
 
-  virtual std::string getText() const
+  std::string getText() const override
   {
     return "";
   }
 
-  virtual std::vector<PMDCharProperties> getCharProperties() const
+  std::vector<PMDCharProperties> getCharProperties() const override
   {
     std::vector<PMDCharProperties> temp;
     temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
     return temp;
   }
 
-  virtual std::vector<PMDParaProperties> getParaProperties() const
+  std::vector<PMDParaProperties> getParaProperties() const override
   {
     std::vector<PMDParaProperties> temp;
     temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
     return temp;
   }
 
-  virtual librevenge::RVNGBinaryData getBitmap() const
+  librevenge::RVNGBinaryData getBitmap() const override
   {
     librevenge::RVNGBinaryData temp;
     return temp;
   }
 
-  virtual ~PMDEllipse()
+  ~PMDEllipse() override
   {
   }
 };
@@ -633,49 +633,49 @@ public:
     : m_bboxTopLeft(bboxTopLeft), m_bboxBotRight(bboxBotRight), m_xFormContainer(xFormContainer),m_bitmap(bitmap)
   { }
 
-  virtual double getRotation() const
+  double getRotation() const override
   {
     int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
-  virtual double getSkew() const
+  double getSkew() const override
   {
     int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
-  virtual PMDShapePoint getXformTopLeft() const
+  PMDShapePoint getXformTopLeft() const override
   {
     return m_xFormContainer.m_xformTopLeft;
   }
 
-  virtual PMDShapePoint getXformBotRight() const
+  PMDShapePoint getXformBotRight() const override
   {
     return m_xFormContainer.m_xformBotRight;
   }
 
-  virtual PMDShapePoint getRotatingPoint() const
+  PMDShapePoint getRotatingPoint() const override
   {
     return m_xFormContainer.m_rotatingPoint;
   }
 
-  virtual PMDShapePoint getBboxTopLeft() const
+  PMDShapePoint getBboxTopLeft() const override
   {
     return m_bboxTopLeft;
   }
 
-  virtual PMDShapePoint getBboxBotRight() const
+  PMDShapePoint getBboxBotRight() const override
   {
     return m_bboxBotRight;
   }
 
-  virtual bool getIsClosed() const
+  bool getIsClosed() const override
   {
     return true;
   }
 
-  virtual std::vector<PMDShapePoint> getPoints() const
+  std::vector<PMDShapePoint> getPoints() const override
   {
     std::vector<PMDShapePoint> points;
 
@@ -687,46 +687,46 @@ public:
     return points;
   }
 
-  virtual uint8_t shapeType() const
+  uint8_t shapeType() const override
   {
     return SHAPE_TYPE_BITMAP;
   }
 
-  virtual PMDFillProperties getFillProperties() const
+  PMDFillProperties getFillProperties() const override
   {
     return PMDFillProperties(0,0,0,0);
   }
 
-  virtual PMDStrokeProperties getStrokeProperties() const
+  PMDStrokeProperties getStrokeProperties() const override
   {
     return PMDStrokeProperties(0,0,0,0,0);
   }
 
-  virtual std::string getText() const
+  std::string getText() const override
   {
     return "";
   }
 
-  virtual std::vector<PMDCharProperties> getCharProperties() const
+  std::vector<PMDCharProperties> getCharProperties() const override
   {
     std::vector<PMDCharProperties> temp;
     temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
     return temp;
   }
 
-  virtual std::vector<PMDParaProperties> getParaProperties() const
+  std::vector<PMDParaProperties> getParaProperties() const override
   {
     std::vector<PMDParaProperties> temp;
     temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
     return temp;
   }
 
-  virtual librevenge::RVNGBinaryData getBitmap() const
+  librevenge::RVNGBinaryData getBitmap() const override
   {
     return m_bitmap;
   }
 
-  virtual ~PMDBitmap()
+  ~PMDBitmap() override
   {
   }
 };
