@@ -245,15 +245,15 @@ void PMDCollector::paintShape(const OutputShape &shape,
 
     std::vector<PMDParaProperties> paraProperties = shape.getParaProperties();
 
-    for (unsigned p = 0; p < paraProperties.size(); ++p)
+    for (auto &paraProperty : paraProperties)
     {
 
-      paraLength = paraProperties[p].m_length;
+      paraLength = paraProperty.m_length;
       paraEnd = paraStart + paraLength - 1;
 
       librevenge::RVNGPropertyList paraProps;
 
-      switch (paraProperties[p].m_align)
+      switch (paraProperty.m_align)
       {
       case 1:
         paraProps.insert("fo:text-align", "right");
@@ -276,25 +276,25 @@ void PMDCollector::paintShape(const OutputShape &shape,
         break;
       }
 
-      if (paraProperties[p].m_afterIndent != 0)
+      if (paraProperty.m_afterIndent != 0)
       {
-        paraProps.insert("fo:margin-bottom", (double)paraProperties[p].m_afterIndent/SHAPE_UNITS_PER_INCH,librevenge::RVNG_INCH);
+        paraProps.insert("fo:margin-bottom", (double)paraProperty.m_afterIndent/SHAPE_UNITS_PER_INCH,librevenge::RVNG_INCH);
       }
-      if (paraProperties[p].m_beforeIndent != 0)
+      if (paraProperty.m_beforeIndent != 0)
       {
-        paraProps.insert("fo:margin-top", (double)paraProperties[p].m_beforeIndent/SHAPE_UNITS_PER_INCH,librevenge::RVNG_INCH);
+        paraProps.insert("fo:margin-top", (double)paraProperty.m_beforeIndent/SHAPE_UNITS_PER_INCH,librevenge::RVNG_INCH);
       }
-      if (paraProperties[p].m_firstIndent != 0)
+      if (paraProperty.m_firstIndent != 0)
       {
-        paraProps.insert("fo:text-indent", (double)paraProperties[p].m_firstIndent/SHAPE_UNITS_PER_INCH,librevenge::RVNG_INCH);
+        paraProps.insert("fo:text-indent", (double)paraProperty.m_firstIndent/SHAPE_UNITS_PER_INCH,librevenge::RVNG_INCH);
       }
-      if (paraProperties[p].m_leftIndent != 0)
+      if (paraProperty.m_leftIndent != 0)
       {
-        paraProps.insert("fo:margin-left", (double)paraProperties[p].m_leftIndent/SHAPE_UNITS_PER_INCH,librevenge::RVNG_INCH);
+        paraProps.insert("fo:margin-left", (double)paraProperty.m_leftIndent/SHAPE_UNITS_PER_INCH,librevenge::RVNG_INCH);
       }
-      if (paraProperties[p].m_rightIndent != 0)
+      if (paraProperty.m_rightIndent != 0)
       {
-        paraProps.insert("fo:margin-right", (double)paraProperties[p].m_rightIndent/SHAPE_UNITS_PER_INCH,librevenge::RVNG_INCH);
+        paraProps.insert("fo:margin-right", (double)paraProperty.m_rightIndent/SHAPE_UNITS_PER_INCH,librevenge::RVNG_INCH);
       }
 
       painter->openParagraph(paraProps);
@@ -313,9 +313,9 @@ void PMDCollector::paintShape(const OutputShape &shape,
       bool capsFlag = false;
 
 
-      for (unsigned i = 0; i < charProperties.size(); ++i)
+      for (auto &charProperty : charProperties)
       {
-        charLength = charProperties[i].m_length;
+        charLength = charProperty.m_length;
         uint16_t charEndTemp = charStart + charLength -1;
 
         if (paraStart > charStart)
@@ -332,11 +332,11 @@ void PMDCollector::paintShape(const OutputShape &shape,
           PMD_DEBUG_MSG(("End is %d \n",charEnd));
 
           librevenge::RVNGPropertyList charProps;
-          charProps.insert("fo:font-size",(double)charProperties[i].m_fontSize/10,librevenge::RVNG_POINT);
+          charProps.insert("fo:font-size",(double)charProperty.m_fontSize/10,librevenge::RVNG_POINT);
 
-          if (charProperties[i].m_fontFace < m_font.size())
+          if (charProperty.m_fontFace < m_font.size())
           {
-            PMDFont tempFont = m_font[charProperties[i].m_fontFace];
+            PMDFont tempFont = m_font[charProperty.m_fontFace];
             std::string tempFontString = tempFont.m_fontName;
             charProps.insert("style:font-name", tempFontString.c_str());
           }
@@ -345,10 +345,10 @@ void PMDCollector::paintShape(const OutputShape &shape,
             PMD_DEBUG_MSG(("Font Not Available"));
           }
 
-          if (charProperties[i].m_fontColor < m_color.size())
+          if (charProperty.m_fontColor < m_color.size())
           {
-            PMDColor tempColor = m_color[charProperties[i].m_fontColor];
-            double charTint = (double)charProperties[i].m_tint/100;
+            PMDColor tempColor = m_color[charProperty.m_fontColor];
+            double charTint = (double)charProperty.m_tint/100;
             double temp_bgcolor = (1 - charTint) * 255;
             librevenge::RVNGString tempColorString;
             tempColorString.sprintf("#%.2x%.2x%.2x",(uint16_t)(tempColor.m_red * charTint + temp_bgcolor),(uint16_t)(tempColor.m_green * charTint + temp_bgcolor),(uint16_t)(tempColor.m_blue * charTint + temp_bgcolor));
@@ -359,7 +359,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
             PMD_DEBUG_MSG(("Color Not Available"));
           }
 
-          switch (charProperties[i].m_boldItalicUnderline)
+          switch (charProperty.m_boldItalicUnderline)
           {
           case 1:
             charProps.insert("fo:font-weight", "bold");
@@ -393,9 +393,9 @@ void PMDCollector::paintShape(const OutputShape &shape,
 
           librevenge::RVNGString superscriptPosSizeString = "";
           librevenge::RVNGString subscriptPosSizeString = "";
-          double superPos = (double)charProperties[i].m_superPos/10;
-          double subPos = (double)charProperties[i].m_subPos/10;
-          double superSubSize = (double)charProperties[i].m_superSubSize/10;
+          double superPos = (double)charProperty.m_superPos/10;
+          double subPos = (double)charProperty.m_subPos/10;
+          double superSubSize = (double)charProperty.m_superSubSize/10;
 
           std::ostringstream sstream;
           sstream << superSubSize;
@@ -420,7 +420,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
           subscriptPosSizeString.append(varAsString.c_str());
           subscriptPosSizeString.append("%");
 
-          switch (charProperties[i].m_superSubscript)
+          switch (charProperty.m_superSubscript)
           {
           case 1:
             charProps.insert("style:text-line-through-style","solid");
@@ -500,10 +500,10 @@ void PMDCollector::paintShape(const OutputShape &shape,
             break;
           }
 
-          if (charProperties[i].m_kerning != 0)
+          if (charProperty.m_kerning != 0)
           {
             charProps.insert("style:letter-kerning","true");
-            charProps.insert("fo:letter-spacing",((double)charProperties[i].m_kerning/1000)*EM2PT,librevenge::RVNG_POINT);
+            charProps.insert("fo:letter-spacing",((double)charProperty.m_kerning/1000)*EM2PT,librevenge::RVNG_POINT);
           }
 
 
@@ -693,9 +693,9 @@ void PMDCollector::writePage(const PMDPage & /*page*/,
     pageProps.insert("svg:height", heightInInches);
   }
   painter->startPage(pageProps);
-  for (unsigned i = 0; i < outputShapes.size(); ++i)
+  for (const auto &outputShape : outputShapes)
   {
-    paintShape(*(outputShapes[i]), painter);
+    paintShape(*outputShape, painter);
   }
   painter->endPage();
 }

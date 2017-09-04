@@ -111,10 +111,10 @@ std::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
       double pmdSkew = ptrToLineSet->getSkew();
       if (pmdRotation == 0 && pmdSkew == 0)
       {
-        for (unsigned i = 0; i < pmdPoints.size(); ++i)
+        for (auto &pmdPoint : pmdPoints)
         {
-          double x = pmdPoints[i].m_x.toInches() + translate.m_x;
-          double y = pmdPoints[i].m_y.toInches() + translate.m_y;
+          double x = pmdPoint.m_x.toInches() + translate.m_x;
+          double y = pmdPoint.m_y.toInches() + translate.m_y;
           ptrToOutputShape->addPoint(InchPoint(x, y));
         }
       }
@@ -157,12 +157,12 @@ std::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
           double tx = (bboxBotRight.m_x.toInches() + bboxTopLeft.m_x.toInches())/2 + translate.m_x;
           double ty = (bboxBotRight.m_y.toInches() + bboxTopLeft.m_y.toInches())/2 + translate.m_y;
 
-          for (unsigned i = 0; i < pmdPoints.size(); ++i)
+          for (auto &pmdPoint : pmdPoints)
           {
 
-            double temp = pmdPoints[i].m_x.toInches() + tan(pmdSkew)*pmdPoints[i].m_y.toInches();
-            double  x = temp*cos(pmdRotation) - pmdPoints[i].m_y.toInches()*sin(pmdRotation) + tx;
-            double  y = temp*sin(pmdRotation) + pmdPoints[i].m_y.toInches()*cos(pmdRotation) + ty;
+            double temp = pmdPoint.m_x.toInches() + tan(pmdSkew)*pmdPoint.m_y.toInches();
+            double  x = temp*cos(pmdRotation) - pmdPoint.m_y.toInches()*sin(pmdRotation) + tx;
+            double  y = temp*sin(pmdRotation) + pmdPoint.m_y.toInches()*cos(pmdRotation) + ty;
 
             ptrToOutputShape->addPoint(InchPoint(x, y));
           }
