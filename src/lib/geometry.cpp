@@ -26,8 +26,7 @@ libpagemaker::getBoundingBox(const PMDLineSet &lineSet, const TransformationMatr
          minY = firstPoint.m_y,
          maxY = firstPoint.m_y;
 
-  for (std::vector<PMDShapePoint>::const_iterator i = points.begin() + 1; i != points.end();
-       ++i)
+  for (auto i = points.begin() + 1; i != points.end(); ++i)
   {
     InchPoint point = matrix.transform(*i);
     double x = point.m_x,

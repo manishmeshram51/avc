@@ -178,7 +178,7 @@ const PMDXForm &PMDParser::getXForm(const uint32_t xFormId) const
 {
   if (xFormId != (std::numeric_limits<uint32_t>::max)() && xFormId != 0)
   {
-    std::map<uint32_t, PMDXForm>::const_iterator it = m_xFormMap.find(xFormId);
+    auto it = m_xFormMap.find(xFormId);
 
     if (it != m_xFormMap.end())
       return it->second;
@@ -903,9 +903,7 @@ void PMDParser::parse()
   parseColors();
   parseXforms();
 
-  typedef std::map<uint16_t, std::vector<unsigned> >::iterator RecIter;
-
-  RecIter i = m_records.find(GLOBAL_INFO);
+  auto i = m_records.find(GLOBAL_INFO);
   if (i != m_records.end()
       && !(i->second.empty()))
   {

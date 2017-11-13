@@ -203,13 +203,13 @@ public:
 
   double getRotation() const override
   {
-    int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
+    auto temp = (int32_t)m_xFormContainer.m_rotationDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   double getSkew() const override
   {
-    int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
+    auto temp = (int32_t)m_xFormContainer.m_skewDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
@@ -309,13 +309,13 @@ public:
 
   double getRotation() const override
   {
-    int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
+    auto temp = (int32_t)m_xFormContainer.m_rotationDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   double getSkew() const override
   {
-    int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
+    auto temp = (int32_t)m_xFormContainer.m_skewDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
@@ -414,13 +414,13 @@ public:
 
   double getRotation() const override
   {
-    int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
+    auto temp = (int32_t)m_xFormContainer.m_rotationDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   double getSkew() const override
   {
-    int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
+    auto temp = (int32_t)m_xFormContainer.m_skewDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
@@ -526,13 +526,13 @@ public:
 
   double getRotation() const override
   {
-    int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
+    auto temp = (int32_t)m_xFormContainer.m_rotationDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   double getSkew() const override
   {
-    int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
+    auto temp = (int32_t)m_xFormContainer.m_skewDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
@@ -635,13 +635,13 @@ public:
 
   double getRotation() const override
   {
-    int32_t temp = (int32_t)m_xFormContainer.m_rotationDegree;
+    auto temp = (int32_t)m_xFormContainer.m_rotationDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
   double getSkew() const override
   {
-    int32_t temp = (int32_t)m_xFormContainer.m_skewDegree;
+    auto temp = (int32_t)m_xFormContainer.m_skewDegree;
     return (-1 * (double)temp/1000 * (M_PI/180));
   }
 
