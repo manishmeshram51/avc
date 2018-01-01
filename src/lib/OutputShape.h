@@ -43,16 +43,16 @@ public:
   OutputShape(bool isClosed, int shape, double rotation, double skew, std::string text, std::vector<PMDCharProperties> charProps, std::vector<PMDParaProperties> paraProps)
     : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
       m_bboxLeft(), m_bboxTop(), m_bboxRight(), m_bboxBot(),
-      m_fillProps(PMDFillProperties(0,0,0,0)),
-      m_strokeProps(PMDStrokeProperties(0,0,0,0,0)),
+      m_fillProps(),
+      m_strokeProps(),
       m_text(text), m_charProps(charProps), m_paraProps(paraProps), m_bitmap(), m_width(), m_height()
   { }
 
   OutputShape(bool isClosed, int shape, double rotation, double skew, librevenge::RVNGBinaryData bitmap)
     : m_isClosed(isClosed), m_shapeType(shape), m_points(), m_rotation(rotation), m_skew(skew),
       m_bboxLeft(), m_bboxTop(), m_bboxRight(), m_bboxBot(),
-      m_fillProps(PMDFillProperties(0,0,0,0)),
-      m_strokeProps(PMDStrokeProperties(0,0,0,0,0)),
+      m_fillProps(),
+      m_strokeProps(),
       m_text(), m_charProps(), m_paraProps(), m_bitmap(bitmap), m_width(), m_height()
   { }
 

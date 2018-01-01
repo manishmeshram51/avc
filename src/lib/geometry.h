@@ -147,7 +147,9 @@ public:
 
   PMDFillProperties getFillProperties() const override
   {
-    return PMDFillProperties(FILL_SOLID,0,0,0);
+    PMDFillProperties props;
+    props.m_fillType = FILL_SOLID;
+    return props;
   }
 
   PMDStrokeProperties getStrokeProperties() const override
@@ -162,16 +164,12 @@ public:
 
   std::vector<PMDCharProperties> getCharProperties() const override
   {
-    std::vector<PMDCharProperties> temp;
-    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
-    return temp;
+    return std::vector<PMDCharProperties>(1);
   }
 
   std::vector<PMDParaProperties> getParaProperties() const override
   {
-    std::vector<PMDParaProperties> temp;
-    temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
-    return temp;
+    return std::vector<PMDParaProperties>(1);
   }
 
   librevenge::RVNGBinaryData getBitmap() const override
@@ -270,16 +268,12 @@ public:
 
   std::vector<PMDCharProperties> getCharProperties() const override
   {
-    std::vector<PMDCharProperties> temp;
-    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
-    return temp;
+    return std::vector<PMDCharProperties>(1);
   }
 
   std::vector<PMDParaProperties> getParaProperties() const override
   {
-    std::vector<PMDParaProperties> temp;
-    temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
-    return temp;
+    return std::vector<PMDParaProperties>(1);
   }
 
   librevenge::RVNGBinaryData getBitmap() const override
@@ -365,12 +359,12 @@ public:
 
   PMDFillProperties getFillProperties() const override
   {
-    return PMDFillProperties(0,0,0,0);
+    return PMDFillProperties();
   }
 
   PMDStrokeProperties getStrokeProperties() const override
   {
-    return PMDStrokeProperties(0,0,0,0,0);
+    return PMDStrokeProperties();
   }
 
   std::string getText() const override
@@ -488,16 +482,12 @@ public:
 
   std::vector<PMDCharProperties> getCharProperties() const override
   {
-    std::vector<PMDCharProperties> temp;
-    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
-    return temp;
+    return std::vector<PMDCharProperties>(1);
   }
 
   std::vector<PMDParaProperties> getParaProperties() const override
   {
-    std::vector<PMDParaProperties> temp;
-    temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
-    return temp;
+    return std::vector<PMDParaProperties>(1);
   }
 
   librevenge::RVNGBinaryData getBitmap() const override
@@ -598,16 +588,12 @@ public:
 
   std::vector<PMDCharProperties> getCharProperties() const override
   {
-    std::vector<PMDCharProperties> temp;
-    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
-    return temp;
+    return std::vector<PMDCharProperties>(1);
   }
 
   std::vector<PMDParaProperties> getParaProperties() const override
   {
-    std::vector<PMDParaProperties> temp;
-    temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
-    return temp;
+    return std::vector<PMDParaProperties>(1);
   }
 
   librevenge::RVNGBinaryData getBitmap() const override
@@ -694,12 +680,12 @@ public:
 
   PMDFillProperties getFillProperties() const override
   {
-    return PMDFillProperties(0,0,0,0);
+    return PMDFillProperties();
   }
 
   PMDStrokeProperties getStrokeProperties() const override
   {
-    return PMDStrokeProperties(0,0,0,0,0);
+    return PMDStrokeProperties();
   }
 
   std::string getText() const override
@@ -709,16 +695,12 @@ public:
 
   std::vector<PMDCharProperties> getCharProperties() const override
   {
-    std::vector<PMDCharProperties> temp;
-    temp.push_back(PMDCharProperties(0,0,0,0,0,0,0,0,0,0,0));
-    return temp;
+    return std::vector<PMDCharProperties>(1);
   }
 
   std::vector<PMDParaProperties> getParaProperties() const override
   {
-    std::vector<PMDParaProperties> temp;
-    temp.push_back(PMDParaProperties(0,0,0,0,0,0,0));
-    return temp;
+    return std::vector<PMDParaProperties>(1);
   }
 
   librevenge::RVNGBinaryData getBitmap() const override

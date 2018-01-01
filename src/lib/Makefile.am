@@ -21,6 +21,7 @@ libpagemaker_@PMD_MAJOR_VERSION@_@PMD_MINOR_VERSION@_la_SOURCES = \
 	PMDParser.cpp \
 	PMDParser.h \
 	PMDRecord.h \
+	PMDTypes.cpp \
 	PMDTypes.h \
 	PMDocument.cpp \
 	Units.h \

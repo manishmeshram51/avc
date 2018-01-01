@@ -230,8 +230,11 @@ void PMDParser::parseLine(const PMDRecordContainer &container, unsigned recordIn
                           unsigned pageID)
 {
   seekToRecord(m_input, container, recordIndex);
+
+  PMDStrokeProperties strokeProps;
+
   skip(m_input, 4);
-  uint8_t strokeColor = readU8(m_input);
+  strokeProps.m_strokeColor = readU8(m_input);
   skip(m_input, 1);
   PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
   PMDShapePoint bboxBotRight = readPoint(m_input, m_bigEndian);
@@ -243,15 +246,13 @@ void PMDParser::parseLine(const PMDRecordContainer &container, unsigned recordIn
     mirrored = true;
 
   skip(m_input, 6);
-  uint8_t strokeType = readU8(m_input);
+  strokeProps.m_strokeType = readU8(m_input);
   skip(m_input, 1);
-  uint16_t strokeWidth =readU16(m_input, m_bigEndian);
+  strokeProps.m_strokeWidth =readU16(m_input, m_bigEndian);
   skip(m_input, 1);
-  uint8_t strokeTint = readU8(m_input);
+  strokeProps.m_strokeTint = readU8(m_input);
   skip(m_input, 6);
-  uint8_t strokeOverprint = readU8(m_input);
-
-  PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
+  strokeProps.m_strokeOverprint = readU8(m_input);
 
   std::shared_ptr<PMDLineSet> newShape(new PMDLine(bboxTopLeft, bboxBotRight, mirrored, strokeProps));
   m_collector->addShapeToPage(pageID, newShape);
@@ -343,24 +344,25 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
     {
       seekToRecord(m_input, charsContainer, i);
 
-      uint16_t length = readU16(m_input, m_bigEndian);
-      uint16_t fontFace = readU16(m_input, m_bigEndian);
-      uint16_t fontSize = readU16(m_input, m_bigEndian);
-      skip(m_input, 2);
-      uint8_t fontColor = readU8(m_input);
-      skip(m_input, 1);
-      uint8_t boldItalicUnderline = readU8(m_input);
-      uint8_t superSubscript = readU8(m_input);
-      skip(m_input, 4);
-      int16_t kerning = readS16(m_input, m_bigEndian);
-      skip(m_input, 2);
-      uint16_t superSubSize = readU16(m_input, m_bigEndian);
-      uint16_t subPos = readU16(m_input, m_bigEndian);
-      uint16_t superPos = readU16(m_input, m_bigEndian);
-      skip(m_input, 2);
-      uint16_t tint = readU16(m_input, m_bigEndian);
+      charProps.push_back(PMDCharProperties());
+      auto &props = charProps.back();
 
-      charProps.push_back(PMDCharProperties(length,fontFace,fontSize,fontColor,boldItalicUnderline,superSubscript,kerning,superSubSize,superPos,subPos,tint));
+      props.m_length = readU16(m_input, m_bigEndian);
+      props.m_fontFace = readU16(m_input, m_bigEndian);
+      props.m_fontSize = readU16(m_input, m_bigEndian);
+      skip(m_input, 2);
+      props.m_fontColor = readU8(m_input);
+      skip(m_input, 1);
+      props.m_boldItalicUnderline = readU8(m_input);
+      props.m_superSubscript = readU8(m_input);
+      skip(m_input, 4);
+      props.m_kerning = readS16(m_input, m_bigEndian);
+      skip(m_input, 2);
+      props.m_superSubSize = readU16(m_input, m_bigEndian);
+      props.m_subPos = readU16(m_input, m_bigEndian);
+      props.m_superPos = readU16(m_input, m_bigEndian);
+      skip(m_input, 2);
+      props.m_tint = readU16(m_input, m_bigEndian);
     }
   }
 
@@ -372,17 +374,18 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
     {
       seekToRecord(m_input, paraContainer, i);
 
-      uint16_t length = readU16(m_input, m_bigEndian);
-      skip(m_input, 1);
-      uint8_t align = readU8(m_input);
-      skip(m_input, 6);
-      uint16_t leftIndent = readU16(m_input, m_bigEndian);
-      uint16_t firstIndent = readU16(m_input, m_bigEndian);
-      uint16_t rightIndent = readU16(m_input, m_bigEndian);
-      uint16_t beforeIndent = readU16(m_input, m_bigEndian); // Above Para Spacing
-      uint16_t afterIndent = readU16(m_input, m_bigEndian); // Below Para Spacing
+      paraProps.push_back(PMDParaProperties());
+      auto &props = paraProps.back();
 
-      paraProps.push_back(PMDParaProperties(length,align,leftIndent,firstIndent,rightIndent,beforeIndent,afterIndent));
+      props.m_length = readU16(m_input, m_bigEndian);
+      skip(m_input, 1);
+      props.m_align = readU8(m_input);
+      skip(m_input, 6);
+      props.m_leftIndent = readU16(m_input, m_bigEndian);
+      props.m_firstIndent = readU16(m_input, m_bigEndian);
+      props.m_rightIndent = readU16(m_input, m_bigEndian);
+      props.m_beforeIndent = readU16(m_input, m_bigEndian); // Above Para Spacing
+      props.m_afterIndent = readU16(m_input, m_bigEndian); // Below Para Spacing
     }
   }
 
@@ -396,33 +399,33 @@ void PMDParser::parseRectangle(const PMDRecordContainer &container, unsigned rec
 {
   seekToRecord(m_input, container, recordIndex);
 
+  PMDFillProperties fillProps;
+  PMDStrokeProperties strokeProps;
+
   skip(m_input, 2);
-  uint8_t fillOverprint = readU8(m_input);
+  fillProps.m_fillOverprint = readU8(m_input);
   skip(m_input, 1);
-  uint8_t fillColor = readU8(m_input);
+  fillProps.m_fillColor = readU8(m_input);
   skip(m_input, 1);
   PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
   PMDShapePoint bboxBotRight = readPoint(m_input, m_bigEndian);
   skip(m_input, 14);
   uint32_t rectXformId = readU32(m_input, m_bigEndian);
 
-  uint8_t strokeType = readU8(m_input);
+  strokeProps.m_strokeType = readU8(m_input);
   skip(m_input, 2);
-  uint16_t strokeWidth = readU16(m_input, m_bigEndian);
+  strokeProps.m_strokeWidth = readU16(m_input, m_bigEndian);
   skip(m_input, 1);
-  uint8_t fillType = readU8(m_input);
+  fillProps.m_fillType = readU8(m_input);
   skip(m_input, 1);
-  uint8_t strokeColor = readU8(m_input);
+  strokeProps.m_strokeColor = readU8(m_input);
   skip(m_input, 1);
-  uint8_t strokeOverprint = readU8(m_input);
+  strokeProps.m_strokeOverprint = readU8(m_input);
   skip(m_input, 1);
-  uint8_t strokeTint = readU8(m_input);
+  strokeProps.m_strokeTint = readU8(m_input);
 
   skip(m_input, 0xb3);
-  uint8_t fillTint = readU8(m_input);
-
-  PMDFillProperties fillProps(fillType,fillColor,fillOverprint,fillTint);
-  PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
+  fillProps.m_fillTint = readU8(m_input);
 
   const PMDXForm &xFormContainer = getXForm(rectXformId);
   std::shared_ptr<PMDLineSet> newShape(new PMDRectangle(bboxTopLeft, bboxBotRight, xFormContainer, fillProps, strokeProps));
@@ -434,10 +437,13 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
 {
   seekToRecord(m_input, container, recordIndex);
 
+  PMDFillProperties fillProps;
+  PMDStrokeProperties strokeProps;
+
   skip(m_input, 2);
-  uint8_t fillOverprint = readU8(m_input);
+  fillProps.m_fillOverprint = readU8(m_input);
   skip(m_input, 1);
-  uint8_t fillColor = readU8(m_input);
+  fillProps.m_fillColor = readU8(m_input);
 
   skip(m_input, 1);
   PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
@@ -446,27 +452,24 @@ void PMDParser::parsePolygon(const PMDRecordContainer &container, unsigned recor
   skip(m_input, 14);
   uint32_t polyXformId = readU32(m_input, m_bigEndian);
 
-  uint8_t strokeType = readU8(m_input);
+  strokeProps.m_strokeType = readU8(m_input);
   skip(m_input, 2);
-  uint16_t strokeWidth = readU16(m_input, m_bigEndian);
+  strokeProps.m_strokeWidth = readU16(m_input, m_bigEndian);
   skip(m_input, 1);
-  uint8_t fillType = readU8(m_input);
+  fillProps.m_fillType = readU8(m_input);
   skip(m_input, 1);
-  uint8_t strokeColor = readU8(m_input);
+  strokeProps.m_strokeColor = readU8(m_input);
   skip(m_input, 1);
-  uint8_t strokeOverprint = readU8(m_input);
+  strokeProps.m_strokeOverprint = readU8(m_input);
   skip(m_input, 1);
-  uint8_t strokeTint = readU8(m_input);
+  strokeProps.m_strokeTint = readU8(m_input);
 
   skip(m_input, 1);
   uint16_t lineSetSeqNum = readU16(m_input, m_bigEndian);
   skip(m_input, 8);
   uint8_t closedMarker = readU8(m_input);
   skip(m_input, 0xa7);
-  uint8_t fillTint = readU8(m_input);
-
-  PMDFillProperties fillProps(fillType,fillColor,fillOverprint,fillTint);
-  PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
+  fillProps.m_fillTint = readU8(m_input);
 
   bool closed;
   switch (closedMarker)
@@ -505,10 +508,13 @@ void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recor
 {
   seekToRecord(m_input, container, recordIndex);
 
+  PMDFillProperties fillProps;
+  PMDStrokeProperties strokeProps;
+
   skip(m_input, 2);
-  uint8_t fillOverprint = readU8(m_input);
+  fillProps.m_fillOverprint = readU8(m_input);
   skip(m_input, 1);
-  uint8_t fillColor = readU8(m_input);
+  fillProps.m_fillColor = readU8(m_input);
 
   skip(m_input, 1);
   PMDShapePoint bboxTopLeft = readPoint(m_input, m_bigEndian);
@@ -517,23 +523,20 @@ void PMDParser::parseEllipse(const PMDRecordContainer &container, unsigned recor
   skip(m_input, 14);
   uint32_t ellipseXformId = readU32(m_input, m_bigEndian);
 
-  uint8_t strokeType = readU8(m_input);
+  strokeProps.m_strokeType = readU8(m_input);
   skip(m_input, 2);
-  uint16_t strokeWidth = readU16(m_input, m_bigEndian);
+  strokeProps.m_strokeWidth = readU16(m_input, m_bigEndian);
   skip(m_input, 1);
-  uint8_t fillType = readU8(m_input);
+  fillProps.m_fillType = readU8(m_input);
   skip(m_input, 1);
-  uint8_t strokeColor = readU8(m_input);
+  strokeProps.m_strokeColor = readU8(m_input);
   skip(m_input, 1);
-  uint8_t strokeOverprint = readU8(m_input);
+  strokeProps.m_strokeOverprint = readU8(m_input);
   skip(m_input, 1);
-  uint8_t strokeTint = readU8(m_input);
+  strokeProps.m_strokeTint = readU8(m_input);
 
   skip(m_input, 0xb3);
-  uint8_t fillTint = readU8(m_input);
-
-  PMDFillProperties fillProps(fillType,fillColor,fillOverprint,fillTint);
-  PMDStrokeProperties strokeProps(strokeType,strokeWidth,strokeColor,strokeOverprint,strokeTint);
+  fillProps.m_fillTint = readU8(m_input);
 
   const PMDXForm &xFormContainer = getXForm(ellipseXformId);
   std::shared_ptr<PMDLineSet> newShape(new PMDEllipse(bboxTopLeft, bboxBotRight, xFormContainer, fillProps, strokeProps));
