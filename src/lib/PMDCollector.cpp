@@ -9,7 +9,6 @@
 
 #include "PMDCollector.h"
 #include "OutputShape.h"
-#include <sstream>
 #include <string>
 #include <iostream>
 #include <math.h>
@@ -359,41 +358,15 @@ void PMDCollector::paintShape(const OutputShape &shape,
           if (charProperty.m_underline)
             charProps.insert("style:text-underline-type", "single");
 
-          librevenge::RVNGString superscriptPosSizeString = "";
-          librevenge::RVNGString subscriptPosSizeString = "";
-          double superPos = (double)charProperty.m_superPos/10;
-          double subPos = (double)charProperty.m_subPos/10;
-          double superSubSize = (double)charProperty.m_superSubSize/10;
-
-          std::ostringstream sstream;
-          sstream << superSubSize;
-          std::string varAsString = sstream.str();
-
-          std::ostringstream sstream1;
-          sstream1 << superPos;
-          std::string varAsString1 = sstream1.str();
-
-          std::ostringstream sstream2;
-          sstream2 << subPos;
-          std::string varAsString2 = sstream2.str();
-
-          superscriptPosSizeString.append(varAsString1.c_str());
-          superscriptPosSizeString.append("% ");
-          superscriptPosSizeString.append(varAsString.c_str());
-          superscriptPosSizeString.append("%");
-
-          subscriptPosSizeString.append("-");
-          subscriptPosSizeString.append(varAsString2.c_str());
-          subscriptPosSizeString.append("% ");
-          subscriptPosSizeString.append(varAsString.c_str());
-          subscriptPosSizeString.append("%");
-
           if (charProperty.m_strike)
             charProps.insert("style:text-line-through-style","solid");
-          if (charProperty.m_super)
-            charProps.insert("style:text-position", superscriptPosSizeString);
-          if (charProperty.m_sub)
-            charProps.insert("style:text-position", subscriptPosSizeString);
+          if (charProperty.m_super || charProperty.m_sub)
+          {
+            const int32_t intPos = charProperty.m_sub ? -int32_t(charProperty.m_subPos) : int32_t(charProperty.m_superPos);
+            librevenge::RVNGString pos;
+            pos.sprintf("%.1f%% %.1f%%", intPos / 10.0, charProperty.m_superSubSize / 10.0);
+            charProps.insert("style:text-position", pos);
+          }
 
           if (charProperty.m_smallCaps)
             charProps.insert("fo:font-variant","small-caps");
