@@ -77,8 +77,14 @@ struct PMDCharProperties
   uint16_t m_fontFace;
   uint16_t m_fontSize;
   uint8_t m_fontColor;
-  uint8_t m_boldItalicUnderline;
-  uint8_t m_superSubscript;
+  bool m_bold;
+  bool m_italic;
+  bool m_underline;
+  bool m_strike;
+  bool m_super;
+  bool m_sub;
+  bool m_smallCaps;
+  bool m_allCaps;
   int16_t m_kerning;
   uint16_t m_superSubSize;
   uint16_t m_superPos;

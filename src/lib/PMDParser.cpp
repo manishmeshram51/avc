@@ -353,8 +353,16 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
       skip(m_input, 2);
       props.m_fontColor = readU8(m_input);
       skip(m_input, 1);
-      props.m_boldItalicUnderline = readU8(m_input);
-      props.m_superSubscript = readU8(m_input);
+      const unsigned flags = readU8(m_input);
+      props.m_bold = flags & 0x1;
+      props.m_italic = flags & 0x2;
+      props.m_underline = flags & 0x4;
+      const unsigned flags2 = readU8(m_input);
+      props.m_strike = flags2 & 0x1;
+      props.m_super = flags2 & 0x2;
+      props.m_sub = flags2 & 0x4;
+      props.m_smallCaps = flags2 & 0x8;
+      props.m_allCaps = flags2 & 0x10;
       skip(m_input, 4);
       props.m_kerning = readS16(m_input, m_bigEndian);
       skip(m_input, 2);

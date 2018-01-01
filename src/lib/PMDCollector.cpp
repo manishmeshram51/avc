@@ -310,9 +310,6 @@ void PMDCollector::paintShape(const OutputShape &shape,
       uint16_t charEnd = 0;
       uint16_t charLength = 0;
 
-      bool capsFlag = false;
-
-
       for (auto &charProperty : charProperties)
       {
         charLength = charProperty.m_length;
@@ -359,37 +356,12 @@ void PMDCollector::paintShape(const OutputShape &shape,
             PMD_DEBUG_MSG(("Color Not Available"));
           }
 
-          switch (charProperty.m_boldItalicUnderline)
-          {
-          case 1:
+          if (charProperty.m_bold)
             charProps.insert("fo:font-weight", "bold");
-            break;
-          case 2:
+          if (charProperty.m_italic)
             charProps.insert("fo:font-style", "italic");
-            break;
-          case 3:
-            charProps.insert("fo:font-weight", "bold");
-            charProps.insert("fo:font-style", "italic");
-            break;
-          case 4:
+          if (charProperty.m_underline)
             charProps.insert("style:text-underline-type", "single");
-            break;
-          case 5:
-            charProps.insert("fo:font-weight", "bold");
-            charProps.insert("style:text-underline-type", "single");
-            break;
-          case 6:
-            charProps.insert("fo:font-style", "italic");
-            charProps.insert("style:text-underline-type", "single");
-            break;
-          case 7:
-            charProps.insert("fo:font-weight", "bold");
-            charProps.insert("fo:font-style", "italic");
-            charProps.insert("style:text-underline-type", "single");
-            break;
-          default:
-            break;
-          }
 
           librevenge::RVNGString superscriptPosSizeString = "";
           librevenge::RVNGString subscriptPosSizeString = "";
@@ -420,84 +392,23 @@ void PMDCollector::paintShape(const OutputShape &shape,
           subscriptPosSizeString.append(varAsString.c_str());
           subscriptPosSizeString.append("%");
 
-          switch (charProperty.m_superSubscript)
+          if (charProperty.m_strike)
+            charProps.insert("style:text-line-through-style","solid");
+          if (charProperty.m_super)
+            charProps.insert("style:text-position", superscriptPosSizeString);
+          if (charProperty.m_sub)
+            charProps.insert("style:text-position", subscriptPosSizeString);
+
+          bool capsFlag = false;
+
+          if (charProperty.m_smallCaps)
           {
-          case 1:
-            charProps.insert("style:text-line-through-style","solid");
-            break;
-          case 2:
-            charProps.insert("style:text-position", superscriptPosSizeString);
-            break;
-          case 3:
-            charProps.insert("style:text-line-through-style","solid");
-            charProps.insert("style:text-position", superscriptPosSizeString);
-            break;
-          case 4:
-            charProps.insert("style:text-position", subscriptPosSizeString);
-            break;
-          case 5:
-            charProps.insert("style:text-line-through-style","solid");
-            charProps.insert("style:text-position", subscriptPosSizeString);
-            break;
-          case 8: // Small Caps
             capsFlag = true;
             charProps.insert("fo:font-variant","small-caps"); // Present in Open Document Schema Central but not working
-            break;
-          case 9:
+          }
+          if (charProperty.m_allCaps)
+          {
             capsFlag = true;
-            charProps.insert("fo:font-variant","small-caps");
-            charProps.insert("style:text-line-through-style","solid");
-            break;
-          case 0x0a:
-            capsFlag = true;
-            charProps.insert("fo:font-variant","small-caps");
-            charProps.insert("style:text-position", superscriptPosSizeString);
-            break;
-          case 0x0b:
-            capsFlag = true;
-            charProps.insert("fo:font-variant","small-caps");
-            charProps.insert("style:text-line-through-style","solid");
-            charProps.insert("style:text-position", superscriptPosSizeString);
-            break;
-          case 0x0c:
-            capsFlag = true;
-            charProps.insert("fo:font-variant","small-caps");
-            charProps.insert("style:text-position", subscriptPosSizeString);
-            break;
-          case 0x0d:
-            capsFlag = true;
-            charProps.insert("fo:font-variant","small-caps");
-            charProps.insert("style:text-line-through-style","solid");
-            charProps.insert("style:text-position", subscriptPosSizeString);
-            break;
-          case 0x10: // Large Caps
-            capsFlag = true;
-            break;
-          case 0x11:
-            capsFlag = true;
-            charProps.insert("style:text-line-through-style","solid");
-            break;
-          case 0x12:
-            capsFlag = true;
-            charProps.insert("style:text-position", superscriptPosSizeString);
-            break;
-          case 0x13:
-            capsFlag = true;
-            charProps.insert("style:text-line-through-style","solid");
-            charProps.insert("style:text-position", superscriptPosSizeString);
-            break;
-          case 0x14:
-            capsFlag = true;
-            charProps.insert("style:text-position", subscriptPosSizeString);
-            break;
-          case 0x15:
-            capsFlag = true;
-            charProps.insert("style:text-line-through-style","solid");
-            charProps.insert("style:text-position", subscriptPosSizeString);
-            break;
-          default:
-            capsFlag = false;
-            break;
           }
 
           if (charProperty.m_kerning != 0)
