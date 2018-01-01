@@ -33,7 +33,7 @@ void flushText(std::string &text, librevenge::RVNGDrawingInterface *const painte
   }
 }
 
-void writeTextSpan(const std::string &text, const std::size_t charStart, std::size_t charEnd, const bool capsFlag, librevenge::RVNGDrawingInterface *const painter)
+void writeTextSpan(const std::string &text, const std::size_t charStart, std::size_t charEnd, librevenge::RVNGDrawingInterface *const painter)
 {
   ++charEnd;
   if (charEnd > text.size())
@@ -73,10 +73,6 @@ void writeTextSpan(const std::string &text, const std::size_t charStart, std::si
       {
         PMD_DEBUG_MSG(("skipping control character %#x\n", c));
         break;
-      }
-      if (capsFlag && c >=97 && c <=122)
-      {
-        currentText.push_back(c - 32);
       }
       else
       {
@@ -399,16 +395,10 @@ void PMDCollector::paintShape(const OutputShape &shape,
           if (charProperty.m_sub)
             charProps.insert("style:text-position", subscriptPosSizeString);
 
-          bool capsFlag = false;
-
           if (charProperty.m_smallCaps)
-          {
-            capsFlag = true;
-            charProps.insert("fo:font-variant","small-caps"); // Present in Open Document Schema Central but not working
-          }
+            charProps.insert("fo:font-variant","small-caps");
           if (charProperty.m_allCaps)
           {
-            capsFlag = true;
           }
 
           if (charProperty.m_kerning != 0)
@@ -419,7 +409,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
 
 
           painter->openSpan(charProps);
-          writeTextSpan(tempText, charStart, charEnd, capsFlag, painter);
+          writeTextSpan(tempText, charStart, charEnd, painter);
           painter->closeSpan();
         }
 
