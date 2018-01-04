@@ -356,6 +356,8 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
       props.m_bold = flags & 0x1;
       props.m_italic = flags & 0x2;
       props.m_underline = flags & 0x4;
+      props.m_outline = flags & 0x8;
+      props.m_shadow = flags & 0x10;
       props.m_strike = flags & 0x100;
       props.m_super = flags & 0x200;
       props.m_sub = flags & 0x400;

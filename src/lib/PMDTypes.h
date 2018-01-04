@@ -80,6 +80,8 @@ struct PMDCharProperties
   bool m_bold;
   bool m_italic;
   bool m_underline;
+  bool m_outline;
+  bool m_shadow;
   bool m_strike;
   bool m_super;
   bool m_sub;

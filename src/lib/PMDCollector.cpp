@@ -357,6 +357,10 @@ void PMDCollector::paintShape(const OutputShape &shape,
             charProps.insert("fo:font-style", "italic");
           if (charProperty.m_underline)
             charProps.insert("style:text-underline-type", "single");
+          if (charProperty.m_outline)
+            charProps.insert("style:text-outline", true);
+          if (charProperty.m_shadow)
+            charProps.insert("fo:text-shadow", "1pt 1pt");
 
           if (charProperty.m_strike)
             charProps.insert("style:text-line-through-style","solid");
