@@ -76,7 +76,7 @@ struct PMDCharProperties
   uint16_t m_length;
   uint16_t m_fontFace;
   uint16_t m_fontSize;
-  uint8_t m_fontColor;
+  uint16_t m_fontColor;
   bool m_bold;
   bool m_italic;
   bool m_underline;
