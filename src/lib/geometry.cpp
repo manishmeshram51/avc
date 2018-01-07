@@ -9,8 +9,9 @@
 
 #include <utility>
 
-#include "geometry.h"
 #include "PMDExceptions.h"
+#include "geometry.h"
+
 std::pair<libpagemaker::InchPoint, libpagemaker::InchPoint>
 libpagemaker::getBoundingBox(const PMDLineSet &lineSet, const TransformationMatrix &matrix)
 {

@@ -7,10 +7,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include "libpagemaker_utils.h"
+
 #include <cassert>
 #include <cstdarg>
-
-#include "libpagemaker_utils.h"
 
 namespace libpagemaker
 {

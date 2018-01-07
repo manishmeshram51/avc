@@ -11,8 +11,11 @@
 #define __PMDEXCEPTIONS_H__
 
 #include <stdint.h>
-#include <librevenge/librevenge.h>
+
 #include <boost/format.hpp>
+
+#include <librevenge/librevenge.h>
+
 namespace libpagemaker
 {
 

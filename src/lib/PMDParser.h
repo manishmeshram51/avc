@@ -10,11 +10,11 @@
 #ifndef __PMDPARSER_H__
 #define __PMDPARSER_H__
 
-#include <librevenge/librevenge.h>
-
-#include <stdint.h>
 #include <map>
 #include <set>
+#include <stdint.h>
+
+#include <librevenge/librevenge.h>
 
 #include "PMDRecord.h"
 #include "geometry.h"

@@ -8,9 +8,12 @@
  */
 
 #include "OutputShape.h"
-#include "geometry.h"
+
 #include <math.h>
+
+#include "geometry.h"
 #include "libpagemaker_utils.h"
+
 std::shared_ptr<libpagemaker::OutputShape> libpagemaker::newOutputShape(
   const std::shared_ptr<const PMDLineSet> &ptrToLineSet, const InchPoint &translate)
 {

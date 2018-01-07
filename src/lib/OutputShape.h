@@ -10,11 +10,13 @@
 #ifndef __LIBPAGEMAKER_OUTPUTSHAPE_H__
 #define __LIBPAGEMAKER_OUTPUTSHAPE_H__
 
-#include "geometry.h"
-#include "PMDExceptions.h"
 #include <memory>
 #include <vector>
+
+#include "PMDExceptions.h"
+#include "geometry.h"
 #include "libpagemaker_utils.h"
+
 namespace libpagemaker
 {
 

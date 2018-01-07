@@ -11,10 +11,12 @@
 #define __LIBPAGEMAKER_GEOMETRY_H__
 
 #include <vector>
+
+#include <librevenge/librevenge.h>
+
+#include "PMDTypes.h"
 #include "Units.h"
 #include "constants.h"
-#include <librevenge/librevenge.h>
-#include <PMDTypes.h>
 #include "libpagemaker_utils.h"
 
 namespace libpagemaker

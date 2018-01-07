@@ -10,21 +10,19 @@
 #ifndef __PMDCOLLECTOR_H__
 #define __PMDCOLLECTOR_H__
 
-#include <stdint.h>
-
 #include <memory>
-#include <vector>
+#include <stdint.h>
 #include <string>
+#include <vector>
 
 #include <boost/optional.hpp>
 
-
-#include "geometry.h"
-#include "PMDPage.h"
-#include "PMDExceptions.h"
-#include "Units.h"
 #include "OutputShape.h"
+#include "PMDExceptions.h"
+#include "PMDPage.h"
 #include "PMDTypes.h"
+#include "Units.h"
+#include "geometry.h"
 
 namespace libpagemaker
 {

@@ -11,9 +11,11 @@
 #define __PMDRECORD_H__
 
 #include <stdint.h>
-#include <librevenge/librevenge.h>
-#include <boost/optional.hpp>
 #include <vector>
+
+#include <boost/optional.hpp>
+
+#include <librevenge/librevenge.h>
 
 #include "constants.h"
 

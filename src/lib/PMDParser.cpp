@@ -7,25 +7,29 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <stdint.h>
-#include <string>
+#include "PMDParser.h"
+
 #include <cassert>
 #include <iterator>
-#include <memory>
-#include <vector>
 #include <limits>
-#include <librevenge/librevenge.h>
+#include <memory>
+#include <stdint.h>
+#include <string>
+#include <vector>
+
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/optional.hpp>
-#include "PMDRecord.h"
-#include "PMDParser.h"
+
+#include <librevenge/librevenge.h>
+
 #include "PMDCollector.h"
 #include "PMDExceptions.h"
-#include "constants.h"
-#include "offsets.h"
-#include "libpagemaker_utils.h"
-#include "geometry.h"
+#include "PMDRecord.h"
 #include "PMDTypes.h"
+#include "constants.h"
+#include "geometry.h"
+#include "libpagemaker_utils.h"
+#include "offsets.h"
 
 namespace libpagemaker
 {

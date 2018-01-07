@@ -8,10 +8,12 @@
  */
 
 #include "PMDCollector.h"
-#include "OutputShape.h"
-#include <string>
+
 #include <iostream>
 #include <math.h>
+#include <string>
+
+#include "OutputShape.h"
 #include "constants.h"
 #include "libpagemaker_utils.h"
 

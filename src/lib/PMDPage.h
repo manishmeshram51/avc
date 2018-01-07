@@ -10,11 +10,12 @@
 #ifndef __PMDPAGE_H__
 #define __PMDPAGE_H__
 
-#include "geometry.h"
-
 #include <memory>
 #include <vector>
+
 #include <librevenge/librevenge.h>
+
+#include "geometry.h"
 
 namespace libpagemaker
 {
