@@ -98,12 +98,12 @@ void PMDCollector::setDoubleSided(bool doubleSided)
 }
 
 /* State-mutating functions */
-void PMDCollector::setPageWidth(PMDPageUnit pageWidth)
+void PMDCollector::setPageWidth(PMDShapeUnit pageWidth)
 {
   m_pageWidth = pageWidth;
 }
 
-void PMDCollector::setPageHeight(PMDPageUnit pageHeight)
+void PMDCollector::setPageHeight(PMDShapeUnit pageHeight)
 {
   m_pageHeight = pageHeight;
 }

@@ -12,9 +12,10 @@
 
 #include <string>
 
+// TODO: remove this pointless abstraction.
+
 namespace libpagemaker
 {
-const unsigned PAGE_UNITS_PER_INCH = 720;
 const unsigned SHAPE_UNITS_PER_INCH = 1440;
 
 template <unsigned PER_INCH> class LengthUnit
@@ -55,7 +56,6 @@ operator-(LengthUnit<PER_INCH> left, LengthUnit<PER_INCH> right)
   return LengthUnit<PER_INCH>(left.m_value - right.m_value);
 }
 
-typedef LengthUnit<PAGE_UNITS_PER_INCH> PMDPageUnit;
 typedef LengthUnit<SHAPE_UNITS_PER_INCH> PMDShapeUnit;
 
 }

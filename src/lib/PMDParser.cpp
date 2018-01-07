@@ -30,6 +30,19 @@
 namespace libpagemaker
 {
 
+namespace
+{
+
+void readDims(librevenge::RVNGInputStream *input, bool bigEndian, int16_t &x, int16_t &y)
+{
+  int16_t dim1 = readS16(input, bigEndian);
+  int16_t dim2 = readS16(input, bigEndian);
+  x = bigEndian ? dim2 : dim1;
+  y = bigEndian ? dim1 : dim2;
+}
+
+}
+
 struct PMDParser::ToCState
 {
   ToCState();
@@ -213,17 +226,21 @@ void PMDParser::parseGlobalInfo(const PMDRecordContainer &container)
 {
   seekToRecord(m_input, container, 0);
 
-  skip(m_input, 0x3a);
-  uint16_t leftPageRightBound = readU16(m_input, m_bigEndian);
-  uint16_t pageHeight = readU16(m_input, m_bigEndian);
+  const unsigned opts = readU8(m_input, m_bigEndian);
 
-  bool doubleSided = (leftPageRightBound == 0);
-  m_collector->setDoubleSided(doubleSided);
+  skip(m_input, 0x35);
 
-  if (!doubleSided)
-    m_collector->setPageWidth(leftPageRightBound);
+  int16_t left = 0;
+  int16_t right = 0;
+  int16_t top = 0;
+  int16_t bottom = 0;
+  // FIXME: pass both pages' boundaries to collector instead of computed width/height
+  readDims(m_input, m_bigEndian, left, top);
+  readDims(m_input, m_bigEndian, right, bottom);
 
-  m_collector->setPageHeight(pageHeight);
+  m_collector->setDoubleSided(m_bigEndian ? opts & 0x40 : opts & 0x2);
+  m_collector->setPageWidth(right - left);
+  m_collector->setPageHeight(bottom - top);
 }
 
 void PMDParser::parseLine(const PMDRecordContainer &container, unsigned recordIndex,
@@ -756,9 +773,10 @@ void PMDParser::parsePages(const PMDRecordContainer &container)
 
   skip(m_input, 8);
   uint16_t pageWidth = readU16(m_input, m_bigEndian);
+  (void) pageWidth;
 
-  if (pageWidth)
-    m_collector->setPageWidth(pageWidth);
+  // if (pageWidth)
+  // m_collector->setPageWidth(pageWidth);
 
   for (unsigned i = 0; i < container.m_numRecords; ++i)
   {

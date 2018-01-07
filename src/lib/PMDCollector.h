@@ -46,8 +46,8 @@ class PMDCollector
    * Height and width in PMD page units.
    * One PMD page unit is 1/20 of a point (1/720 inch)
    */
-  boost::optional<PMDPageUnit> m_pageWidth;
-  boost::optional<PMDPageUnit> m_pageHeight;
+  boost::optional<PMDShapeUnit> m_pageWidth;
+  boost::optional<PMDShapeUnit> m_pageHeight;
 
   std::vector<PMDPage> m_pages;
   std::vector<PMDColor> m_color;
@@ -68,8 +68,8 @@ public:
   PMDCollector();
 
   /* State-mutating functions */
-  void setPageWidth(PMDPageUnit);
-  void setPageHeight(PMDPageUnit);
+  void setPageWidth(PMDShapeUnit);
+  void setPageHeight(PMDShapeUnit);
   void setDoubleSided(bool);
   void addShapeToPage(unsigned pageID, const std::shared_ptr<PMDLineSet> &shape);
   void addColor(const PMDColor &color);
