@@ -1,3 +1,16 @@
+libpagemaker 0.0.4
+
+- Add a command line tool for conversion to plain text, called pmd2text.
+- Require C++11 for build.
+- Drop outdated MSVC project files.
+- Fix parsing of page dimensions and shape coordinates in Mac documents.
+  That makes the output at least somewhat useful, but more work is needed
+  to handle big endian files properly.
+- Fix parsing of color tint in Mac documents. (tdf#109126)
+- Fix parsing of text formatting attributes in Mac documents.
+- Properly handle all caps and small caps.
+- Parse more text formatting attributes.
+
 libpagemaker 0.0.3
 
 - Make --help output of conversion tools help2man-friendly.
