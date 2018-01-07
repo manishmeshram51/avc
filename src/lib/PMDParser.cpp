@@ -219,7 +219,7 @@ PMDShapePoint readPoint(librevenge::RVNGInputStream *const input, const bool big
 {
   const PMDShapeUnit x(readS16(input, bigEndian));
   const PMDShapeUnit y(readS16(input, bigEndian));
-  return PMDShapePoint(x, y);
+  return bigEndian ? PMDShapePoint(y, x) : PMDShapePoint(x, y);
 }
 
 void PMDParser::parseGlobalInfo(const PMDRecordContainer &container)
