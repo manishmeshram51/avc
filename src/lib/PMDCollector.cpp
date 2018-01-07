@@ -375,7 +375,7 @@ void PMDCollector::paintShape(const OutputShape &shape,
           if (charProperty.m_smallCaps)
             charProps.insert("fo:font-variant","small-caps");
           if (charProperty.m_allCaps)
-            charProps.insert("fo:text-transform", "capitalize");
+            charProps.insert("fo:text-transform", "uppercase");
 
           if (charProperty.m_kerning != 0)
           {
