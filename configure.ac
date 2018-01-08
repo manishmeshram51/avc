@@ -8,7 +8,7 @@ AC_PREREQ([2.65])
 # ====================
 m4_define([libpagemaker_version_major],[0])
 m4_define([libpagemaker_version_minor],[0])
-m4_define([libpagemaker_version_micro],[4])
+m4_define([libpagemaker_version_micro],[5])
 m4_define([libpagemaker_version],[libpagemaker_version_major.libpagemaker_version_minor.libpagemaker_version_micro])
 
 # =============
