@@ -48,7 +48,7 @@ void readDims(librevenge::RVNGInputStream *input, bool bigEndian, int16_t &x, in
 boost::optional<PMDStrokeProperties> readRule(librevenge::RVNGInputStream *input, bool bigEndian)
 {
   const uint16_t flags = readU16(input, bigEndian);
-  if (!flags & 0x1)
+  if (!(flags & 0x1))
   {
     skip(input, 18);
     return boost::none;
