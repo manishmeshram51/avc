@@ -10,6 +10,8 @@
 #ifndef __PMDTYPES_H__
 #define __PMDTYPES_H__
 
+#include <boost/optional.hpp>
+
 #include "Units.h"
 
 namespace libpagemaker
@@ -74,6 +76,8 @@ struct PMDParaProperties
   bool m_keepTogether;
   bool m_hyphenate;
   uint16_t m_hyphensCount;
+  boost::optional<PMDStrokeProperties> m_ruleAbove;
+  boost::optional<PMDStrokeProperties> m_ruleBelow;
 
   PMDParaProperties();
 };

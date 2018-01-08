@@ -87,6 +87,49 @@ void writeTextSpan(const std::string &text, const std::size_t charStart, std::si
   flushText(currentText, painter);
 }
 
+void writeBorder(librevenge::RVNGPropertyList &props, const char *const name, const PMDStrokeProperties &stroke, const std::vector<PMDColor> &colors)
+{
+  librevenge::RVNGString border;
+
+  border.sprintf("%fpt", stroke.m_strokeWidth / 5.0);
+  border.append(" ");
+  switch (stroke.m_strokeType)
+  {
+  default:
+  // PMD_DEBUG_MSG(("unexpected stroke type %u\n", unsigned(stroke.m_strokeType)));
+  case STROKE_NORMAL:
+    border.append("solid");
+    break;
+  case STROKE_LIGHT_LIGHT:
+  case STROKE_DARK_LIGHT:
+  case STROKE_LIGHT_DARK:
+  case STROKE_LIGHT_DARK_LIGHT:
+    border.append("double");
+    break;
+  case STROKE_DASHED:
+    border.append("dashed");
+    break;
+  case STROKE_SQUARE_DOTS:
+  case STROKE_CIRCULAR_DOTS:
+    border.append("dotted");
+    break;
+  }
+  border.append(" ");
+  if (stroke.m_strokeColor < colors.size())
+  {
+    const auto &color = colors[stroke.m_strokeColor];
+    librevenge::RVNGString colorStr;
+    colorStr.sprintf("#%.2x%.2x%.2x", color.m_red, color.m_green, color.m_blue);
+    border.append(colorStr);
+  }
+  else
+  {
+    border.append("#000000");
+  }
+
+  props.insert(name, border);
+}
+
 }
 
 PMDCollector::PMDCollector() :
@@ -307,6 +350,11 @@ void PMDCollector::paintShape(const OutputShape &shape,
         else
           paraProps.insert("fo:hyphenation-ladder-count", "no-limit");
       }
+
+      if (paraProperty.m_ruleAbove)
+        writeBorder(paraProps, "fo:border-top", get(paraProperty.m_ruleAbove), m_color);
+      if (paraProperty.m_ruleBelow)
+        writeBorder(paraProps, "fo:border-bottom", get(paraProperty.m_ruleBelow), m_color);
 
       painter->openParagraph(paraProps);
       PMD_DEBUG_MSG(("\n\nPara Start is %d \n",paraStart));

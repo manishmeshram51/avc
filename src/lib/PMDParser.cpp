@@ -45,6 +45,28 @@ void readDims(librevenge::RVNGInputStream *input, bool bigEndian, int16_t &x, in
   y = bigEndian ? dim1 : dim2;
 }
 
+boost::optional<PMDStrokeProperties> readRule(librevenge::RVNGInputStream *input, bool bigEndian)
+{
+  const uint16_t flags = readU16(input, bigEndian);
+  if (!flags & 0x1)
+  {
+    skip(input, 18);
+    return boost::none;
+  }
+
+  PMDStrokeProperties stroke;
+
+  stroke.m_strokeType = readU8(input, bigEndian);
+  skip(input, 1);
+  // FIXME: needs fixing of reading of stroke width elsewhere
+  stroke.m_strokeWidth = uint16_t(readU32(input, bigEndian) >> 8);
+  stroke.m_strokeColor = readU16(input, bigEndian);
+  stroke.m_strokeTint = readU16(input, bigEndian);
+  skip(input, 6);
+
+  return stroke;
+}
+
 }
 
 struct PMDParser::ToCState
@@ -424,6 +446,9 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
       props.m_keepWithNext = (keepOpts >> 1) & 0x3;
       props.m_widows = (keepOpts >> 4) & 0x3;
       props.m_orphans = (keepOpts >> 7) & 0x3;
+      skip(m_input, 2);
+      props.m_ruleAbove = readRule(m_input, m_bigEndian);
+      props.m_ruleBelow = readRule(m_input, m_bigEndian);
     }
   }
 

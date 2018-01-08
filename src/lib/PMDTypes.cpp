@@ -45,6 +45,8 @@ PMDParaProperties::PMDParaProperties()
   , m_keepTogether(false)
   , m_hyphenate(false)
   , m_hyphensCount(0)
+  , m_ruleAbove()
+  , m_ruleBelow()
 {
 }
 
