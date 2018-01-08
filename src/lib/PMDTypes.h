@@ -68,6 +68,12 @@ struct PMDParaProperties
   uint16_t m_rightIndent;
   uint16_t m_beforeIndent;
   uint16_t m_afterIndent;
+  uint16_t m_orphans;
+  uint16_t m_widows;
+  uint16_t m_keepWithNext;
+  bool m_keepTogether;
+  bool m_hyphenate;
+  uint16_t m_hyphensCount;
 
   PMDParaProperties();
 };

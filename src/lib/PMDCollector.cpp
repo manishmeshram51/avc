@@ -294,6 +294,20 @@ void PMDCollector::paintShape(const OutputShape &shape,
         paraProps.insert("fo:margin-right", (double)paraProperty.m_rightIndent/SHAPE_UNITS_PER_INCH,librevenge::RVNG_INCH);
       }
 
+      paraProps.insert("fo:orphans", int16_t(paraProperty.m_orphans));
+      paraProps.insert("fo:widows", int16_t(paraProperty.m_widows));
+      paraProps.insert("fo:keep-together", paraProperty.m_keepTogether ? "always" : "auto");
+      paraProps.insert("fo:keep-with-next", paraProperty.m_keepWithNext > 0 ? "always" : "auto");
+
+      paraProps.insert("fo:hyphenate", paraProperty.m_hyphenate);
+      if (paraProperty.m_hyphenate)
+      {
+        if (paraProperty.m_hyphensCount > 0)
+          paraProps.insert("fo:hyphenation-ladder-count", int16_t(paraProperty.m_hyphensCount));
+        else
+          paraProps.insert("fo:hyphenation-ladder-count", "no-limit");
+      }
+
       painter->openParagraph(paraProps);
       PMD_DEBUG_MSG(("\n\nPara Start is %d \n",paraStart));
       PMD_DEBUG_MSG(("Para End is %d \n\n",paraEnd));

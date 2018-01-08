@@ -39,6 +39,12 @@ PMDParaProperties::PMDParaProperties()
   , m_rightIndent(0)
   , m_beforeIndent(0)
   , m_afterIndent(0)
+  , m_orphans(0)
+  , m_widows(0)
+  , m_keepWithNext(0)
+  , m_keepTogether(false)
+  , m_hyphenate(false)
+  , m_hyphensCount(0)
 {
 }
 

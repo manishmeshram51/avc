@@ -407,7 +407,8 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
       auto &props = paraProps.back();
 
       props.m_length = readU16(m_input, m_bigEndian);
-      skip(m_input, 1);
+      const unsigned flags = readU8(m_input, m_bigEndian);
+      props.m_hyphenate = flags & 0x8;
       props.m_align = readU8(m_input);
       skip(m_input, 6);
       props.m_leftIndent = readU16(m_input, m_bigEndian);
@@ -415,6 +416,14 @@ void PMDParser::parseTextBox(const PMDRecordContainer &container, unsigned recor
       props.m_rightIndent = readU16(m_input, m_bigEndian);
       props.m_beforeIndent = readU16(m_input, m_bigEndian); // Above Para Spacing
       props.m_afterIndent = readU16(m_input, m_bigEndian); // Below Para Spacing
+      skip(m_input, 18);
+      props.m_hyphensCount = readU8(m_input, m_bigEndian);
+      skip(m_input, 1);
+      const unsigned keepOpts = readU16(m_input, m_bigEndian);
+      props.m_keepTogether = keepOpts & 0x1;
+      props.m_keepWithNext = (keepOpts >> 1) & 0x3;
+      props.m_widows = (keepOpts >> 4) & 0x3;
+      props.m_orphans = (keepOpts >> 7) & 0x3;
     }
   }
 
