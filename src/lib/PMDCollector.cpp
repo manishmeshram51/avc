@@ -96,7 +96,8 @@ void writeBorder(librevenge::RVNGPropertyList &props, const char *const name, co
   switch (stroke.m_strokeType)
   {
   default:
-  // PMD_DEBUG_MSG(("unexpected stroke type %u\n", unsigned(stroke.m_strokeType)));
+    PMD_DEBUG_MSG(("unexpected stroke type %u\n", unsigned(stroke.m_strokeType)));
+    PMD_FALLTHROUGH;
   case STROKE_NORMAL:
     border.append("solid");
     break;

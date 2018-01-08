@@ -34,6 +34,14 @@
 #  define PMD_ATTRIBUTE_PRINTF(fmt, arg)
 #endif
 
+#if defined(HAVE_CLANG_ATTRIBUTE_FALLTHROUGH)
+#  define PMD_FALLTHROUGH [[clang::fallthrough]]
+#elif defined(HAVE_GCC_ATTRIBUTE_FALLTHROUGH)
+#  define PMD_FALLTHROUGH __attribute__((fallthrough))
+#else
+#  define PMD_FALLTHROUGH ((void) 0)
+#endif
+
 // do nothing with debug messages in a release compile
 #ifdef DEBUG
 namespace libpagemaker
