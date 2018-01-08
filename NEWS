@@ -10,6 +10,7 @@ libpagemaker 0.0.4
 - Fix parsing of text formatting attributes in Mac documents.
 - Properly handle all caps and small caps.
 - Parse more text formatting attributes.
+- Parse more paragraph attributes.
 
 libpagemaker 0.0.3
 
