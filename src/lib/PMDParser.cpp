@@ -852,7 +852,7 @@ void PMDParser::parseHeader(uint32_t *tocOffset, uint16_t *tocLength)
     *tocLength = readU16(m_input, m_bigEndian);
     PMD_DEBUG_MSG(("[Header] TOC length is %d\n", *tocLength));
   }
-  catch (PMDStreamException)
+  catch (const PMDStreamException &)
   {
     throw PMDParseException("Can't find the table of contents length in the header.");
   }
@@ -862,7 +862,7 @@ void PMDParser::parseHeader(uint32_t *tocOffset, uint16_t *tocLength)
     *tocOffset = readU32(m_input, m_bigEndian);
     PMD_DEBUG_MSG(("[Header] TOC offset is 0x%x\n", *tocOffset));
   }
-  catch (PMDStreamException)
+  catch (const PMDStreamException &)
   {
     throw PMDParseException("Can't find the table of contents offset in the header.");
   }
