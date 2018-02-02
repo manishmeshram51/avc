@@ -11,8 +11,7 @@
 #define __PMDPARSER_H__
 
 #include <map>
-#include <set>
-#include <stdint.h>
+#include <vector>
 
 #include <librevenge/librevenge.h>
 

@@ -10,6 +10,8 @@
 #ifndef __LIBPAGEMAKER_GEOMETRY_H__
 #define __LIBPAGEMAKER_GEOMETRY_H__
 
+#include <string>
+#include <utility>
 #include <vector>
 
 #include <librevenge/librevenge.h>

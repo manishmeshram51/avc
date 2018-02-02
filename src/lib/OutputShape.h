@@ -11,9 +11,12 @@
 #define __LIBPAGEMAKER_OUTPUTSHAPE_H__
 
 #include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "PMDExceptions.h"
+#include "PMDTypes.h"
 #include "geometry.h"
 #include "libpagemaker_utils.h"
 

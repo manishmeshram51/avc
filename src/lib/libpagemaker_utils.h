@@ -16,8 +16,6 @@
 
 #include <cmath>
 #include <cstdio>
-#include <memory>
-#include <string>
 
 #include <boost/cstdint.hpp>
 

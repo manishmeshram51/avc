@@ -11,14 +11,10 @@
 #define __PMDCOLLECTOR_H__
 
 #include <memory>
-#include <stdint.h>
-#include <string>
 #include <vector>
 
 #include <boost/optional.hpp>
 
-#include "OutputShape.h"
-#include "PMDExceptions.h"
 #include "PMDPage.h"
 #include "PMDTypes.h"
 #include "Units.h"
@@ -27,6 +23,8 @@
 namespace libpagemaker
 {
 
+class OutputShape;
+class PMDLineSet;
 
 /**
  * Builder class for PMD Documents.

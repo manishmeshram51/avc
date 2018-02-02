@@ -10,9 +10,11 @@
 #ifndef __PMDTYPES_H__
 #define __PMDTYPES_H__
 
+#include <string>
+
 #include <boost/optional.hpp>
 
-#include "Units.h"
+#include "libpagemaker_utils.h"
 
 namespace libpagemaker
 {

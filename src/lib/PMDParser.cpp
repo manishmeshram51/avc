@@ -9,10 +9,12 @@
 
 #include "PMDParser.h"
 
+#include <algorithm>
 #include <cassert>
 #include <iterator>
 #include <limits>
 #include <memory>
+#include <set>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -26,6 +28,7 @@
 #include "PMDExceptions.h"
 #include "PMDRecord.h"
 #include "PMDTypes.h"
+#include "Units.h"
 #include "constants.h"
 #include "geometry.h"
 #include "libpagemaker_utils.h"
