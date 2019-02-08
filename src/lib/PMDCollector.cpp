@@ -652,7 +652,7 @@ void PMDCollector::fillOutputShapesByPage_TwoSided(PageShapesList_t &pageShapes)
   InchPoint translateForLeftPage(centerToEdge_x * 2, centerToEdge_y);
   InchPoint translateForRightPage(0, centerToEdge_y);
 
-  for (unsigned i = 0; i < m_pages.size(); ++i)
+  for (size_t i = 0; i < m_pages.size(); ++i)
   {
     const bool leftPageExists = (i > 0);
 
@@ -689,7 +689,7 @@ void PMDCollector::fillOutputShapesByPage_OneSided(PageShapesList_t &pageShapes)
   double centerToEdge_y = m_pageHeight.get().toInches() / 2;
   InchPoint translateShapes(centerToEdge_x, centerToEdge_y);
 
-  for (unsigned i = 0; i < m_pages.size(); ++i)
+  for (size_t i = 0; i < m_pages.size(); ++i)
   {
     const PMDPage &page = m_pages[i];
     for (unsigned j = 0; j < page.numShapes(); ++j)
@@ -714,7 +714,7 @@ void PMDCollector::draw(librevenge::RVNGDrawingInterface *painter) const
 
   PageShapesList_t shapesByPage;
   fillOutputShapesByPage(shapesByPage);
-  for (unsigned i = 0; i < m_pages.size(); ++i)
+  for (size_t i = 0; i < m_pages.size(); ++i)
   {
     PageShapes_t shapes = shapesByPage[i];
     writePage(m_pages[i], painter, shapes);
